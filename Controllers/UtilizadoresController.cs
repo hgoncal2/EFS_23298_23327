@@ -54,7 +54,7 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UtilizadorID,PrimeiroNome,UltimoNome,Password,Email,NumeroTelemovel,DataCriacao")] Utilizadores utilizadores)
+        public async Task<IActionResult> Create([Bind("UtilizadorID,PrimeiroNome,UltimoNome,Password,Email,NumeroTelemovel")] Utilizadores utilizadores)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UtilizadorID,PrimeiroNome,UltimoNome,Password,Email,NumeroTelemovel,DataCriacao")] Utilizadores utilizadores)
+        public async Task<IActionResult> Edit(int id, [Bind("UtilizadorID,PrimeiroNome,UltimoNome,Password,Email,NumeroTelemovel")] Utilizadores utilizadores)
         {
             if (id != utilizadores.UtilizadorID)
             {
