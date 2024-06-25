@@ -1,0 +1,66 @@
+﻿@model EFS_23298_23306.Models.Temas
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Temas</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Nome" class="control-label"></label>
+                <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Descricao" class="control-label"></label>
+                <input asp-for="Descricao" class="form-control" />
+                <span asp-validation-for="Descricao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TempoEstimado" class="control-label"></label>
+                <input asp-for="TempoEstimado" class="form-control" />
+                <span asp-validation-for="TempoEstimado" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MinPessoas" class="control-label"></label>
+                <input asp-for="MinPessoas" class="form-control" />
+                <span asp-validation-for="MinPessoas" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaxPessoas" class="control-label"></label>
+                <input asp-for="MaxPessoas" class="form-control" />
+                <span asp-validation-for="MaxPessoas" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Dificuldade" class="control-label"></label>
+                <select asp-for="Dificuldade" class="form-control"></select>
+                <span asp-validation-for="Dificuldade" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FotoID" class="control-label"></label>
+                <select asp-for="FotoID" class ="form-control" asp-items="ViewBag.FotoID"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="SalaID" class="control-label"></label>
+                <select asp-for="SalaID" class ="form-control" asp-items="ViewBag.SalaID"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
