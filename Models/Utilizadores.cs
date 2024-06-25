@@ -23,7 +23,7 @@ namespace EFS_23298_23306.Models;
 
     public Utilizadores()
         {
-            this.DataCriacao = DateTime.UtcNow;
+            this.DataCriacao = DateTime.Now;
             
 
     }
