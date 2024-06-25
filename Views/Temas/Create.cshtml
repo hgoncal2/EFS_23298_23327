@@ -1,66 +1,87 @@
-﻿@model EFS_23298_23306.Models.Temas
+﻿@using EFS_23298_23306.Data.Enum
+@model EFS_23298_23306.Models.Temas
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Temas";
 }
 
-<h1>Create</h1>
-
-<h4>Temas</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
-                <span asp-validation-for="Descricao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TempoEstimado" class="control-label"></label>
-                <input asp-for="TempoEstimado" class="form-control" />
-                <span asp-validation-for="TempoEstimado" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MinPessoas" class="control-label"></label>
-                <input asp-for="MinPessoas" class="form-control" />
-                <span asp-validation-for="MinPessoas" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MaxPessoas" class="control-label"></label>
-                <input asp-for="MaxPessoas" class="form-control" />
-                <span asp-validation-for="MaxPessoas" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Dificuldade" class="control-label"></label>
-                <select asp-for="Dificuldade" class="form-control"></select>
-                <span asp-validation-for="Dificuldade" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FotoID" class="control-label"></label>
-                <select asp-for="FotoID" class ="form-control" asp-items="ViewBag.FotoID"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="SalaID" class="control-label"></label>
-                <select asp-for="SalaID" class ="form-control" asp-items="ViewBag.SalaID"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a class="fa fa-angles-left display-5 link-underline-opacity-0 link-secondary" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
 </div>
+
+
+<h1>Criar tema</h1>
+
+@if (@ViewBag.TemaExistente != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Erro! Tema <strong>@ViewBag.TemaExistente</strong> já existe!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<hr />
+<form asp-action="Create">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
+    <div class="container-fluid justify-content-center">
+        <div class="row">
+            <div class="col">
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Nome, new { @class = "required" })
+                    <input asp-for="Nome"  class="form-control" />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Descricao" class="control-label"></label>
+                    <input asp-for="Descricao" class="form-control" />
+                    <span asp-validation-for="Descricao" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TempoEstimado, new { @class = "required" })
+                    <input asp-for="TempoEstimado" class="form-control" />
+                    <span asp-validation-for="TempoEstimado" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label asp-for="MinPessoas" class="control-label"></label>
+                    <input min="1" max="10" asp-for="MinPessoas" class="form-control" />
+                    <span asp-validation-for="MinPessoas" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="MaxPessoas" class="control-label"></label>
+                    <input min="1" max="20" asp-for="MaxPessoas" class="form-control" />
+                    <span asp-validation-for="MaxPessoas" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Dificuldade, new { @class = "required" })
+                    <select class="form-select" asp-for="Dificuldade" aria-label="Escolher dificuldade">
+                    @foreach (var dif in Html.GetEnumSelectList<Dificuldade>())
+                    {
+                            <option value="@dif.Value">@dif.Text</option>
+                    }
+                    </select>
+                    <span asp-validation-for="Dificuldade" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br/>
+   
+    <div class="form-group text-center d-grid gap-2 col-6 mx-auto">
+        <input type="submit" value="Create" class="btn btn-outline-primary btn-lg" />
+    </div>
+    
+
+</form>
+
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

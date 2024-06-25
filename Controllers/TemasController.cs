@@ -59,12 +59,46 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,FotoID,SalaID")] Temas temas)
+        public async Task<IActionResult> Create([Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas)
         {
+
             if (ModelState.IsValid)
             {
+
+                var msgErro = "";
+                var erro = false;
+
+                var tema = _context.Temas.FirstOrDefault(acc => acc.Nome == temas.Nome);
+                if (tema != null)
+                {
+                    ViewBag.TemaExistente = tema.Nome;
+
+                    return View(temas);
+                }
+
+                if (temas.MaxPessoas <= temas.MinPessoas)
+                {
+                    msgErro = "Erro!Máximo de pessoas tem que ser maior que o mínimo de pessoas";
+                    ModelState.AddModelError("MaxPessoas",msgErro);
+                    erro = true;
+
+                }
+                if (temas.MinPessoas >= temas.MaxPessoas)
+                {
+                    msgErro = "Erro!Mínimo de pessoas tem que ser menor que o máximo de pessoas";
+
+                    ModelState.AddModelError("MinPessoas", msgErro);
+                    erro = true;
+
+                }
+                if (erro)
+                {
+                    return View(temas);
+                }
+                
                 _context.Add(temas);
                 await _context.SaveChangesAsync();
+                TempData["NomeTemaCriado"] = temas.Nome;
                 return RedirectToAction(nameof(Index));
             }
             ViewData["FotoID"] = new SelectList(_context.Fotos, "FotoID", "FotoID", temas.FotoID);
@@ -95,7 +129,7 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,FotoID,SalaID")] Temas temas)
+        public async Task<IActionResult> Edit(int id, [Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas)
         {
             if (id != temas.TemaID)
             {
@@ -104,6 +138,27 @@ namespace EFS_23298_23306.Controllers
 
             if (ModelState.IsValid)
             {
+                var msgErro = "";
+                var erro = false;
+                if (temas.MaxPessoas <= temas.MinPessoas)
+                {
+                    msgErro = "Erro!Máximo de pessoas tem que ser maior que o mínimo de pessoas";
+                    ModelState.AddModelError("MaxPessoas", msgErro);
+                    erro = true;
+
+                }
+                if (temas.MinPessoas >= temas.MaxPessoas)
+                {
+                    msgErro = "Erro!Mínimo de pessoas tem que ser menor que o máximo de pessoas";
+
+                    ModelState.AddModelError("MinPessoas", msgErro);
+                    erro = true;
+
+                }
+                if (erro)
+                {
+                    return View(temas);
+                }
                 try
                 {
                     _context.Update(temas);
@@ -120,7 +175,8 @@ namespace EFS_23298_23306.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                ViewBag.ShowAlert = true;
+                return View(temas);
             }
             ViewData["FotoID"] = new SelectList(_context.Fotos, "FotoID", "FotoID", temas.FotoID);
             ViewData["SalaID"] = new SelectList(_context.Salas, "SalaID", "SalaID", temas.SalaID);
