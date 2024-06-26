@@ -9,6 +9,7 @@ namespace EFS_23298_23306.Models
     {
 
         [Key]
+        [Display(Name = "ID")]
         public int TemaID { get; set; }
         [Display(Name = "Nome")]
         public required String Nome { get; set; }
@@ -34,9 +35,17 @@ namespace EFS_23298_23306.Models
         [Display(Name = "Sala")]
         public int? SalaID { get; set; }
         public Salas? Sala { get; set; }
+        [Display(Name = "Data de Criação")]
+     
+        public DateTime DataCriacao { get; set; }
 
 
+        public Temas()
+        {
+            this.DataCriacao = DateTime.Now;
 
+
+        }
 
 
     }

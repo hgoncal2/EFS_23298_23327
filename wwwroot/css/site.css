@@ -11,14 +11,47 @@ html {
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
-
-html {
-  position: relative;
-  min-height: 100%;
+.modal-header-danger {
+    color: #fff;
+    padding: 9px 15px;
+    border-bottom: 1px solid #eee;
+    background-color: #d9534f;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
+
+.nav-link:hover {
+    color: #43576b !important;
+}
+
+html {
+    position: relative;
+    height: 100%;
+}
+
+footer {
+    margin-top: auto;
+    background-color: white;
+    max-height:100px;
+    text-align:center;
+}
+.icons-index {
+    font-size:1.8rem;
+    margin-right:10px;
+    margin-left:10px;
+}
+.delete:hover {
+    color: #6b2c32;
+}
 body {
-  margin-bottom: 60px;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
 }
 .required::after {
     content: "*";

@@ -22,7 +22,9 @@ namespace EFS_23298_23306.Controllers
         // GET: Utilizadores
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Utilizadores.ToListAsync());
+            var applicationDbContext = _context.Utilizadores.OrderByDescending(m => m.DataCriacao);
+
+            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Utilizadores/Details/5
@@ -54,12 +56,30 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UtilizadorID,PrimeiroNome,UltimoNome,Password,Email,NumeroTelemovel")] Utilizadores utilizadores)
+        public async Task<IActionResult> Create([Bind("UtilizadorID,Username,PrimeiroNome,UltimoNome,Password,Email,NumeroTelemovel")] Utilizadores utilizadores)
         {
             if (ModelState.IsValid)
             {
+                var msgErro = "";
+                var erro = false;
+
+                var utilizador = _context.Utilizadores.FirstOrDefault(m => m.Username.Trim().ToLower() == utilizadores.Username.Trim().ToLower());
+                if (utilizador != null)
+                {
+                    ViewBag.UtilizadorExistente = utilizador.Username;
+
+                    return View(utilizadores);
+                }
+
+                if (erro)
+                {
+                    return View(utilizadores);
+                }
+
+
                 _context.Add(utilizadores);
                 await _context.SaveChangesAsync();
+                TempData["NomeUtilizadorCriado"] = utilizadores.Username;
                 return RedirectToAction(nameof(Index));
             }
             return View(utilizadores);
@@ -78,6 +98,7 @@ namespace EFS_23298_23306.Controllers
             {
                 return NotFound();
             }
+            ViewBag.UtilizadorAntigo = utilizadores.Username;
             return View(utilizadores);
         }
 
@@ -86,18 +107,48 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UtilizadorID,PrimeiroNome,UltimoNome,Password,Email,NumeroTelemovel")] Utilizadores utilizadores)
+        public async Task<IActionResult> Edit(int id, [Bind("UtilizadorID,Username,PrimeiroNome,UltimoNome,Email,NumeroTelemovel")] Utilizadores utilizadores,String nomeAntigo)
         {
             if (id != utilizadores.UtilizadorID)
             {
                 return NotFound();
             }
-
+            if (ModelState.ContainsKey("confirmPassword"))
+            {
+                ModelState.Remove("confirmPassword");
+            }
+            if (ModelState.ContainsKey("nomeAntigo"))
+            {
+                ModelState.Remove("nomeAntigo");
+            }
+            if (ModelState.ContainsKey("Password"))
+            {
+                ModelState.Remove("Password");
+            }
             if (ModelState.IsValid)
             {
+                var utilizador = _context.Utilizadores.FirstOrDefault(m => m.Username.Trim().ToLower() == utilizadores.Username.Trim().ToLower() && m.UtilizadorID != utilizadores.UtilizadorID);
+                if (utilizador != null)
+                {
+                    ViewBag.UtilizadorExistente = utilizador.Username;
+                    utilizadores.Username = nomeAntigo;
+                    ViewBag.UtilizadorAntigo = utilizadores.Username;
+                    return View(utilizadores);
+
+                }
+                var msgErro = "";
+                var erro = false;
+
+                if (erro)
+                {
+                    return View(utilizadores);
+                }
+
                 try
                 {
                     _context.Update(utilizadores);
+                    _context.Entry(utilizadores).Property(t => t.DataCriacao).IsModified = false;
+                    _context.Entry(utilizadores).Property(t => t.Password).IsModified = false;
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -111,7 +162,9 @@ namespace EFS_23298_23306.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                ViewBag.UtilizadorAntigo = utilizadores.Username;
+                ViewBag.ShowAlert = true;
+                return View(utilizadores);
             }
             return View(utilizadores);
         }
@@ -139,13 +192,19 @@ namespace EFS_23298_23306.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            String? utilizador = null;
             var utilizadores = await _context.Utilizadores.FindAsync(id);
             if (utilizadores != null)
             {
+                utilizador = utilizadores.Username;
                 _context.Utilizadores.Remove(utilizadores);
             }
 
             await _context.SaveChangesAsync();
+            if (utilizador != null)
+            {
+                TempData["UtilizadorApagado"] = utilizador;
+            }
             return RedirectToAction(nameof(Index));
         }
 

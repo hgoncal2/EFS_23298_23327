@@ -11,6 +11,8 @@ namespace EFS_23298_23306.Models;
         public int UtilizadorID { get; set; }
     [Display(Name = "Primeiro Nome")]
     public String? PrimeiroNome { get; set; }
+    [Display(Name = "Username")]
+    public String Username { get; set; }
     [Display(Name = "Último Nome")]
     public String? UltimoNome { get; set; }
    

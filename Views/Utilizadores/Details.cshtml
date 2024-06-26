@@ -4,51 +4,56 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<div>
+    <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" title="Voltar atrás" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
+</div>
+<h2 class="ms-5">Ver Utilizador <span style="color:mediumpurple"><strong>@Model.Username</strong></span> </h2>
 
 <div>
-    <h4>Utilizadores</h4>
+
+    <br />
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PrimeiroNome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PrimeiroNome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UltimoNome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UltimoNome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Password)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Password)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NumeroTelemovel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NumeroTelemovel)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DataCriacao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DataCriacao)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.UtilizadorID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="container-fluid mt-5 justify-content-center h-100 d-inline-block">
+        <div class="row">
+            <div class="col">
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Username)
+                    <input disabled="true" asp-for="Username" class="form-control" />
+
+                </div>
+                <div class="form-group">
+                    <label asp-for="PrimeiroNome" class="control-label"></label>
+                    <input disabled="true" asp-for="PrimeiroNome" class="form-control" />
+
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.UltimoNome)
+                    <input disabled="true" asp-for="UltimoNome" class="form-control" />
+
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input disabled="true" asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NumeroTelemovel" class="control-label"></label>
+                    <input disabled="true" asp-for="NumeroTelemovel" class="form-control" />
+                    <span asp-validation-for="NumeroTelemovel" class="text-danger"></span>
+                </div>
+                
+            </div>
+        </div>
+        <a asp-route-id="@Model?.UtilizadorID" asp-action="Edit">
+            <button class="btn btn-primary position-absolute mt-lg-5"> <i class="fa fa-pencil me-2"></i>Editar Utilizador</button>
+        </a>
+    </div>
+    <br />
+
+
 </div>

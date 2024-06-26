@@ -4,63 +4,60 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<div>
+    <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" title="Voltar atrás" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
+</div>
+<h2 class="ms-5">Ver Tema <span style="color:mediumpurple"><strong>@Model.Nome</strong></span> </h2>
 
 <div>
-    <h4>Temas</h4>
+    
+    <br/>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descricao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descricao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TempoEstimado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TempoEstimado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MinPessoas)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MinPessoas)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaxPessoas)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaxPessoas)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Dificuldade)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Dificuldade)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Foto)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Foto.FotoID)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Sala)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Sala.SalaID)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.TemaID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="container-fluid mt-5 justify-content-center h-100 d-inline-block">
+        <div class="row">
+            <div class="col">
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Nome)
+                    <input disabled="true" asp-for="Nome" class="form-control" />
+                    
+                </div>
+                <div class="form-group">
+                    <label asp-for="Descricao" class="control-label"></label>
+                    <input disabled="true" asp-for="Descricao" class="form-control" />
+                   
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TempoEstimado)
+                    <input disabled="true" asp-for="TempoEstimado" class="form-control" />
+                    
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label asp-for="MinPessoas" class="control-label"></label>
+                    <input disabled="true" min="1" max="10" asp-for="MinPessoas" class="form-control" />
+                    
+                </div>
+                <div class="form-group">
+                    <label asp-for="MaxPessoas" class="control-label"></label>
+                    <input disabled="true"  asp-for="MaxPessoas" class="form-control" />
+                    
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Dificuldade)
+                    <input disabled="true"  value="@Model.Dificuldade" class="form-control" />
+                    
+                </div>
+            </div>
+        </div>
+         <a asp-route-id="@Model?.TemaID" asp-action="Edit" >
+        <button class="btn btn-primary position-absolute mt-lg-5" > <i class="fa fa-pencil me-2"></i>Editar tema</button>
+        </a>
+    </div>
+    <br/>
+
+
 </div>

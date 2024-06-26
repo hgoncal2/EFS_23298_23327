@@ -1,54 +1,76 @@
-﻿@model EFS_23298_23306.Models.Utilizadores
+﻿@using EFS_23298_23306.Data.Enum
+@model EFS_23298_23306.Models.Utilizadores
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar";
+    ViewData["Nome"] = "Utilizador";
 }
 
-<h1>Create</h1>
 
-<h4>Utilizadores</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="PrimeiroNome" class="control-label"></label>
-                <input asp-for="PrimeiroNome" class="form-control" />
-                <span asp-validation-for="PrimeiroNome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UltimoNome" class="control-label"></label>
-                <input asp-for="UltimoNome" class="form-control" />
-                <span asp-validation-for="UltimoNome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NumeroTelemovel" class="control-label"></label>
-                <input  title="Com indicação da extensão internacional,ex: +351" asp-for="NumeroTelemovel" class="form-control" />
-                <span asp-validation-for="NumeroTelemovel" class="text-danger"></span>
-            </div>
-            
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+@if (@ViewBag.UtilizadorExistente != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Erro! Utilizador <strong>@ViewBag.UtilizadorExistente</strong> já existe!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-</div>
+}
+<hr />
+<form asp-action="Create">
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
+    <div class="container-fluid justify-content-center">
+        <div class="row">
+            <div class="col">
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Username, new { @class = "required" })
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PrimeiroNome" class="control-label"></label>
+                    <input asp-for="PrimeiroNome" class="form-control" />
+                    <span asp-validation-for="PrimeiroNome" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="UltimoNome" class="control-label"></label>
+                    <input asp-for="UltimoNome" class="form-control" />
+                    <span asp-validation-for="UltimoNome" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NumeroTelemovel" class="control-label"></label>
+                    <input asp-for="NumeroTelemovel" class="form-control" />
+                    <span asp-validation-for="NumeroTelemovel" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input type="password" asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+
+    <div class="form-group text-center d-grid gap-2 col-6 mx-auto">
+        <input type="submit" value="Create" class="btn btn-outline-primary btn-lg" />
+    </div>
+
+
+</form>
+
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

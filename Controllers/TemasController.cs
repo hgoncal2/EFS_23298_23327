@@ -13,6 +13,7 @@ namespace EFS_23298_23306.Controllers
     public class TemasController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private String? temaAntigo;
 
         public TemasController(ApplicationDbContext context)
         {
@@ -22,7 +23,8 @@ namespace EFS_23298_23306.Controllers
         // GET: Temas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Temas.Include(t => t.Foto).Include(t => t.Sala);
+            var applicationDbContext = _context.Temas.Include(t => t.Foto).Include(t => t.Sala).OrderByDescending(m => m.DataCriacao);
+            
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -68,7 +70,7 @@ namespace EFS_23298_23306.Controllers
                 var msgErro = "";
                 var erro = false;
 
-                var tema = _context.Temas.FirstOrDefault(acc => acc.Nome == temas.Nome);
+                var tema = _context.Temas.FirstOrDefault(m =>  m.Nome.Trim().ToLower() == temas.Nome.Trim().ToLower());
                 if (tema != null)
                 {
                     ViewBag.TemaExistente = tema.Nome;
@@ -115,10 +117,12 @@ namespace EFS_23298_23306.Controllers
             }
 
             var temas = await _context.Temas.FindAsync(id);
+
             if (temas == null)
             {
                 return NotFound();
             }
+            ViewBag.TemaAntigo = temas.Nome;
             ViewData["FotoID"] = new SelectList(_context.Fotos, "FotoID", "FotoID", temas.FotoID);
             ViewData["SalaID"] = new SelectList(_context.Salas, "SalaID", "SalaID", temas.SalaID);
             return View(temas);
@@ -129,15 +133,28 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas)
+        public async Task<IActionResult> Edit(int id, [Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas,String nomeAntigo)
         {
             if (id != temas.TemaID)
             {
                 return NotFound();
             }
-
+            if (ModelState.ContainsKey("nomeAntigo"))
+            {
+                ModelState.Remove("nomeAntigo");
+            }
+           
             if (ModelState.IsValid)
             {
+                var tema = _context.Temas.FirstOrDefault(m => m.Nome.Trim().ToLower() == temas.Nome.Trim().ToLower() && m.TemaID != temas.TemaID);
+                if (tema != null)
+                {
+                    ViewBag.TemaExistente = tema.Nome;
+                    temas.Nome = nomeAntigo;
+                    ViewBag.TemaAntigo = temas.Nome;
+                    return View(temas);
+
+                }
                 var msgErro = "";
                 var erro = false;
                 if (temas.MaxPessoas <= temas.MinPessoas)
@@ -161,7 +178,9 @@ namespace EFS_23298_23306.Controllers
                 }
                 try
                 {
+                    
                     _context.Update(temas);
+                    _context.Entry(temas).Property(t => t.DataCriacao).IsModified = false;
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -175,6 +194,7 @@ namespace EFS_23298_23306.Controllers
                         throw;
                     }
                 }
+                ViewBag.TemaAntigo = temas.Nome;
                 ViewBag.ShowAlert = true;
                 return View(temas);
             }
@@ -182,7 +202,7 @@ namespace EFS_23298_23306.Controllers
             ViewData["SalaID"] = new SelectList(_context.Salas, "SalaID", "SalaID", temas.SalaID);
             return View(temas);
         }
-
+        //função criada por defeito,não está a ser usada
         // GET: Temas/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -208,13 +228,26 @@ namespace EFS_23298_23306.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            String? tema = null;
+
             var temas = await _context.Temas.FindAsync(id);
             if (temas != null)
             {
+                 tema = temas.Nome;
                 _context.Temas.Remove(temas);
+
+            }
+            else
+            {
+                return NotFound();
             }
 
             await _context.SaveChangesAsync();
+            if(tema != null)
+            {
+                TempData["TemaApagado"] = tema;
+            }
+           
             return RedirectToAction(nameof(Index));
         }
 
