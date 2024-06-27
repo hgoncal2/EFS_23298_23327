@@ -57,6 +57,16 @@
         <button class="btn btn-primary position-absolute mt-lg-5" > <i class="fa fa-pencil me-2"></i>Editar tema</button>
         </a>
     </div>
+   
+    </a>
+    <div class="w-50 container-fluid justify-content-center mt-5 text-center">
+         <a data-fancybox="gallery" data-caption="Imagem do tema '@Model?.Nome'"
+       href="~/Imagens/@Model?.Foto?.Nome">
+        <img src="~/Imagens/@Model?.Foto?.Nome"
+             alt="Imagem do tema '@Model?.Nome'"
+             title="Imagem do tema '@Model?.Nome'"
+             class="rounded img-thumbnail expandeImagem" width="30%" /> </a>
+    </div>
     <br/>
 
 

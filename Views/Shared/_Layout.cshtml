@@ -19,14 +19,13 @@
     
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" asp-append-version="true" />
-    
+    <script src="~/js/site.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="~/EFS_23298_23306.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
 
-        @if (!ViewData["Title"].ToString().Equals("Criar") && !ViewData["Title"].ToString().Equals("Editar"))
-            {  
+       
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark ">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
@@ -51,28 +50,7 @@
                 </div>
             </div>
             </nav>
-        }
-        else
-        {
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark ">
-                <div class="container-fluid">
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                        <ul class="navbar-nav flex-grow-1 text-white">
-                            <li class="nav-item text-white">
-                                <div>
-                                    <a class="fa fa-angles-left display-5 link-underline-opacity-0 link-primary" style="float:left;text-decoration: none;" asp-action="Index"></a>
-                                </div>
-                            </li>
-                            <li class="nav-item ms-5 text-white">
-                                <div>
-                                    <h1>Criar @ViewData["Nome"]</h1>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        }
+      
     </header>
 
     <div class="container">
@@ -91,7 +69,7 @@
    
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -10,12 +10,7 @@
         $('#nomeTema').text(nome);
         $('#apagarTema').attr('action', '/Temas/Delete/' + id);
     }
-    $(document).ready(function () {
-
-        Fancybox.bind("[data-fancybox]", {
-            // Your custom options
-        });
-    });
+    
     
 </script>
 
@@ -149,14 +144,23 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Dificuldade)
             </td>
-            <td>
-                    <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                        href="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)">
-                        <img src="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)"
-                         alt="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                         title="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                         class="rounded img-thumbnail expandeImagem" width="15%"/></a>
-                    <br />
+                <td>
+                    @if (item.Foto != null)
+                    {
+                        <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                           href="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)">
+                            <img src="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)"
+                                 alt="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                 title="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                 class="rounded img-thumbnail expandeImagem" width="15%" />
+                        </a>
+                    }
+                    else
+                    {
+
+                        <span>N.A.</span>
+                    }
+                    
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Sala.SalaID)

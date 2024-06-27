@@ -65,10 +65,13 @@ namespace EFS_23298_23306.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas, IFormFile Imagem)
         {
-
+            if (ModelState.ContainsKey("Imagem"))
+            {
+                ModelState.Remove("Imagem");
+            } 
             if (ModelState.IsValid)
             {
-
+               
                 var msgErro = "";
                 var erro = false;
 
@@ -189,7 +192,11 @@ namespace EFS_23298_23306.Controllers
             {
                 ModelState.Remove("nomeAntigo");
             }
-           
+            if (ModelState.ContainsKey("Imagem"))
+            {
+                ModelState.Remove("Imagem");
+            }
+
             if (ModelState.IsValid)
             {
                 var tema = _context.Temas.FirstOrDefault(m => m.Nome.Trim().ToLower() == temas.Nome.Trim().ToLower() && m.TemaID != temas.TemaID);
