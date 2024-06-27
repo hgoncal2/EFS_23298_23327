@@ -10,6 +10,13 @@
         $('#nomeTema').text(nome);
         $('#apagarTema').attr('action', '/Temas/Delete/' + id);
     }
+    $(document).ready(function () {
+
+        Fancybox.bind("[data-fancybox]", {
+            // Your custom options
+        });
+    });
+    
 </script>
 
 <div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -143,10 +150,12 @@
                 @Html.DisplayFor(modelItem => item.Dificuldade)
             </td>
             <td>
-                    <img src="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)"
-                         alt="Imagem do tema @Html.DisplayFor(modelItem => item.Nome)"
-                         title="Imagem do tema @Html.DisplayFor(modelItem => item.Nome)"
-                         width="50%" />
+                    <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                        href="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)">
+                        <img src="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)"
+                         alt="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                         title="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                         class="rounded img-thumbnail expandeImagem" width="15%"/></a>
                     <br />
             </td>
             <td>
@@ -165,4 +174,5 @@
     </tbody>
   
 </table>
+
 @Html.AntiForgeryToken()
