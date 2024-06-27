@@ -22,7 +22,7 @@ namespace EFS_23298_23306.Controllers
         // GET: Utilizadores
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Utilizadores.OrderByDescending(m => m.DataCriacao);
+            var applicationDbContext = _context.Utilizadores.Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
 
             return View(await applicationDbContext.ToListAsync());
         }
@@ -197,7 +197,7 @@ namespace EFS_23298_23306.Controllers
             if (utilizadores != null)
             {
                 utilizador = utilizadores.Username;
-                _context.Utilizadores.Remove(utilizadores);
+                utilizadores.Deleted = true;
             }
 
             await _context.SaveChangesAsync();

@@ -27,8 +27,9 @@ namespace EFS_23298_23306.Models;
     [Display(Name = "Data de Criação")]
    
     public DateTime DataCriacao { get; set; }
-       
-        
+    public bool Deleted { get; set; }
+
+
 
 
 

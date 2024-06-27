@@ -82,6 +82,13 @@
         </div>
     </div>
     <br />
+    <div class="w-50 container-fluid justify-content-center text-center">
+        <input asp-for="Foto" type="file"
+               name="Imagem"
+               accept=".png,.jpg,.jpeg"
+               class="form-control" />
+        <span class="text-danger" asp-validation-for="Foto"></span>
+    </div>
 
     <div class="form-group text-center mt-lg-4  mx-auto">
         <a type="submit">

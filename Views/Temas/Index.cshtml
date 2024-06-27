@@ -91,7 +91,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+            <tr class="text-center">
                 <th scope="row">
                     @Html.DisplayFor(modelItem => item.TemaID)
                 </th>
@@ -143,7 +143,11 @@
                 @Html.DisplayFor(modelItem => item.Dificuldade)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Foto.FotoID)
+                    <img src="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)"
+                         alt="Imagem do tema @Html.DisplayFor(modelItem => item.Nome)"
+                         title="Imagem do tema @Html.DisplayFor(modelItem => item.Nome)"
+                         width="50%" />
+                    <br />
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Sala.SalaID)

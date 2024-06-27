@@ -14,16 +14,18 @@ namespace EFS_23298_23306.Controllers
     {
         private readonly ApplicationDbContext _context;
         private String? temaAntigo;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public TemasController(ApplicationDbContext context)
+        public TemasController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Temas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Temas.Include(t => t.Foto).Include(t => t.Sala).OrderByDescending(m => m.DataCriacao);
+            var applicationDbContext = _context.Temas.Include(t => t.Foto).Include(t => t.Sala).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
             
             return View(await applicationDbContext.ToListAsync());
         }
@@ -61,7 +63,7 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas)
+        public async Task<IActionResult> Create([Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas, IFormFile Imagem)
         {
 
             if (ModelState.IsValid)
@@ -93,13 +95,57 @@ namespace EFS_23298_23306.Controllers
                     erro = true;
 
                 }
+
+                var hasImagem = false;
+                string nomeImagem = "";
+                if (Imagem != null)
+                {
+                    if (!(Imagem.ContentType == "image/png" || Imagem.ContentType == "image/jpeg"))
+                    {
+                        msgErro = "Erro!Ficheiro de imagem tem que ser png ou jpeg!";
+                        ModelState.AddModelError("Foto", msgErro);
+                        erro = true;
+                    }
+                    else
+                    {
+                        
+                        Guid g = Guid.NewGuid();
+                        nomeImagem = g.ToString();
+                        string extensaoImagem = Path.GetExtension(Imagem.FileName).ToLowerInvariant();
+                        nomeImagem += extensaoImagem;
+                        Fotos f = new Fotos(nomeImagem);
+                        temas.FotoID = f.FotoID;
+                        temas.Foto = f;
+                        hasImagem = true;
+
+                    }
+                }
+
+
                 if (erro)
                 {
                     return View(temas);
                 }
+               
                 
                 _context.Add(temas);
                 await _context.SaveChangesAsync();
+                if (hasImagem)
+                {
+                    string localizacaoImagem = _webHostEnvironment.WebRootPath;
+                    // adicionar à raiz da parte web, o nome da pasta onde queremos guardar as imagens
+                    localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens");
+                    if (!Directory.Exists(localizacaoImagem))
+                    {
+                        Directory.CreateDirectory(localizacaoImagem);
+                    }
+                    // atribuir ao caminho o nome da imagem
+                    localizacaoImagem = Path.Combine(localizacaoImagem, nomeImagem);
+                    using var stream = new FileStream(
+                  localizacaoImagem, FileMode.Create
+                  );
+                    await Imagem.CopyToAsync(stream);
+                }
                 TempData["NomeTemaCriado"] = temas.Nome;
                 return RedirectToAction(nameof(Index));
             }
@@ -133,7 +179,7 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas,String nomeAntigo)
+        public async Task<IActionResult> Edit(int id, [Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas,String nomeAntigo, IFormFile Imagem)
         {
             if (id != temas.TemaID)
             {
@@ -172,6 +218,35 @@ namespace EFS_23298_23306.Controllers
                     erro = true;
 
                 }
+
+                var hasImagem = false;
+                string nomeImagem = "";
+
+                if (Imagem != null)
+                {
+                    if (!(Imagem.ContentType == "image/png" || Imagem.ContentType == "image/jpeg"))
+                    {
+                        msgErro = "Erro!Ficheiro de imagem tem que ser png ou jpeg!";
+                        ModelState.AddModelError("Foto", msgErro);
+                        erro = true;
+                    }
+                    else
+                    {
+                        
+                        Guid g = Guid.NewGuid();
+                        nomeImagem = g.ToString();
+                        string extensaoImagem = Path.GetExtension(Imagem.FileName).ToLowerInvariant();
+                        nomeImagem += extensaoImagem;
+                        Fotos f = new Fotos(nomeImagem);
+                        temas.FotoID = f.FotoID;
+                        temas.Foto = f;
+                        hasImagem = true;
+
+                    }
+                }
+
+
+
                 if (erro)
                 {
                     return View(temas);
@@ -182,6 +257,22 @@ namespace EFS_23298_23306.Controllers
                     _context.Update(temas);
                     _context.Entry(temas).Property(t => t.DataCriacao).IsModified = false;
                     await _context.SaveChangesAsync();
+                    if (hasImagem)
+                    {
+                        string localizacaoImagem = _webHostEnvironment.WebRootPath;
+                        // adicionar à raiz da parte web, o nome da pasta onde queremos guardar as imagens
+                        localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens");
+                        if (!Directory.Exists(localizacaoImagem))
+                        {
+                            Directory.CreateDirectory(localizacaoImagem);
+                        }
+                        // atribuir ao caminho o nome da imagem
+                        localizacaoImagem = Path.Combine(localizacaoImagem, nomeImagem);
+                        using var stream = new FileStream(
+                      localizacaoImagem, FileMode.Create
+                      );
+                        await Imagem.CopyToAsync(stream);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -234,7 +325,7 @@ namespace EFS_23298_23306.Controllers
             if (temas != null)
             {
                  tema = temas.Nome;
-                _context.Temas.Remove(temas);
+                temas.Deleted = true;
 
             }
             else
