@@ -27,10 +27,9 @@ namespace EFS_23298_23306.Models
         [Display(Name = "Dificuldade")]
         [EnumDataType(typeof(Dificuldade))]
         public Dificuldade Dificuldade { get; set; }
-        [Display(Name = "Foto")]
+        [Display(Name = "Fotos")]
         [ForeignKey(nameof(Fotos))]
-        public int? FotoID { get; set; }
-        public Fotos? Foto { get; set; }
+        public virtual ICollection<Fotos>? ListaFotos { get; set; }
         [ForeignKey(nameof(Salas))]
         [Display(Name = "Sala")]
         public int? SalaID { get; set; }
@@ -45,6 +44,7 @@ namespace EFS_23298_23306.Models
         public Temas()
         {
             this.DataCriacao = DateTime.Now;
+            ListaFotos = new HashSet<Fotos>();
 
 
         }

@@ -10,8 +10,17 @@
 
 
 
+<div>
+    <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
+</div>
 
 
+<h2 class="ms-5">Criar Tema </h2>
+
+<br />
+
+<hr />
 @if (@ViewBag.TemaExistente != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -19,7 +28,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
-<hr />
+
 <form asp-action="Create" method="post" enctype="multipart/form-data">
 
     <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
@@ -72,11 +81,12 @@
 
     <br/>
     <div class="w-50 container-fluid justify-content-center text-center">
-        <input asp-for="Foto" type="file"
+        Adicionar Imagens
+        <input asp-for="ListaFotos" type="file"
            name="Imagem"
            accept=".png,.jpg,.jpeg"
-           class="form-control"/>
-    <span class="text-danger" asp-validation-for="Foto"></span>
+               class="form-control" data-show-caption="true" multiple />
+        <span class="text-danger" asp-validation-for="ListaFotos"></span>
     </div>
    
     

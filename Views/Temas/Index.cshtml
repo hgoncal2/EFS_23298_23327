@@ -80,7 +80,7 @@
                 @Html.DisplayNameFor(model => model.Dificuldade)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Foto)
+                @Html.DisplayNameFor(model => model.ListaFotos)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Sala)
@@ -93,6 +93,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
+            
             <tr class="text-center">
                 <th scope="row">
                     @Html.DisplayFor(modelItem => item.TemaID)
@@ -145,15 +146,20 @@
                 @Html.DisplayFor(modelItem => item.Dificuldade)
             </td>
                 <td>
-                    @if (item.Foto != null)
+                   
+                    @if (@item.ListaFotos != null || @item.ListaFotos.Any())
                     {
-                        <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                           href="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)">
-                            <img src="~/Imagens/@Html.DisplayFor(modelItem => item.Foto.Nome)"
-                                 alt="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                                 title="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                                 class="rounded img-thumbnail expandeImagem" width="15%" />
-                        </a>
+                        @foreach (var foto in @item.ListaFotos)
+                        {
+                            <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                               href="~/Imagens/@foto.Nome">
+                                <img src="~/Imagens/@Html.DisplayFor(modelItem => @foto.Nome)"
+                                     alt="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                     title="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                     class="rounded img-thumbnail expandeImagem" width="15%" />
+                            </a>
+                        }
+                        
                     }
                     else
                     {

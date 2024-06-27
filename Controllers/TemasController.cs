@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EFS_23298_23306.Data;
 using EFS_23298_23306.Models;
+using System.Numerics;
 
 namespace EFS_23298_23306.Controllers
 {
@@ -25,7 +26,7 @@ namespace EFS_23298_23306.Controllers
         // GET: Temas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Temas.Include(t => t.Foto).Include(t => t.Sala).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
+            var applicationDbContext = _context.Temas.Include(m => m.ListaFotos.Where(f => f.deleted!=true)).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
             
             return View(await applicationDbContext.ToListAsync());
         }
@@ -38,10 +39,8 @@ namespace EFS_23298_23306.Controllers
                 return NotFound();
             }
 
-            var temas = await _context.Temas
-                .Include(t => t.Foto)
-                .Include(t => t.Sala)
-                .FirstOrDefaultAsync(m => m.TemaID == id);
+            var temas = await _context.Temas.Include(m => m.ListaFotos)
+.FirstOrDefaultAsync(m => m.TemaID == id);
             if (temas == null)
             {
                 return NotFound();
@@ -63,8 +62,9 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas, IFormFile Imagem)
+        public async Task<IActionResult> Create([Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas)
         {
+            var Imagens = HttpContext.Request.Form.Files;
             if (ModelState.ContainsKey("Imagem"))
             {
                 ModelState.Remove("Imagem");
@@ -101,28 +101,42 @@ namespace EFS_23298_23306.Controllers
 
                 var hasImagem = false;
                 string nomeImagem = "";
-                if (Imagem != null)
+                Dictionary<Fotos, IFormFile> mapFotos = new Dictionary<Fotos, IFormFile>();
+                
+                if (Imagens != null)
                 {
-                    if (!(Imagem.ContentType == "image/png" || Imagem.ContentType == "image/jpeg"))
+                    foreach(var Imagem in Imagens)
                     {
-                        msgErro = "Erro!Ficheiro de imagem tem que ser png ou jpeg!";
-                        ModelState.AddModelError("Foto", msgErro);
-                        erro = true;
-                    }
-                    else
-                    {
-                        
-                        Guid g = Guid.NewGuid();
-                        nomeImagem = g.ToString();
-                        string extensaoImagem = Path.GetExtension(Imagem.FileName).ToLowerInvariant();
-                        nomeImagem += extensaoImagem;
-                        Fotos f = new Fotos(nomeImagem);
-                        temas.FotoID = f.FotoID;
-                        temas.Foto = f;
-                        hasImagem = true;
+                        if (Imagem != null)
+                        {
+                            if (!(Imagem.ContentType == "image/png" || Imagem.ContentType == "image/jpeg"))
+                            {
+                                msgErro = "Erro!Ficheiro de imagem tem que ser png ou jpeg!";
+                                ModelState.AddModelError("Foto", msgErro);
+                                erro = true;
+                            }
+                            else
+                            {
 
+                                Guid g = Guid.NewGuid();
+                                nomeImagem = g.ToString();
+                                string extensaoImagem = Path.GetExtension(Imagem.FileName).ToLowerInvariant();
+                                nomeImagem += extensaoImagem;
+                                Fotos f = new Fotos(nomeImagem);
+                                
+                                f.TemaID = temas.TemaID;
+                                f.Tema = temas;
+
+                                temas.ListaFotos.Add(f);
+                                mapFotos.Add(f,Imagem);
+                                hasImagem = true;
+
+                            }
+                        }
                     }
+                   
                 }
+                
 
 
                 if (erro)
@@ -136,24 +150,32 @@ namespace EFS_23298_23306.Controllers
                 if (hasImagem)
                 {
                     string localizacaoImagem = _webHostEnvironment.WebRootPath;
-                    // adicionar à raiz da parte web, o nome da pasta onde queremos guardar as imagens
                     localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens");
                     if (!Directory.Exists(localizacaoImagem))
                     {
                         Directory.CreateDirectory(localizacaoImagem);
                     }
+                    foreach (KeyValuePair<Fotos, IFormFile> i in mapFotos)
+                    {
+
+                        localizacaoImagem = Path.Combine(localizacaoImagem, i.Key.Nome);
+                        using var stream = new FileStream(
+                      localizacaoImagem, FileMode.Create
+                      );
+                        await i.Value.CopyToAsync(stream);
+                        localizacaoImagem = _webHostEnvironment.WebRootPath;
+                        localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens");
+                    }
+                    
+                    // adicionar à raiz da parte web, o nome da pasta onde queremos guardar as imagens
+                  
                     // atribuir ao caminho o nome da imagem
-                    localizacaoImagem = Path.Combine(localizacaoImagem, nomeImagem);
-                    using var stream = new FileStream(
-                  localizacaoImagem, FileMode.Create
-                  );
-                    await Imagem.CopyToAsync(stream);
+                   
                 }
                 TempData["NomeTemaCriado"] = temas.Nome;
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FotoID"] = new SelectList(_context.Fotos, "FotoID", "FotoID", temas.FotoID);
-            ViewData["SalaID"] = new SelectList(_context.Salas, "SalaID", "SalaID", temas.SalaID);
+          
             return View(temas);
         }
 
@@ -165,15 +187,14 @@ namespace EFS_23298_23306.Controllers
                 return NotFound();
             }
 
-            var temas = await _context.Temas.FindAsync(id);
+            var temas = await _context.Temas.Include(m => m.ListaFotos.Where(f => f.deleted != true)).FirstOrDefaultAsync(m => m.TemaID == id);
 
             if (temas == null)
             {
                 return NotFound();
             }
             ViewBag.TemaAntigo = temas.Nome;
-            ViewData["FotoID"] = new SelectList(_context.Fotos, "FotoID", "FotoID", temas.FotoID);
-            ViewData["SalaID"] = new SelectList(_context.Salas, "SalaID", "SalaID", temas.SalaID);
+           
             return View(temas);
         }
 
@@ -182,7 +203,7 @@ namespace EFS_23298_23306.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas,String nomeAntigo, IFormFile Imagem)
+        public async Task<IActionResult> Edit(int id, [Bind("TemaID,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade")] Temas temas,String nomeAntigo)
         {
             if (id != temas.TemaID)
             {
@@ -196,7 +217,7 @@ namespace EFS_23298_23306.Controllers
             {
                 ModelState.Remove("Imagem");
             }
-
+             var Imagens = HttpContext.Request.Form.Files;
             if (ModelState.IsValid)
             {
                 var tema = _context.Temas.FirstOrDefault(m => m.Nome.Trim().ToLower() == temas.Nome.Trim().ToLower() && m.TemaID != temas.TemaID);
@@ -210,6 +231,7 @@ namespace EFS_23298_23306.Controllers
                 }
                 var msgErro = "";
                 var erro = false;
+
                 if (temas.MaxPessoas <= temas.MinPessoas)
                 {
                     msgErro = "Erro!Máximo de pessoas tem que ser maior que o mínimo de pessoas";
@@ -228,28 +250,40 @@ namespace EFS_23298_23306.Controllers
 
                 var hasImagem = false;
                 string nomeImagem = "";
+                Dictionary<Fotos, IFormFile> mapFotos = new Dictionary<Fotos, IFormFile>();
 
-                if (Imagem != null)
+                if (Imagens != null)
                 {
-                    if (!(Imagem.ContentType == "image/png" || Imagem.ContentType == "image/jpeg"))
+                    foreach (var Imagem in Imagens)
                     {
-                        msgErro = "Erro!Ficheiro de imagem tem que ser png ou jpeg!";
-                        ModelState.AddModelError("Foto", msgErro);
-                        erro = true;
-                    }
-                    else
-                    {
-                        
-                        Guid g = Guid.NewGuid();
-                        nomeImagem = g.ToString();
-                        string extensaoImagem = Path.GetExtension(Imagem.FileName).ToLowerInvariant();
-                        nomeImagem += extensaoImagem;
-                        Fotos f = new Fotos(nomeImagem);
-                        temas.FotoID = f.FotoID;
-                        temas.Foto = f;
-                        hasImagem = true;
+                        if (Imagem != null)
+                        {
+                            if (!(Imagem.ContentType == "image/png" || Imagem.ContentType == "image/jpeg"))
+                            {
+                                msgErro = "Erro!Ficheiro de imagem tem que ser png ou jpeg!";
+                                ModelState.AddModelError("Foto", msgErro);
+                                erro = true;
+                            }
+                            else
+                            {
 
+                                Guid g = Guid.NewGuid();
+                                nomeImagem = g.ToString();
+                                string extensaoImagem = Path.GetExtension(Imagem.FileName).ToLowerInvariant();
+                                nomeImagem += extensaoImagem;
+                                Fotos f = new Fotos(nomeImagem);
+
+                                f.TemaID = temas.TemaID;
+                                f.Tema = temas;
+
+                                temas.ListaFotos.Add(f);
+                                mapFotos.Add(f, Imagem);
+                                hasImagem = true;
+
+                            }
+                        }
                     }
+
                 }
 
 
@@ -264,22 +298,31 @@ namespace EFS_23298_23306.Controllers
                     _context.Update(temas);
                     _context.Entry(temas).Property(t => t.DataCriacao).IsModified = false;
                     await _context.SaveChangesAsync();
-                    if (hasImagem)
+                     if (hasImagem)
+                {
+                    string localizacaoImagem = _webHostEnvironment.WebRootPath;
+                    localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens");
+                    if (!Directory.Exists(localizacaoImagem))
                     {
-                        string localizacaoImagem = _webHostEnvironment.WebRootPath;
-                        // adicionar à raiz da parte web, o nome da pasta onde queremos guardar as imagens
-                        localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens");
-                        if (!Directory.Exists(localizacaoImagem))
-                        {
-                            Directory.CreateDirectory(localizacaoImagem);
-                        }
-                        // atribuir ao caminho o nome da imagem
-                        localizacaoImagem = Path.Combine(localizacaoImagem, nomeImagem);
+                        Directory.CreateDirectory(localizacaoImagem);
+                    }
+                    foreach (KeyValuePair<Fotos, IFormFile> i in mapFotos)
+                    {
+
+                        localizacaoImagem = Path.Combine(localizacaoImagem, i.Key.Nome);
                         using var stream = new FileStream(
                       localizacaoImagem, FileMode.Create
                       );
-                        await Imagem.CopyToAsync(stream);
+                        await i.Value.CopyToAsync(stream);
+                        localizacaoImagem = _webHostEnvironment.WebRootPath;
+                        localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens");
                     }
+                    
+                    // adicionar à raiz da parte web, o nome da pasta onde queremos guardar as imagens
+                  
+                    // atribuir ao caminho o nome da imagem
+                   
+                }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -294,10 +337,10 @@ namespace EFS_23298_23306.Controllers
                 }
                 ViewBag.TemaAntigo = temas.Nome;
                 ViewBag.ShowAlert = true;
-                return View(temas);
+                var temasAtual = await _context.Temas.Include(m => m.ListaFotos).FirstOrDefaultAsync(m => m.TemaID == id);
+                return View(temasAtual);
             }
-            ViewData["FotoID"] = new SelectList(_context.Fotos, "FotoID", "FotoID", temas.FotoID);
-            ViewData["SalaID"] = new SelectList(_context.Salas, "SalaID", "SalaID", temas.SalaID);
+          
             return View(temas);
         }
         //função criada por defeito,não está a ser usada
@@ -309,10 +352,7 @@ namespace EFS_23298_23306.Controllers
                 return NotFound();
             }
 
-            var temas = await _context.Temas
-                .Include(t => t.Foto)
-                .Include(t => t.Sala)
-                .FirstOrDefaultAsync(m => m.TemaID == id);
+            var temas = await _context.Temas.Include(m => m.ListaFotos).FirstOrDefaultAsync(m => m.TemaID == id);
             if (temas == null)
             {
                 return NotFound();
@@ -329,10 +369,17 @@ namespace EFS_23298_23306.Controllers
             String? tema = null;
 
             var temas = await _context.Temas.FindAsync(id);
+           
             if (temas != null)
             {
+                
                  tema = temas.Nome;
                 temas.Deleted = true;
+                var fotos = await _context.Fotos.Where(f => f.TemaID == temas.TemaID).ToListAsync();
+                foreach (var item in fotos)
+                {
+                   item.deleted = true;
+                }
 
             }
             else
@@ -348,6 +395,41 @@ namespace EFS_23298_23306.Controllers
            
             return RedirectToAction(nameof(Index));
         }
+
+        // POST: Temas/EliminaFoto/5
+        [HttpPost, ActionName("EliminaFoto")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminaFoto(int id)
+        {
+            
+
+            var foto = await _context.Fotos.FindAsync(id);
+            Temas tema;
+            if (foto != null)
+            {
+
+               
+                foto.deleted = true;
+                 tema = await _context.Temas.FirstOrDefaultAsync(f => f.TemaID == foto.TemaID);
+                if (tema != null)
+                {
+                    tema.ListaFotos.FirstOrDefault(f => f.FotoID == id).deleted = true;
+                    await _context.SaveChangesAsync();
+
+                    TempData["FotoEliminada"] = true;
+                    return RedirectToAction(nameof(Edit),new { id = tema.TemaID});
+                }
+
+            }
+            else
+            {
+                return NotFound();
+            }
+
+            return NotFound();
+        }
+
+
 
         private bool TemasExists(int id)
         {

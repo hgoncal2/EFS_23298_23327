@@ -1,6 +1,7 @@
 ﻿using EFS_23298_23306.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 namespace EFS_23298_23306.Data
 {
     public class ApplicationDbContext : IdentityDbContext
@@ -9,6 +10,16 @@ namespace EFS_23298_23306.Data
           : base(options)
         {
 
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Fotos>()
+                .HasOne(e => e.Tema).
+                WithMany(c => c.ListaFotos)
+                .HasForeignKey(e => e.TemaID);
+
+
+            base.OnModelCreating(modelBuilder);
         }
         public DbSet<Utilizadores> Utilizadores { get; set; }
         public DbSet<Clientes> Clientes { get; set; }
