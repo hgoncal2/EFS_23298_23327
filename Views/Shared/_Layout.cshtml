@@ -22,6 +22,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="~/EFS_23298_23306.styles.css" asp-append-version="true" />
 </head>
+
 <body class="h-100">
     <header>
 
@@ -34,7 +35,7 @@
                          height="50"
                          alt="MDB Logo"
                          loading="lazy" />
-                    <small>Escape From Sellium</small>
+                    <small>@User.Identity?.Name</small>
                 </a>
                 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">

@@ -1,10 +1,12 @@
 ﻿using EFS_23298_23306.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using EFS_23298_23306.ViewModel;
 namespace EFS_23298_23306.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<Utilizadores>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
           : base(options)
@@ -20,6 +22,11 @@ namespace EFS_23298_23306.Data
 
 
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<IdentityRole>().HasData(
+             new IdentityRole { Id = "anf", Name = "Anfitriao", NormalizedName = "ANFITRIAO" },
+             new IdentityRole { Id = "adm", Name = "Admin", NormalizedName = "ADMIN" },
+             new IdentityRole { Id = "cl", Name = "Cliente", NormalizedName = "CLIENTE" }
+             );
         }
         public DbSet<Utilizadores> Utilizadores { get; set; }
         public DbSet<Clientes> Clientes { get; set; }
@@ -28,6 +35,8 @@ namespace EFS_23298_23306.Data
         public DbSet<Reservas> Reservas { get; set; }
         public DbSet<Salas> Salas { get; set; }
         public DbSet<Fotos> Fotos { get; set; }
+        public DbSet<EFS_23298_23306.ViewModel.LoginViewModel> LoginViewModel { get; set; } = default!;
+        public DbSet<EFS_23298_23306.ViewModel.UtilizadoresViewModel> UtilizadoresViewModel { get; set; } = default!;
 
     }
 

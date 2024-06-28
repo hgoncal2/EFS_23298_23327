@@ -4,6 +4,7 @@ using EFS_23298_23306.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFS_23298_23306.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240628213832_loginVM")]
+    partial class loginVM
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,13 +27,13 @@ namespace EFS_23298_23306.Migrations
 
             modelBuilder.Entity("AnfitrioesSalas", b =>
                 {
-                    b.Property<string>("ListaAnfitrioesId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("ListaAnfitrioesUtilizadorID")
+                        .HasColumnType("int");
 
                     b.Property<int>("ListaSalasSalaID")
                         .HasColumnType("int");
 
-                    b.HasKey("ListaAnfitrioesId", "ListaSalasSalaID");
+                    b.HasKey("ListaAnfitrioesUtilizadorID", "ListaSalasSalaID");
 
                     b.HasIndex("ListaSalasSalaID");
 
@@ -79,8 +82,8 @@ namespace EFS_23298_23306.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservaID"));
 
-                    b.Property<string>("ClientesId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("ClientesUtilizadorID")
+                        .HasColumnType("int");
 
                     b.Property<int>("NumPessoas")
                         .HasColumnType("int");
@@ -94,12 +97,12 @@ namespace EFS_23298_23306.Migrations
                     b.Property<int?>("TemaID")
                         .HasColumnType("int");
 
-                    b.Property<string>("UtilizadorID")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("UtilizadorID")
+                        .HasColumnType("int");
 
                     b.HasKey("ReservaID");
 
-                    b.HasIndex("ClientesId");
+                    b.HasIndex("ClientesUtilizadorID");
 
                     b.HasIndex("TemaID");
 
@@ -172,14 +175,16 @@ namespace EFS_23298_23306.Migrations
 
             modelBuilder.Entity("EFS_23298_23306.Models.Utilizadores", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("UtilizadorID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtilizadorID"));
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
@@ -194,11 +199,13 @@ namespace EFS_23298_23306.Migrations
                         .HasColumnType("nvarchar(13)");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -207,12 +214,10 @@ namespace EFS_23298_23306.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -236,20 +241,11 @@ namespace EFS_23298_23306.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("UtilizadorID");
 
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("Utilizadores");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Utilizadores");
 
@@ -275,32 +271,6 @@ namespace EFS_23298_23306.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LoginViewModel");
-                });
-
-            modelBuilder.Entity("EFS_23298_23306.ViewModel.UtilizadoresViewModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PrimeiroNome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UltimoNome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UtilizadoresViewModel");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -373,6 +343,71 @@ namespace EFS_23298_23306.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -478,7 +513,7 @@ namespace EFS_23298_23306.Migrations
                 {
                     b.HasOne("EFS_23298_23306.Models.Anfitrioes", null)
                         .WithMany()
-                        .HasForeignKey("ListaAnfitrioesId")
+                        .HasForeignKey("ListaAnfitrioesUtilizadorID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -504,7 +539,7 @@ namespace EFS_23298_23306.Migrations
                 {
                     b.HasOne("EFS_23298_23306.Models.Clientes", null)
                         .WithMany("ListaReservas")
-                        .HasForeignKey("ClientesId");
+                        .HasForeignKey("ClientesUtilizadorID");
 
                     b.HasOne("EFS_23298_23306.Models.Temas", "Tema")
                         .WithMany()
@@ -539,7 +574,7 @@ namespace EFS_23298_23306.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("EFS_23298_23306.Models.Utilizadores", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -548,7 +583,7 @@ namespace EFS_23298_23306.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("EFS_23298_23306.Models.Utilizadores", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -563,7 +598,7 @@ namespace EFS_23298_23306.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EFS_23298_23306.Models.Utilizadores", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -572,7 +607,7 @@ namespace EFS_23298_23306.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("EFS_23298_23306.Models.Utilizadores", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

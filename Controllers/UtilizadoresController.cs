@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EFS_23298_23306.Data;
-using EFS_23298_23306.Models;
+using EFS_23298_23306.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EFS_23298_23306.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UtilizadoresController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,15 +21,24 @@ namespace EFS_23298_23306.Controllers
             _context = context;
         }
 
-        // GET: Utilizadores
+        // GET: UtilizadoresViewModels
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Utilizadores.Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
 
-            return View(await applicationDbContext.ToListAsync());
+           var  users = await _context.Utilizadores.ToListAsync();
+            ICollection<UtilizadoresViewModel> listaU = new List<UtilizadoresViewModel>();
+            if(users != null || users.Any())
+            {
+                foreach(var u in users)
+                {
+                    var uVM = new UtilizadoresViewModel(u.UserName,u.PrimeiroNome,u.UltimoNome,u.DataCriacao);
+                    listaU.Add(uVM);
+                }
+            }
+            return View(listaU);
         }
 
-        // GET: Utilizadores/Details/5
+        // GET: UtilizadoresViewModels/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,57 +46,39 @@ namespace EFS_23298_23306.Controllers
                 return NotFound();
             }
 
-            var utilizadores = await _context.Utilizadores
-                .FirstOrDefaultAsync(m => m.UtilizadorID == id);
-            if (utilizadores == null)
+            var utilizadoresViewModel = await _context.UtilizadoresViewModel
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (utilizadoresViewModel == null)
             {
                 return NotFound();
             }
 
-            return View(utilizadores);
+            return View(utilizadoresViewModel);
         }
 
-        // GET: Utilizadores/Create
+        // GET: UtilizadoresViewModels/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Utilizadores/Create
+        // POST: UtilizadoresViewModels/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UtilizadorID,Username,PrimeiroNome,UltimoNome,Password,Email,NumeroTelemovel")] Utilizadores utilizadores)
+        public async Task<IActionResult> Create([Bind("Id,PrimeiroNome,UltimoNome,DataCriacao")] UtilizadoresViewModel utilizadoresViewModel)
         {
             if (ModelState.IsValid)
             {
-                var msgErro = "";
-                var erro = false;
-
-                var utilizador = _context.Utilizadores.FirstOrDefault(m => m.Username.Trim().ToLower() == utilizadores.Username.Trim().ToLower());
-                if (utilizador != null)
-                {
-                    ViewBag.UtilizadorExistente = utilizador.Username;
-
-                    return View(utilizadores);
-                }
-
-                if (erro)
-                {
-                    return View(utilizadores);
-                }
-
-
-                _context.Add(utilizadores);
+                _context.Add(utilizadoresViewModel);
                 await _context.SaveChangesAsync();
-                TempData["NomeUtilizadorCriado"] = utilizadores.Username;
                 return RedirectToAction(nameof(Index));
             }
-            return View(utilizadores);
+            return View(utilizadoresViewModel);
         }
 
-        // GET: Utilizadores/Edit/5
+        // GET: UtilizadoresViewModels/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -93,67 +86,36 @@ namespace EFS_23298_23306.Controllers
                 return NotFound();
             }
 
-            var utilizadores = await _context.Utilizadores.FindAsync(id);
-            if (utilizadores == null)
+            var utilizadoresViewModel = await _context.UtilizadoresViewModel.FindAsync(id);
+            if (utilizadoresViewModel == null)
             {
                 return NotFound();
             }
-            ViewBag.UtilizadorAntigo = utilizadores.Username;
-            return View(utilizadores);
+            return View(utilizadoresViewModel);
         }
 
-        // POST: Utilizadores/Edit/5
+        // POST: UtilizadoresViewModels/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UtilizadorID,Username,PrimeiroNome,UltimoNome,Email,NumeroTelemovel")] Utilizadores utilizadores,String nomeAntigo)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,PrimeiroNome,UltimoNome,DataCriacao")] UtilizadoresViewModel utilizadoresViewModel)
         {
-            if (id != utilizadores.UtilizadorID)
+            if (id != utilizadoresViewModel.Id)
             {
                 return NotFound();
             }
-            if (ModelState.ContainsKey("confirmPassword"))
-            {
-                ModelState.Remove("confirmPassword");
-            }
-            if (ModelState.ContainsKey("nomeAntigo"))
-            {
-                ModelState.Remove("nomeAntigo");
-            }
-            if (ModelState.ContainsKey("Password"))
-            {
-                ModelState.Remove("Password");
-            }
+
             if (ModelState.IsValid)
             {
-                var utilizador = _context.Utilizadores.FirstOrDefault(m => m.Username.Trim().ToLower() == utilizadores.Username.Trim().ToLower() && m.UtilizadorID != utilizadores.UtilizadorID);
-                if (utilizador != null)
-                {
-                    ViewBag.UtilizadorExistente = utilizador.Username;
-                    utilizadores.Username = nomeAntigo;
-                    ViewBag.UtilizadorAntigo = utilizadores.Username;
-                    return View(utilizadores);
-
-                }
-                var msgErro = "";
-                var erro = false;
-
-                if (erro)
-                {
-                    return View(utilizadores);
-                }
-
                 try
                 {
-                    _context.Update(utilizadores);
-                    _context.Entry(utilizadores).Property(t => t.DataCriacao).IsModified = false;
-                    _context.Entry(utilizadores).Property(t => t.Password).IsModified = false;
+                    _context.Update(utilizadoresViewModel);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UtilizadoresExists(utilizadores.UtilizadorID))
+                    if (!UtilizadoresViewModelExists(utilizadoresViewModel.Id))
                     {
                         return NotFound();
                     }
@@ -162,14 +124,12 @@ namespace EFS_23298_23306.Controllers
                         throw;
                     }
                 }
-                ViewBag.UtilizadorAntigo = utilizadores.Username;
-                ViewBag.ShowAlert = true;
-                return View(utilizadores);
+                return RedirectToAction(nameof(Index));
             }
-            return View(utilizadores);
+            return View(utilizadoresViewModel);
         }
 
-        // GET: Utilizadores/Delete/5
+        // GET: UtilizadoresViewModels/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -177,40 +137,34 @@ namespace EFS_23298_23306.Controllers
                 return NotFound();
             }
 
-            var utilizadores = await _context.Utilizadores
-                .FirstOrDefaultAsync(m => m.UtilizadorID == id);
-            if (utilizadores == null)
+            var utilizadoresViewModel = await _context.UtilizadoresViewModel
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (utilizadoresViewModel == null)
             {
                 return NotFound();
             }
 
-            return View(utilizadores);
+            return View(utilizadoresViewModel);
         }
 
-        // POST: Utilizadores/Delete/5
+        // POST: UtilizadoresViewModels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            String? utilizador = null;
-            var utilizadores = await _context.Utilizadores.FindAsync(id);
-            if (utilizadores != null)
+            var utilizadoresViewModel = await _context.UtilizadoresViewModel.FindAsync(id);
+            if (utilizadoresViewModel != null)
             {
-                utilizador = utilizadores.Username;
-                utilizadores.Deleted = true;
+                _context.UtilizadoresViewModel.Remove(utilizadoresViewModel);
             }
 
             await _context.SaveChangesAsync();
-            if (utilizador != null)
-            {
-                TempData["UtilizadorApagado"] = utilizador;
-            }
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UtilizadoresExists(int id)
+        private bool UtilizadoresViewModelExists(int id)
         {
-            return _context.Utilizadores.Any(e => e.UtilizadorID == id);
+            return _context.UtilizadoresViewModel.Any(e => e.Id == id);
         }
     }
 }

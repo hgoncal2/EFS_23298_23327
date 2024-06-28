@@ -1,64 +1,14 @@
-﻿@model IEnumerable<EFS_23298_23306.Models.Utilizadores>
+﻿@model IEnumerable<EFS_23298_23306.ViewModel.UtilizadoresViewModel>
 
 @{
     ViewData["Title"] = "Index";
 }
 
+<h1>Index</h1>
 
-<script>
-    function teste(id, nome) {
-        $('#nomeUtilizador').text(nome);
-        $('#apagarUtilizador').attr('action', '/Utilizadores/Delete/' + id);
-    }
-</script>
-
-<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
-        <div class="modal-content">
-            <div class="modal-header modal-header-danger">
-                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar Utilizador '<span id="nomeUtilizador">a</span>' ?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-footer ">
-
-                <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
-                <form id="apagarUtilizador" method="post">
-                    <button type="submit" class="btn btn-danger">Apagar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<h1>Utilizadores</h1>
-@if (TempData["UtilizadorApagado"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Utilizador <strong>@TempData["UtilizadorApagado"]</strong> apagado com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (@TempData["NomeUtilizadorCriado"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Utilizador <strong>@TempData["NomeUtilizadorCriado"]</strong> criado com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-<p>
-    <a asp-action="Create">
-        <button class="btn btn-primary"> <i class="fa fa-add me-2"></i>Criar Utilizador</button>
-    </a>
-
-</p>
-
-
-<table id="Utilizadores" class="table display compact table-bordered w-100 table-sm table-striped">
-    <thead class="table-primary text-center">
+<table class="table">
+    <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.UtilizadorID)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Username)
             </th>
@@ -69,94 +19,32 @@
                 @Html.DisplayNameFor(model => model.UltimoNome)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NumeroTelemovel)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.DataCriacao)
             </th>
-           
-           
-            <th>Ações</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td scope="row">
-                    @Html.DisplayFor(modelItem => item.UtilizadorID)
-                </td>
+@foreach (var item in Model) {
+        <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Username)
                 </td>
-                <td>
-                    @if (item.PrimeiroNome != null)
-                    {
-
-                        @Html.DisplayFor(modelItem => item.PrimeiroNome)
-                        ;
-                    }
-                    else
-                    {
-
-                        <span>N.A.</span>
-                    }
-                </td>
-                <td>
-                    @if (item.UltimoNome != null)
-                    {
-
-                        @Html.DisplayFor(modelItem => item.UltimoNome)
-                        ;
-                    }
-                    else
-                    {
-
-                        <span>N.A.</span>
-                    }
-                </td>
-                <td>
-
-                    @if (item.Email != null)
-                    {
-
-                        @Html.DisplayFor(modelItem => item.Email)
-                        ;
-                    }
-                    else
-                    {
-
-                        <span>N.A.</span>
-                    }
-                </td>
-                <td>
-                    @if (item.NumeroTelemovel != null)
-                    {
-
-                        @Html.DisplayFor(modelItem => item.NumeroTelemovel)
-                        ;
-                    }
-                    else
-                    {
-
-                        <span>N.A.</span>
-                    }
-                </td>
-                
-                <td>
-                    @Html.DisplayFor(modelItem => item.DataCriacao)
-                </td>
-                <td class="align-content-center text-nowrap">
-                    <a asp-action="Edit" title="Editar" asp-route-id="@item.UtilizadorID"><i class="fa fa-pencil link-success icons-index"></i></a>
-                    <a asp-action="Details" asp-route-id="@item.UtilizadorID"><i class="fa-solid fa-circle-info icons-index"></i></a>
-                    <a data-bs-toggle="modal" style="cursor:pointer" data-bs-target="#modalApagar" onclick="teste('@item.UtilizadorID','@item.Username')"><i class="fa fa-trash icons-index link-danger delete"></i></a>
-                </td>
-            </tr>
-        }
+            <td>
+                @Html.DisplayFor(modelItem => item.PrimeiroNome)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UltimoNome)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DataCriacao)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
     </tbody>
-
 </table>
-@Html.AntiForgeryToken()
