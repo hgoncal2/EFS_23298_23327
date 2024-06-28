@@ -93,11 +93,11 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-            
-            <tr class="text-center">
-                <th scope="row">
+
+            <tr class="text-center align-text-top">
+                <td scope="row">
                     @Html.DisplayFor(modelItem => item.TemaID)
-                </th>
+                </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Nome)
             </td>
@@ -115,7 +115,7 @@
                     }
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TempoEstimado)
+                @Html.DisplayFor(modelItem => item.TempoEstimado) Minutos
             </td>
             <td>
                 
@@ -156,7 +156,7 @@
                                 <img src="~/Imagens/@Html.DisplayFor(modelItem => @foto.Nome)"
                                      alt="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
                                      title="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                                     class="rounded img-thumbnail expandeImagem" width="15%" />
+                                     class="rounded img-thumbnail expandeImagem" style="max-height:50px;min-height:50px;"/>
                             </a>
                         }
                         

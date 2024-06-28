@@ -34,11 +34,17 @@ html {
     height: 100%;
 }
 
+
+th {
+    background-color: #6b86e2 !important;
+    color:white;
+}
 footer {
     margin-top: auto;
-    background-color: white;
-    max-height:100px;
-    text-align:center;
+    background-color: #6e8495;
+    max-height: 100px;
+    text-align: center;
+    color: white;
 }
 .icons-index {
     font-size:1.8rem;
@@ -52,6 +58,7 @@ body {
     height: 100%;
     display: flex;
     flex-flow: column;
+    background-color: #e3ebf5;
 }
 .required::after {
     content: "*";
