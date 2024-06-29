@@ -13,6 +13,20 @@
     </div>
 }
 
+@{
+    @if (@ViewBag.Unauth != null)
+    {
+        @if ((bool)@ViewBag.Unauth == true)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Erro! Não está autenticado!
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+    }
+
+}
 
 <hr />
 <div class="row">

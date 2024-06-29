@@ -26,11 +26,17 @@ namespace EFS_23298_23306.Controllers
             _userManager = userManager;
         }
         [HttpGet]
-        public ActionResult Login()
+        public ActionResult Login(bool unauth)
 
         {
+
+            if (unauth)
+            {
+                ViewBag.Unauth = true;
+            }
             return View(new LoginViewModel());
         }
+        
 
 
 
@@ -68,6 +74,17 @@ namespace EFS_23298_23306.Controllers
             return View(loginVM);
 
 
+        }
+        [HttpPost]
+        public async Task<IActionResult> logout()
+        {
+            await _signInManager.SignOutAsync();
+            TempData["logOut"] = true;
+            {
+                // This needs to be a redirect so that the browser performs a new
+                // request and the identity for the user gets updated.
+                return RedirectToAction("Index","Home");
+            }
         }
 
 

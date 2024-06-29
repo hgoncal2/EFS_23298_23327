@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace EFS_23298_23306.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [CustomAuthorize(Roles = "Admin")]
     public class UtilizadoresController : Controller
     {
         private readonly ApplicationDbContext _context;
