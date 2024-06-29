@@ -21,9 +21,13 @@ namespace EFS_23298_23306.Models
         [ForeignKey(nameof(Temas))]
         public int? TemaID { get; set; }
         public  Temas? Tema { get; set; }
+        public DateTime DataCriacao { get; set; }
 
 
-
+        public Reservas()
+        {
+            this.DataCriacao = DateTime.Now;
+        }
 
     }
 }

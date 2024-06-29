@@ -1,4 +1,6 @@
-﻿namespace EFS_23298_23306.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace EFS_23298_23306.Models
 {
     public class Anfitrioes:Utilizadores
     {
