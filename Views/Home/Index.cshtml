@@ -10,27 +10,42 @@
     <button type="button" class="btn btn-primary" style="float:left; margin:10px; background-color:lavender; color: black;">Localização</button>
     <button id="signInBtn" type="button" class="btn btn-primary" style="float:right; margin:10px; background-color:lavender; color: black;">Entrar</button>
 </div>
-<div style="height:500px; background-color:lightblue">
-    <div  id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+<div style="min-height:90%;max-height:90%;; background-color:lightblue">
+    <div  id="carouselExampleControls" class="carousel carousel-dark slide" data-bs-ride="carousel">
         <div class="carousel-inner">
+            @{
+                int i = 0;
+            }
             @foreach (var item in Model)
             {
-                <div class="carousel-item active">
-
-                    <img class="d-block w-50" src="/Imagens/@item.Foto" alt="First slide" title="@item.Tema">
+                if (i == 0)
+                {
+                    <div class="carousel-item active text-center">
+                        <span>Tema @item.Tema</span>
+                        <img class="d-block w-100" style="max-height:600px" src="/Imagens/@item.Foto" alt="First slide" title="@item.Tema">
                 </div>
+                    i++;
+                }
+                
+                else
+                {
+                    <div class="carousel-item text-center">
+                        <span>Tema @item.Tema</span>
+                        <img class="d-block w-100" style="max-height:600px" src="/Imagens/@item.Foto" alt="First slide" title="@item.Tema">
+                    </div>
+                }
             }
             
            
         </div>
-        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+        <button class="carousel-control-prev btn-secondary" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next btn-secondary" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-        </a>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
 
 </div>
