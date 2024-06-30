@@ -4,6 +4,7 @@ using EFS_23298_23306.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EFS_23298_23306.Controllers
 {
@@ -56,13 +57,24 @@ namespace EFS_23298_23306.Controllers
                 var pass = await _userManager.CheckPasswordAsync(u, loginVM.Password);
                 if (pass)
                 {
+                    bool AdminOrAnf = false;
                     var result = await _signInManager.PasswordSignInAsync(u, loginVM.Password, false, false);
 
                     if (result.Succeeded)
                     {
                         if(u.UserName == "admin")
                         {
+                            AdminOrAnf = true;
                             await _userManager.AddToRoleAsync(u, "Admin");
+                            
+                        }
+                        var userAnf = await _context.Anfitrioes.Where(m => m.Deleted != true).Where(a=> a.UserName.Equals(u.UserName)).FirstOrDefaultAsync();
+                        if (userAnf != null) {
+                            AdminOrAnf = true;
+                            await _userManager.AddToRoleAsync(u, "Anfitriao");
+                        }
+                        if (!AdminOrAnf) {
+                            await _userManager.AddToRoleAsync(u, "Cliente");
                         }
                         userLogado = u;
                         return RedirectToAction("Index", "Temas");

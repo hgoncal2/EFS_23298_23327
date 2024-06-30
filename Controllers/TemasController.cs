@@ -11,6 +11,9 @@ using System.Numerics;
 
 namespace EFS_23298_23306.Controllers
 {
+    [CustomAuthorize(Roles = "Admin,Anfitriao")]
+
+    
     public class TemasController : Controller
     {
         private readonly ApplicationDbContext _context;

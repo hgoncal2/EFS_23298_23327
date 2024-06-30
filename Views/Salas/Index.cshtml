@@ -59,14 +59,12 @@
     <thead class="table-primary text-center">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.SalaID)
+                @Html.DisplayNameFor(model => model.Numero)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Area)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Numero)
-            </th>
+            
             <th>
                 @Html.DisplayNameFor(model => model.ListaAnfitrioes)
             </th>
@@ -82,8 +80,8 @@
         {
 
             <tr class="text-center align-text-top">
-                <td scope="row">
-                    @Html.DisplayFor(modelItem => item.SalaID)
+                <td>
+                    @Html.DisplayFor(modelItem => item.Numero)
                 </td>
                 <td>
                     @if (item.Area != null)
@@ -98,14 +96,12 @@
                         <span>N.A.</span>
                     }
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Numero)
-                </td>
+
                
       
                 <td>
 
-                    @if (@item.ListaAnfitrioes != null || @item.ListaAnfitrioes.Any())
+                    @if (@item.ListaAnfitrioes.Any())
                     {
                         @foreach (var anfitriao in @item.ListaAnfitrioes)
                         {

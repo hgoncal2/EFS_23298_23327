@@ -1,4 +1,7 @@
 ﻿using EFS_23298_23306.Models;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace EFS_23298_23306.ViewModel
 {
@@ -7,6 +10,7 @@ namespace EFS_23298_23306.ViewModel
         public int Id { get; set; }
 
         public  Salas? Sala { get; set; }
+        [DisplayName("Anfitriões")]
         public ICollection<String>? ListaAnfitrioes { get; set; }
 
 
