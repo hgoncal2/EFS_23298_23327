@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EFS_23298_23306.Models
 {
-    public class Salas
+    public class Salas : BaseEntity
     {
         [Key]
         public int SalaID { get; set; }
@@ -14,12 +14,11 @@ namespace EFS_23298_23306.Models
         public int Numero { get; set; }
         [DisplayName("Anfitriões")]
         public ICollection<Anfitrioes>? ListaAnfitrioes { get; set; }
-        public DateTime DataCriacao { get; set; }
-
+      
         public Salas()
         {
             this.ListaAnfitrioes = new HashSet<Anfitrioes>();
-            this.DataCriacao = DateTime.Now;
+           
         }
     }
 }

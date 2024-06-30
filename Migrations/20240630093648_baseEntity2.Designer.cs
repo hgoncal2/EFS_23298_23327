@@ -4,6 +4,7 @@ using EFS_23298_23306.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFS_23298_23306.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240630093648_baseEntity2")]
+    partial class baseEntity2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,10 +48,7 @@ namespace EFS_23298_23306.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FotoID"));
 
-                    b.Property<string>("CriadoPorOid")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CriadoPorUsername")
+                    b.Property<string>("CriadoPor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
@@ -91,10 +91,7 @@ namespace EFS_23298_23306.Migrations
                     b.Property<string>("ClientesId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CriadoPorOid")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CriadoPorUsername")
+                    b.Property<string>("CriadoPor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
@@ -140,10 +137,7 @@ namespace EFS_23298_23306.Migrations
                     b.Property<int>("Area")
                         .HasColumnType("int");
 
-                    b.Property<string>("CriadoPorOid")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CriadoPorUsername")
+                    b.Property<string>("CriadoPor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
@@ -168,10 +162,7 @@ namespace EFS_23298_23306.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TemaID"));
 
-                    b.Property<string>("CriadoPorOid")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CriadoPorUsername")
+                    b.Property<string>("CriadoPor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
@@ -221,10 +212,7 @@ namespace EFS_23298_23306.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CriadoPorOid")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CriadoPorUsername")
+                    b.Property<string>("CriadoPor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")

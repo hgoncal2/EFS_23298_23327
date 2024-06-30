@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EFS_23298_23306.Models
 {
-    public class Temas
+    public class Temas:BaseEntity
     {
 
         [Key]
@@ -34,16 +34,12 @@ namespace EFS_23298_23306.Models
         [Display(Name = "Sala")]
         public int? SalaID { get; set; }
         public Salas? Sala { get; set; }
-        [Display(Name = "Data de Criação")]
-     
-        public DateTime DataCriacao { get; set; }
         
-        public bool Deleted { get; set; }
-
+     
 
         public Temas()
         {
-            this.DataCriacao = DateTime.Now;
+           
             ListaFotos = new HashSet<Fotos>();
 
 

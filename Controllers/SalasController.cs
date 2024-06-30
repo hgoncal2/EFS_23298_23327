@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EFS_23298_23306.Data;
 using EFS_23298_23306.Models;
 using EFS_23298_23306.ViewModel;
+using System.Security.Claims;
 
 namespace EFS_23298_23306.Controllers
 {
@@ -91,8 +92,9 @@ namespace EFS_23298_23306.Controllers
 
                 }
                 sala.ListaAnfitrioes = anfs;
-                
 
+                sala.CriadoPorOid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                sala.CriadoPorUsername = User.FindFirstValue(ClaimTypes.Name);
                 _context.Add(sala);
                 await _context.SaveChangesAsync();
                 TempData["NumeroSalaCriada"] = sala.Numero;

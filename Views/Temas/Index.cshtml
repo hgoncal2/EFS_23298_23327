@@ -88,6 +88,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.DataCriacao)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CriadoPorUsername)
+            </th>
             <th>Ações</th>
         </tr>
     </thead>
@@ -173,6 +176,9 @@
             </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.DataCriacao)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.C)
                 </td>
                 <td class="align-content-center text-nowrap">
                     <a asp-action="Edit" title="Editar" asp-route-id="@item.TemaID"><i class="fa fa-pencil link-success icons-index"></i></a>

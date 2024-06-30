@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EFS_23298_23306.Models
 {
-    public class Reservas
+    public class Reservas : BaseEntity
     {
 
         [Key]
@@ -21,13 +21,8 @@ namespace EFS_23298_23306.Models
         [ForeignKey(nameof(Temas))]
         public int? TemaID { get; set; }
         public  Temas? Tema { get; set; }
-        public DateTime DataCriacao { get; set; }
-
-
-        public Reservas()
-        {
-            this.DataCriacao = DateTime.Now;
-        }
+      
+      
 
     }
 }

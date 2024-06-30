@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EFS_23298_23306.Data;
 using EFS_23298_23306.Models;
 using System.Numerics;
+using System.Security.Claims;
 
 namespace EFS_23298_23306.Controllers
 {
@@ -29,7 +30,7 @@ namespace EFS_23298_23306.Controllers
         // GET: Temas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Temas.Include(m => m.ListaFotos.Where(f => f.deleted!=true)).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
+            var applicationDbContext = _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted!=true)).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
             
             return View(await applicationDbContext.ToListAsync());
         }
@@ -129,7 +130,8 @@ namespace EFS_23298_23306.Controllers
                                 
                                 f.TemaID = temas.TemaID;
                                 f.Tema = temas;
-
+                                f.CriadoPorOid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                                f.CriadoPorUsername = User.FindFirstValue(ClaimTypes.Name);
                                 temas.ListaFotos.Add(f);
                                 mapFotos.Add(f,Imagem);
                                 hasImagem = true;
@@ -146,8 +148,9 @@ namespace EFS_23298_23306.Controllers
                 {
                     return View(temas);
                 }
-               
-                
+                //https://stackoverflow.com/a/71882405
+                temas.CriadoPorOid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                temas.CriadoPorUsername = User.FindFirstValue(ClaimTypes.Name);
                 _context.Add(temas);
                 await _context.SaveChangesAsync();
                 if (hasImagem)
@@ -190,7 +193,7 @@ namespace EFS_23298_23306.Controllers
                 return NotFound();
             }
 
-            var temas = await _context.Temas.Include(m => m.ListaFotos.Where(f => f.deleted != true)).FirstOrDefaultAsync(m => m.TemaID == id);
+            var temas = await _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).FirstOrDefaultAsync(m => m.TemaID == id);
 
             if (temas == null)
             {
@@ -381,7 +384,7 @@ namespace EFS_23298_23306.Controllers
                 var fotos = await _context.Fotos.Where(f => f.TemaID == temas.TemaID).ToListAsync();
                 foreach (var item in fotos)
                 {
-                   item.deleted = true;
+                   item.Deleted = true;
                 }
 
             }
@@ -412,11 +415,11 @@ namespace EFS_23298_23306.Controllers
             {
 
                
-                foto.deleted = true;
+                foto.Deleted = true;
                  tema = await _context.Temas.FirstOrDefaultAsync(f => f.TemaID == foto.TemaID);
                 if (tema != null)
                 {
-                    tema.ListaFotos.FirstOrDefault(f => f.FotoID == id).deleted = true;
+                    tema.ListaFotos.FirstOrDefault(f => f.FotoID == id).Deleted = true;
                     await _context.SaveChangesAsync();
 
                     TempData["FotoEliminada"] = true;

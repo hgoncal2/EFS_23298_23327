@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace EFS_23298_23306.Models
 {
-    public class Fotos
+    public class Fotos : BaseEntity
     {
         [Key]
         public int FotoID { get; set; }
@@ -16,7 +16,7 @@ namespace EFS_23298_23306.Models
         [ForeignKey(nameof(Temas))]
         public int TemaID { get; set; }
         public Temas Tema { get; set; }
-        public bool deleted { get; set; }
+        
 
         [SetsRequiredMembers]
         public Fotos(string nome)
