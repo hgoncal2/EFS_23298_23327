@@ -7,7 +7,7 @@ namespace EFS_23298_23306.Models
     {
 
         [Key]
-        public int ReservaID { get; set; }
+        public int ReservaId { get; set; }
         [Display(Name = "Data da reserva")]
         public DateTime ReservaDate { get; set; }
         [Display(Name = "Preço(em Euros)")]

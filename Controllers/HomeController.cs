@@ -24,6 +24,13 @@ namespace EFS_23298_23306.Controllers
         public async Task<IActionResult> Index()
         {
 
+            if (User.Identity.IsAuthenticated) {
+                var u = await _context.Utilizadores.Where(a => a.UserName == User.Identity.Name).FirstOrDefaultAsync();
+                if (u != null) { 
+                
+                }
+
+            }
             var applicationDbContext = _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
             ICollection<TemasFotoViewModel> TmVm = new List<TemasFotoViewModel>();
             var lista = await applicationDbContext.ToListAsync();

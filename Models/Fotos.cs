@@ -9,12 +9,12 @@ namespace EFS_23298_23306.Models
     public class Fotos : BaseEntity
     {
         [Key]
-        public int FotoID { get; set; }
+        public int FotoId { get; set; }
         public required String Nome { get; set; }
         public  DateTime? DataTirada { get; set; }
         public String? Descricao { get; set; }
         [ForeignKey(nameof(Temas))]
-        public int TemaID { get; set; }
+        public int TemaId { get; set; }
         public Temas Tema { get; set; }
         
 

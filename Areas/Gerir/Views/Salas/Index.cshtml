@@ -1,0 +1,152 @@
+﻿@model IEnumerable<EFS_23298_23306.Models.Salas>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<script>
+    function teste(id, nome) {
+        $('#nomeSala').text(nome);
+        $('#apagarSala').attr('action', 'Salas/Delete/' + id);
+    }
+
+
+</script>
+
+<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header modal-header-danger">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar Sala '<span id="nomeSala">a</span>' ?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-footer ">
+
+                <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
+                <form id="apagarSala" method="post">
+                    <button type="submit" class="btn btn-danger">Apagar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h1>Salas</h1>
+@if (TempData["SalaApagada"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Sala <strong>@TempData["SalaApagada"]</strong> apagado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErroEliminar"] != null) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Erro! Não pode apagar esta sala pois está a ser usada no tema <strong>@TempData["ErroEliminar"]</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (@TempData["NumeroSalaCriada"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Sala <strong>@TempData["NumeroSalaCriada"]</strong> criada com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<p>
+    <a asp-action="Create">
+        <button class="btn btn-primary"> <i class="fa fa-add me-2"></i>Criar Sala</button>
+    </a>
+
+</p>
+
+
+<table id="Salas" class="table display compact table-bordered w-100 table-sm table-striped">
+    <thead class="table-primary text-center">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Numero)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Area)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.ListaAnfitrioes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DataCriacao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CriadoPorUsername)
+            </th>
+            
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+            <tr class="text-center align-text-top">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Numero)
+                </td>
+                <td>
+                    @if (item.Area != null)
+                    {
+
+                        @Html.DisplayFor(modelItem => item.Area)
+                        ;
+                    }
+                    else
+                    {
+
+                        <span>N.A.</span>
+                    }
+                </td>
+
+               
+      
+                <td>
+
+                    @if (@item.ListaAnfitrioes.Any())
+                    {
+                        <ul class="list-group list-group-horizontal">
+                        @foreach (var anfitriao in @item.ListaAnfitrioes)
+                        {
+
+                                <li class="list-group-item text-black list-group-item-primary flex-fill ms-2" title="@anfitriao.UserName">@anfitriao.PrimeiroNome @anfitriao.UltimoNome</li>
+
+                               
+                                   
+                        }
+                        </ul>
+
+                    }
+                    else
+                    {
+
+                        <span>N.A.</span>
+                    }
+
+                </td>
+              
+                <td>
+                    @Html.DisplayFor(modelItem => item.DataCriacao)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CriadoPorUsername)
+                </td>
+                <td class="align-content-center text-nowrap">
+                    <a asp-action="Edit" title="Editar" asp-route-id="@item.SalaId"><i class="fa fa-pencil link-success icons-index"></i></a>
+                    <a asp-action="Details" title="Ver" asp-route-id="@item.SalaId"><i class="fa-solid fa-circle-info icons-index"></i></a>
+                    <a data-bs-toggle="modal" title="Apagar" style="cursor:pointer" data-bs-target="#modalApagar" onclick="teste('@item.SalaId','@item.Numero')"><i class="fa fa-trash icons-index link-danger delete"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+@Html.AntiForgeryToken()

@@ -57,27 +57,35 @@ namespace EFS_23298_23306.Controllers
                 var pass = await _userManager.CheckPasswordAsync(u, loginVM.Password);
                 if (pass)
                 {
-                    bool AdminOrAnf = false;
+                    bool hasChanges = false;
+                    bool adminAnf = false;
                     var result = await _signInManager.PasswordSignInAsync(u, loginVM.Password, false, false);
 
                     if (result.Succeeded)
                     {
-                        if(u.UserName == "admin")
+                        if(u.UserName == "admin" && !User.IsInRole("Admin"))
                         {
-                            AdminOrAnf = true;
-                            await _userManager.AddToRoleAsync(u, "Admin");
+                            hasChanges = true;
+                            adminAnf = true;
+                             await _userManager.AddToRoleAsync(u, "Admin");
                             
                         }
                         var userAnf = await _context.Anfitrioes.Where(m => m.Deleted != true).Where(a=> a.UserName.Equals(u.UserName)).FirstOrDefaultAsync();
-                        if (userAnf != null) {
-                            AdminOrAnf = true;
+                        if (userAnf != null && !User.IsInRole("Anfitriao")) {
+                            hasChanges = true;
+                            adminAnf = true;
                             await _userManager.AddToRoleAsync(u, "Anfitriao");
                         }
-                        if (!AdminOrAnf) {
+                        if ((!User.IsInRole("Admin") && !User.IsInRole("Anfitriao")) && !adminAnf) {
+                            hasChanges = true;
                             await _userManager.AddToRoleAsync(u, "Cliente");
                         }
                         userLogado = u;
-                        return RedirectToAction("Index", "Temas");
+                        if (hasChanges) {
+                            await _context.SaveChangesAsync();
+                        }
+                        
+                        return RedirectToAction("Index", "Temas", new { area = "Gerir" });
                     }
                 }
             }
@@ -95,7 +103,7 @@ namespace EFS_23298_23306.Controllers
             {
                 // This needs to be a redirect so that the browser performs a new
                 // request and the identity for the user gets updated.
-                return RedirectToAction("Index","Home");
+                return RedirectToAction("Index", "Home", new {area = ""});
             }
         }
 

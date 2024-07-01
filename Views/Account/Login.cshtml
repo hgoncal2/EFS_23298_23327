@@ -14,10 +14,9 @@
 }
 
 @{
-    @if (@ViewBag.Unauth != null)
+    @if (@TempData["Autenticado"] != null)
     {
-        @if ((bool)@ViewBag.Unauth == true)
-        {
+        @if ((bool)@TempData["Autenticado"] == false) {
             <div class="alert alert-danger alert-dismissible text-center fade show" role="alert">
                 Erro! Não está autenticado!
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

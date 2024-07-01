@@ -1,0 +1,62 @@
+﻿@model EFS_23298_23306.Models.Salas
+
+@{
+    ViewData["Title"] = "Detalhes";
+}
+
+<div>
+    <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" title="Voltar atrás" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
+</div>
+<h2 class="ms-5">Ver Sala <span style="color:mediumpurple"><strong>@Model.Numero</strong></span> </h2>
+
+<div>
+
+    <br />
+    <hr />
+    <div class="container-fluid mt-5 justify-content-center h-100 d-inline-block">
+        <div class="row">
+            <div class="col">
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Numero)
+                    <input disabled="true" asp-for="Numero" class="form-control" />
+
+                </div>
+                <div class="form-group">
+                    <label asp-for="Area" class="control-label"></label>
+                    <input disabled="true" asp-for="Area" class="form-control" />
+
+                </div>
+                <div class="form-group mt-3 text-center">
+                    @Html.LabelFor(m => m.ListaAnfitrioes)
+                    <ul class="list-group mt-3 list-group-horizontal">
+                    
+                     @if (@Model.ListaAnfitrioes.Any())
+                    {
+                    @foreach(var i in @Model.ListaAnfitrioes){
+                                <li class="list-group-item text-black list-group-item-primary flex-fill ms-2" title="@i.UserName">@i.PrimeiroNome @i.UltimoNome</li>
+                    }
+                    }else{
+                        @:N.A
+                    }
+                   
+                       
+                       
+                    </ul>
+
+                </div>
+            </div>
+
+        </div>
+        <a asp-route-id="@Model?.SalaId" asp-action="Edit">
+            <button class="btn btn-primary position-absolute mt-lg-5"> <i class="fa fa-pencil me-2"></i>Editar Sala</button>
+        </a>
+    </div>
+
+    </a>
+    <br />
+    
+    
+
+</div>

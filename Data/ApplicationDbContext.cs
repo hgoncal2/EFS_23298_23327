@@ -18,8 +18,9 @@ namespace EFS_23298_23306.Data
             modelBuilder.Entity<Fotos>()
                 .HasOne(e => e.Tema).
                 WithMany(c => c.ListaFotos)
-                .HasForeignKey(e => e.TemaID);
+                .HasForeignKey(e => e.TemaId);
 
+            
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<IdentityRole>().HasData(

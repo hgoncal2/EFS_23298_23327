@@ -1,0 +1,94 @@
+﻿@using EFS_23298_23306.Data.Enum
+@model EFS_23298_23306.ViewModel.AnfitriaoSalaViewModel
+
+@{
+    ViewData["Title"] = "Editar";
+}
+
+<div>
+    <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
+</div>
+
+
+<h2 class="ms-5">Editar Sala <span style="color:mediumpurple"><strong>@Model.Sala.Numero</strong></span> </h2>
+
+<br />
+<hr />
+@if (ViewBag.ShowAlert == true) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Sala <strong>@Model.Sala.Numero</strong> guardado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+@if (@ViewBag.SalaExistente != null && ViewBag.SalaExistente != Model.Sala.Numero) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Erro! Sala <strong>@ViewBag.TemaExistente</strong> já existe!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+}
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Sala.SalaId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
+    
+    <div class="container-fluid mt-1 justify-content-center h-100 d-inline-block">
+        <div class="row">
+            <div class="col">
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Sala.Numero, new { @class = "required" })
+                    <input asp-for="Sala.Numero" class="form-control" />
+                    <span asp-validation-for="Sala.Numero" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Sala.Area" class="control-label"></label>
+                    <input asp-for="Sala.Area" class="form-control" />
+                    <span asp-validation-for="Sala.Area" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ListaAnfitrioes)
+                    @Html.ListBoxFor(model => model.ListaAnfitrioes, (MultiSelectList)ViewBag.SelectionIdList, new { @class = "form-control" })
+
+                    <span asp-validation-for="ListaAnfitrioes" class="text-danger"></span>
+                </div>
+            </div>
+
+           
+    </div>
+    <br /><br />
+
+    
+
+
+        
+    </div>
+    <br />
+    <div class="form-group text-center mt-lg-4  mx-auto">
+        <a type="submit">
+            @if (@ViewBag.SalaAntiga != null) {
+                @Html.Hidden("numeroAntigo", (String)@ViewBag.SalaAntiga)
+            }
+
+            <button class="btn btn-primary btn-lg"><i class="fa fa-floppy-disk me-2"></i>Guardar Sala</button>
+        </a>
+    </div>
+
+    <br />
+    <br />
+
+
+
+</form>
+
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

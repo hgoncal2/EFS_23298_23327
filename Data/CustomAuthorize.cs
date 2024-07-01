@@ -15,14 +15,15 @@ namespace EFS_23298_23306.Data
         public bool NotAuth { get; set; }
 
 
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
+        public override void OnActionExecuting(ActionExecutingContext filterContext) {
+            var controller = filterContext.Controller as Controller;
+
             //if user isn't logged in.
             if (filterContext.HttpContext.User.Identity == null || !filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
-                
-                    filterContext.HttpContext.Response.StatusCode = 403;
-                    filterContext.Result = new RedirectToActionResult("Login", "Account", new { unauth = true });
+                controller.TempData["Autenticado"] = false;
+                filterContext.HttpContext.Response.StatusCode = 403;
+                    filterContext.Result = new RedirectToActionResult("Login", "Account", new { area = "",unauth=true});
             } else {
                 var user = filterContext.HttpContext.User;
                 //Check user rights here
@@ -39,10 +40,22 @@ namespace EFS_23298_23306.Data
                 if (!authorized) {
                     var s = filterContext.HttpContext.Request.HttpContext.Request.Path.ToString();
                     filterContext.HttpContext.Response.StatusCode = 401;
-                    var controller = filterContext.Controller as Controller;
-                    var referer = filterContext.HttpContext.Request.Headers["Referer"].ToString().Split("/")[3];
-                    controller.TempData["Auth"] = false;
-                    filterContext.Result = new RedirectToActionResult("Index", referer, new { });
+                    var referer = "Home";
+                    try {
+                     referer = filterContext.HttpContext.Request.Headers["Referer"].ToString().Split("/")[3];
+
+                    }catch(Exception) { 
+                    
+                    }
+                    if(referer == "") {
+                        controller.TempData["Auth"] = false;
+                        filterContext.Result = new RedirectToActionResult("Index", "Home", new { area = "" });
+
+                    } else {
+                        controller.TempData["Auth"] = false;
+                        filterContext.Result = new RedirectToActionResult("Index", referer, new { area = "" });
+                    }
+                   
                 }
 
                 

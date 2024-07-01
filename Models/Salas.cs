@@ -6,7 +6,7 @@ namespace EFS_23298_23306.Models
     public class Salas : BaseEntity
     {
         [Key]
-        public int SalaID { get; set; }
+        public int SalaId { get; set; }
         [DisplayName("Área (m2)")]
         public int Area { get; set; }
         [DisplayName("Número da Sala")]

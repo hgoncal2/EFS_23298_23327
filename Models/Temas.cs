@@ -10,7 +10,7 @@ namespace EFS_23298_23306.Models
 
         [Key]
         [Display(Name = "ID")]
-        public int TemaID { get; set; }
+        public int TemaId { get; set; }
         [Display(Name = "Nome")]
         public required String Nome { get; set; }
         [Display(Name = "Descrição")]

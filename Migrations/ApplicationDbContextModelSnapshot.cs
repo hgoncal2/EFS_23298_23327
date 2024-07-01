@@ -27,23 +27,23 @@ namespace EFS_23298_23306.Migrations
                     b.Property<string>("ListaAnfitrioesId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ListaSalasSalaID")
+                    b.Property<int>("ListaSalasSalaId")
                         .HasColumnType("int");
 
-                    b.HasKey("ListaAnfitrioesId", "ListaSalasSalaID");
+                    b.HasKey("ListaAnfitrioesId", "ListaSalasSalaId");
 
-                    b.HasIndex("ListaSalasSalaID");
+                    b.HasIndex("ListaSalasSalaId");
 
                     b.ToTable("AnfitrioesSalas");
                 });
 
             modelBuilder.Entity("EFS_23298_23306.Models.Fotos", b =>
                 {
-                    b.Property<int>("FotoID")
+                    b.Property<int>("FotoId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FotoID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FotoId"));
 
                     b.Property<string>("CriadoPorOid")
                         .HasColumnType("nvarchar(max)");
@@ -70,23 +70,23 @@ namespace EFS_23298_23306.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TemaID")
+                    b.Property<int>("TemaId")
                         .HasColumnType("int");
 
-                    b.HasKey("FotoID");
+                    b.HasKey("FotoId");
 
-                    b.HasIndex("TemaID");
+                    b.HasIndex("TemaId");
 
                     b.ToTable("Fotos");
                 });
 
             modelBuilder.Entity("EFS_23298_23306.Models.Reservas", b =>
                 {
-                    b.Property<int>("ReservaID")
+                    b.Property<int>("ReservaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservaID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservaId"));
 
                     b.Property<string>("ClientesId")
                         .HasColumnType("nvarchar(450)");
@@ -118,7 +118,7 @@ namespace EFS_23298_23306.Migrations
                     b.Property<string>("UtilizadorID")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ReservaID");
+                    b.HasKey("ReservaId");
 
                     b.HasIndex("ClientesId");
 
@@ -131,11 +131,11 @@ namespace EFS_23298_23306.Migrations
 
             modelBuilder.Entity("EFS_23298_23306.Models.Salas", b =>
                 {
-                    b.Property<int>("SalaID")
+                    b.Property<int>("SalaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SalaID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SalaId"));
 
                     b.Property<int>("Area")
                         .HasColumnType("int");
@@ -155,18 +155,18 @@ namespace EFS_23298_23306.Migrations
                     b.Property<int>("Numero")
                         .HasColumnType("int");
 
-                    b.HasKey("SalaID");
+                    b.HasKey("SalaId");
 
                     b.ToTable("Salas");
                 });
 
             modelBuilder.Entity("EFS_23298_23306.Models.Temas", b =>
                 {
-                    b.Property<int>("TemaID")
+                    b.Property<int>("TemaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TemaID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TemaId"));
 
                     b.Property<string>("CriadoPorOid")
                         .HasColumnType("nvarchar(max)");
@@ -202,7 +202,7 @@ namespace EFS_23298_23306.Migrations
                     b.Property<int>("TempoEstimado")
                         .HasColumnType("int");
 
-                    b.HasKey("TemaID");
+                    b.HasKey("TemaId");
 
                     b.HasIndex("SalaID");
 
@@ -529,7 +529,7 @@ namespace EFS_23298_23306.Migrations
 
                     b.HasOne("EFS_23298_23306.Models.Salas", null)
                         .WithMany()
-                        .HasForeignKey("ListaSalasSalaID")
+                        .HasForeignKey("ListaSalasSalaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -538,7 +538,7 @@ namespace EFS_23298_23306.Migrations
                 {
                     b.HasOne("EFS_23298_23306.Models.Temas", "Tema")
                         .WithMany("ListaFotos")
-                        .HasForeignKey("TemaID")
+                        .HasForeignKey("TemaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

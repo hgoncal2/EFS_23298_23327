@@ -1,0 +1,195 @@
+﻿@model IEnumerable<EFS_23298_23306.Models.Temas>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<script>
+    function teste(id,nome){
+        $('#nomeTema').text(nome);
+        $('#apagarTema').attr('action', 'Gerir/Temas/Delete/' + id);
+    }
+    
+    
+</script>
+
+<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header modal-header-danger">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar tema '<span id="nomeTema">a</span>' ?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-footer ">
+                
+                <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
+                <form id="apagarTema" method="post" >
+                 <button type="submit" class="btn btn-danger" >Apagar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h1>Temas</h1>
+@if (TempData["TemaApagado"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Tema <strong>@TempData["TemaApagado"]</strong> apagado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (@TempData["NomeTemaCriado"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Tema <strong>@TempData["NomeTemaCriado"]</strong> criado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<p>
+    <a asp-action="Create">
+    <button class="btn btn-primary" > <i  class="fa fa-add me-2"></i>Criar tema</button>
+    </a>
+
+</p>
+
+
+<table id="temas" class="table display compact table-bordered w-100 table-sm table-striped">
+    <thead class="table-primary text-center">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TemaId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descricao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TempoEstimado)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MinPessoas)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaxPessoas)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dificuldade)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ListaFotos)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sala)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DataCriacao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CriadoPorUsername)
+            </th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+@foreach (var item in Model) {
+
+            <tr class="text-center align-text-top">
+                <td scope="row">
+                    @Html.DisplayFor(modelItem => item.TemaId)
+                </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nome)
+            </td>
+            <td>
+                    @if (item.MinPessoas != null)
+                    {
+
+                        @Html.DisplayFor(modelItem => item.Descricao)
+                        ;
+                    }
+                    else
+                    {
+
+                        <span>N.A.</span>
+                    }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TempoEstimado) Minutos
+            </td>
+            <td>
+                
+                    @if(item.MinPessoas != null)
+                    {
+
+                        @Html.DisplayFor(modelItem => item.MinPessoas);
+                    }
+                    else{
+
+                        <span>N.A.</span>
+                        }
+                    </td>
+            <td>
+                    @if (item.MinPessoas != null)
+                    {
+
+                        @Html.DisplayFor(modelItem => item.MaxPessoas)
+                        ;
+                    }
+                    else
+                    {
+
+                        <span>N.A.</span>
+                    }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dificuldade)
+            </td>
+                <td>
+                   
+                    @if (@item.ListaFotos != null || @item.ListaFotos.Any())
+                    {
+                        @foreach (var foto in @item.ListaFotos)
+                        {
+                            <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                               href="~/Imagens/@foto.Nome">
+                                <img src="~/Imagens/@Html.DisplayFor(modelItem => @foto.Nome)"
+                                     alt="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                     title="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                     class="rounded img-thumbnail expandeImagem" style="max-height:50px;min-height:50px;"/>
+                            </a>
+                        }
+                        
+                    }
+                    else
+                    {
+
+                        <span>N.A.</span>
+                    }
+                    
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Sala.Numero)
+            </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DataCriacao)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CriadoPorUsername)
+                </td>
+                <td class="align-content-center text-nowrap">
+                    <a asp-action="Edit" title="Editar" asp-route-id="@item.TemaId"><i class="fa fa-pencil link-success icons-index"></i></a>
+                    <a asp-action="Details" title="Ver" asp-route-id="@item.TemaId"><i class="fa-solid fa-circle-info icons-index"></i></a>
+                    <a data-bs-toggle="modal" title="Apagar" style="cursor:pointer" data-bs-target="#modalApagar" onclick="teste('@item.TemaId','@item.Nome')"><i class="fa fa-trash icons-index link-danger delete"></i></a>
+            </td>
+        </tr>
+}
+    </tbody>
+  
+</table>
+
+@Html.AntiForgeryToken()

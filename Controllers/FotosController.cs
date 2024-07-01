@@ -34,7 +34,7 @@ namespace EFS_23298_23306.Controllers
             }
 
             var fotos = await _context.Fotos
-                .FirstOrDefaultAsync(m => m.FotoID == id);
+                .FirstOrDefaultAsync(m => m.FotoId == id);
             if (fotos == null)
             {
                 return NotFound();
@@ -88,7 +88,7 @@ namespace EFS_23298_23306.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("FotoID,Caminho,DataTirada,Descricao")] Fotos fotos)
         {
-            if (id != fotos.FotoID)
+            if (id != fotos.FotoId)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace EFS_23298_23306.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!FotosExists(fotos.FotoID))
+                    if (!FotosExists(fotos.FotoId))
                     {
                         return NotFound();
                     }
@@ -125,7 +125,7 @@ namespace EFS_23298_23306.Controllers
             }
 
             var fotos = await _context.Fotos
-                .FirstOrDefaultAsync(m => m.FotoID == id);
+                .FirstOrDefaultAsync(m => m.FotoId == id);
             if (fotos == null)
             {
                 return NotFound();
@@ -151,7 +151,7 @@ namespace EFS_23298_23306.Controllers
 
         private bool FotosExists(int id)
         {
-            return _context.Fotos.Any(e => e.FotoID == id);
+            return _context.Fotos.Any(e => e.FotoId == id);
         }
     }
 }

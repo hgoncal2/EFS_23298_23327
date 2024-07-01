@@ -1,0 +1,18 @@
+﻿<ul class="nav nav-tabs navbar-dark bg-dark">
+    <li class="nav-item">
+        <a class="nav-link text-white" asp-area="Gerir" asp-controller="Temas" asp-action="Index">Temas</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-white" asp-area="Gerir" asp-controller="Salas" asp-action="Index">Salas</a>
+    </li>
+
+    @if (User.IsInRole("Admin")) {
+        <li class="nav-item">
+            <a class="nav-link text-white" asp-area="Gerir" asp-controller="Utilizadores" asp-action="Index">Utilizadores</a>
+        </li>
+    }
+
+
+
+
+</ul>
