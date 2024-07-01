@@ -1,6 +1,6 @@
-﻿namespace EFS_23298_23306.Data
+﻿namespace EFS_23298_23327.Data
 {
-    using EFS_23298_23306.Models;
+    using EFS_23298_23327.Models;
     using Microsoft.AspNetCore.Identity;
 
 

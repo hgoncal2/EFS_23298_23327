@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EFS_23298_23306.Data;
-using EFS_23298_23306.Models;
+using EFS_23298_23327.Data;
+using EFS_23298_23327.Models;
 using System.Numerics;
 using System.Security.Claims;
 
-namespace EFS_23298_23306.Areas.Gerir.Controllers
+namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
     [CustomAuthorize(Roles = "Admin,Anfitriao")]
 

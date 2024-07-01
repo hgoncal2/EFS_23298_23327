@@ -1,5 +1,5 @@
-using EFS_23298_23306.Data;
-using EFS_23298_23306.Models;
+using EFS_23298_23327.Data;
+using EFS_23298_23327.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

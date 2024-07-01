@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace EFS_23298_23306.Models
+namespace EFS_23298_23327.Models
 {
     public class Fotos : BaseEntity
     {

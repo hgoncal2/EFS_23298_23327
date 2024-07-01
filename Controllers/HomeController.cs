@@ -1,13 +1,13 @@
-﻿using EFS_23298_23306.Data;
-using EFS_23298_23306.Models;
-using EFS_23298_23306.ViewModel;
+﻿using EFS_23298_23327.Data;
+using EFS_23298_23327.Models;
+using EFS_23298_23327.ViewModel;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
-namespace EFS_23298_23306.Controllers
+namespace EFS_23298_23327.Controllers
 {
     public class HomeController : Controller
     {

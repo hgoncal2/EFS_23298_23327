@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using EFS_23298_23306.Controllers;
+using EFS_23298_23327.Controllers;
 
 
 //https://stackoverflow.com/questions/73555584/c-sharp-net-6-0-how-to-redirect-an-unauthorized-user-to-an-unauthorizedpage
 // Obrigado ao utilizador GuyonM
-namespace EFS_23298_23306.Data
+namespace EFS_23298_23327.Data
 {
     public class CustomAuthorizeAttribute : ActionFilterAttribute
     {

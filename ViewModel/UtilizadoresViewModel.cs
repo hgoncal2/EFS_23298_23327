@@ -1,7 +1,7 @@
 ﻿using EFS_23298_23306.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace EFS_23298_23306.ViewModel
+namespace EFS_23298_23327.ViewModel
 {
     public class UtilizadoresViewModel
     {

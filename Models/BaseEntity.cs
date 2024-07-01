@@ -1,9 +1,9 @@
-﻿using EFS_23298_23306.Data.Interfaces;
+﻿using EFS_23298_23327.Data.Interfaces;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EFS_23298_23306.Models
+namespace EFS_23298_23327.Models
 {
     public class BaseEntity : BaseEntityInterface
     { 

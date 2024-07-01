@@ -1,10 +1,10 @@
-﻿using EFS_23298_23306.Models;
+﻿using EFS_23298_23327.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using EFS_23298_23306.ViewModel;
-namespace EFS_23298_23306.Data
+using EFS_23298_23327.ViewModel;
+namespace EFS_23298_23327.Data
 {
     public class ApplicationDbContext : IdentityDbContext<Utilizadores>
     {
@@ -36,8 +36,8 @@ namespace EFS_23298_23306.Data
         public DbSet<Reservas> Reservas { get; set; }
         public DbSet<Salas> Salas { get; set; }
         public DbSet<Fotos> Fotos { get; set; }
-        public DbSet<EFS_23298_23306.ViewModel.LoginViewModel> LoginViewModel { get; set; } = default!;
-        public DbSet<EFS_23298_23306.ViewModel.UtilizadoresViewModel> UtilizadoresViewModel { get; set; } = default!;
+        public DbSet<EFS_23298_23327.ViewModel.LoginViewModel> LoginViewModel { get; set; } = default!;
+        public DbSet<EFS_23298_23327.ViewModel.UtilizadoresViewModel> UtilizadoresViewModel { get; set; } = default!;
 
     }
 

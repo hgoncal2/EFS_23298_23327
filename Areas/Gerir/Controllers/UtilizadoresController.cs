@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EFS_23298_23306.Data;
-using EFS_23298_23306.ViewModel;
+using EFS_23298_23327.Data;
+using EFS_23298_23327.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using EFS_23298_23306.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
-namespace EFS_23298_23306.Areas.Gerir.Controllers
+namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
     [CustomAuthorize(Roles = "Admin")]
     [Area("Gerir")]

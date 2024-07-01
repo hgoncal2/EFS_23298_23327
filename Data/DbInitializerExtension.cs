@@ -1,6 +1,6 @@
-﻿using EFS_23298_23306.Data.Aulas.Data;
+﻿using EFS_23298_23327.Data.Aulas.Data;
 
-namespace EFS_23298_23306.Data
+namespace EFS_23298_23327.Data
 {
     internal static class DbInitializerExtension
     {

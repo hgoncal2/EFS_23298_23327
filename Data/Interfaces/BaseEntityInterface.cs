@@ -1,8 +1,8 @@
-﻿using EFS_23298_23306.Models;
+﻿using EFS_23298_23327.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EFS_23298_23306.Data.Interfaces
+namespace EFS_23298_23327.Data.Interfaces
 {
     public interface BaseEntityInterface
     {
