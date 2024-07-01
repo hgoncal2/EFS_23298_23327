@@ -4,6 +4,7 @@ using EFS_23298_23306.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFS_23298_23306.Controllers
@@ -12,17 +13,18 @@ namespace EFS_23298_23306.Controllers
     {
         private readonly UserManager<Utilizadores> _userManager;
         private readonly SignInManager<Utilizadores> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
         private Utilizadores userLogado { get; set; }
 
         // GET: AccountController
 
         public AccountController(UserManager<Utilizadores> userManager,
-            SignInManager<Utilizadores> signInManager,
+            SignInManager<Utilizadores> signInManager, RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context)
         {
             _context = context;
-
+            _roleManager = roleManager;
             _signInManager = signInManager;
             _userManager = userManager;
         }
@@ -95,6 +97,18 @@ namespace EFS_23298_23306.Controllers
 
 
         }
+
+
+        [HttpGet]
+        public  ActionResult Register() {
+            
+            var ViewModel = new RegisterViewModel();
+            ViewBag.SelectionIdList = new MultiSelectList(_roleManager.Roles.ToList(), "Name", "Name", ViewModel.Roles);
+            return View(new RegisterViewModel());
+
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> logout()
         {

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EFS_23298_23306.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace EFS_23298_23306.ViewModel
 {
@@ -8,19 +9,27 @@ namespace EFS_23298_23306.ViewModel
         public String Username { get; set; }
         [Display(Name = "Primeiro Nome")]
         public String? PrimeiroNome { get; set; }
+        public String? Email { get; set; }
 
         [Display(Name = "Último Nome")]
         public String? UltimoNome { get; set; }
 
-        [Display(Name = "Data de Criação")]
+        [Display(Name = "Roles")]
 
+        public HashSet<String> Roles { get; set; } = new HashSet<String>();
+        [Display(Name = "Data de criação")]
         public DateTime DataCriacao { get; set; }
 
-        public UtilizadoresViewModel(String Username, String PrimeiroNome, String UltimoNome, DateTime DataCriacao) { 
-            this.Username = Username;
-            this.PrimeiroNome = PrimeiroNome;
-            this.UltimoNome = UltimoNome;
-            this.DataCriacao = DataCriacao;
+        public UtilizadoresViewModel() { 
+        
+        }
+
+        public UtilizadoresViewModel(Utilizadores u) { 
+            this.Username = u.UserName;
+            this.PrimeiroNome = u.PrimeiroNome;
+            this.UltimoNome = u.UltimoNome;
+            this.DataCriacao = u.DataCriacao;
+            this.Email= u.Email;
         }
     }
 }

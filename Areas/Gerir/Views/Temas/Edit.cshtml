@@ -90,6 +90,7 @@
                     @Html.LabelFor(m => m.Sala)
                     @if (@ViewBag.s != null && (ViewBag.s as List<Salas>).Any()) {
                         <select class="form-select" asp-for="SalaID" aria-label="Escolher dificuldade">
+                            <option value="@null">Nenhuma </option>
                             @foreach (var dif in @ViewBag.s as List<Salas>) {
                                 <option value="@dif.SalaId">@dif.Numero</option>
                             }

@@ -1,6 +1,7 @@
 ﻿
 
 using EFS_23298_23306.Data.Interfaces;
+using EFS_23298_23306.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -30,8 +31,17 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
     public Utilizadores()
         {
             this.DataCriacao = DateTime.Now;
-            
+       
+    }
 
+    public Utilizadores(RegisterViewModel r) {
+        this.DataCriacao = DateTime.Now;
+        var hasher = new PasswordHasher<Utilizadores>();
+        this.PrimeiroNome = r.PrimeiroNome;
+        this.UltimoNome = r.UltimoNome;
+        this.UserName = r.Username;
+        this.PasswordHash=hasher.HashPassword(null,r.Password);
+        this.Email = r.Email;
     }
 
     }

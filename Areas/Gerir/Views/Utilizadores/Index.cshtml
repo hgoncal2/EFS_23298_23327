@@ -6,7 +6,7 @@
 
 <h1>Index</h1>
 
-<table class="table">
+<table class="table text-center">
     <thead>
         <tr>
             <th>
@@ -17,6 +17,12 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.UltimoNome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Roles)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.DataCriacao)
@@ -36,6 +42,38 @@
             <td>
                 @Html.DisplayFor(modelItem => item.UltimoNome)
             </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+
+                    @if (@item.Roles.Any()) {
+                        <ul class="list-group list-group-horizontal">
+                            @foreach (var role in @item.Roles) {
+                                @if(role.Equals("Admin")){
+                                    <li class="list-group-item text-white  bg-danger flex-fill ms-2">@role</li>
+
+                                }
+                                @if (role.Equals("Anfitriao")) {
+                                    <li class="list-group-item text-white  bg-warning flex-fill ms-2">@role</li>
+
+                                }
+                                @if (role.Equals("Cliente")) {
+                                    <li class="list-group-item text-white  bg-primary flex-fill ms-2">@role</li>
+
+                                }
+
+
+
+                            }
+                        </ul>
+
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+
+                </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DataCriacao)
             </td>

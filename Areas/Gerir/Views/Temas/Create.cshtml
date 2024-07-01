@@ -67,6 +67,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Dificuldade, new { @class = "required" })
                     <select class="form-select" asp-for="Dificuldade" aria-label="Escolher dificuldade">
+                        
                     @foreach (var dif in Html.GetEnumSelectList<Dificuldade>())
                     {
                             <option value="@dif.Value">@dif.Text</option>
@@ -78,7 +79,9 @@
 
                     @Html.LabelFor(m => m.Sala)
                     @if(@ViewBag.s != null && (ViewBag.s as List<Salas>).Any()){
+                        
                         <select class="form-select" asp-for="SalaID" aria-label="Escolher dificuldade">
+                            <option value="@null">Nenhuma </option>
                             @foreach (var dif in @ViewBag.s as List<Salas>) {
                                 <option value="@dif.SalaId">@dif.Numero</option>
                             }

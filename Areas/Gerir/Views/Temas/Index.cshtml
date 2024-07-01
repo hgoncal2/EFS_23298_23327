@@ -173,7 +173,16 @@
                     
             </td>
             <td>
-                    @Html.DisplayFor(modelItem => item.Sala.Numero)
+                    @if (item.Sala != null) {
+                         <ul class="list-group list-group-horizontal">
+
+
+                            <li class="list-group-item text-black list-group-item-success flex-fill ms-2">@Html.DisplayFor(modelItem => item.Sala.Numero)</li>
+                        </ul>
+                    } else {
+
+                        <span>N.A.</span>
+                    }
             </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.DataCriacao)

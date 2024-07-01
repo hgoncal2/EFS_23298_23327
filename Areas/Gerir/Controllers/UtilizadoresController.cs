@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using EFS_23298_23306.Data;
 using EFS_23298_23306.ViewModel;
 using Microsoft.AspNetCore.Authorization;
+using EFS_23298_23306.Models;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace EFS_23298_23306.Areas.Gerir.Controllers
 {
@@ -15,11 +18,18 @@ namespace EFS_23298_23306.Areas.Gerir.Controllers
     [Area("Gerir")]
     public class UtilizadoresController : Controller
     {
+        private readonly UserManager<Utilizadores> _userManager;
+        private readonly SignInManager<Utilizadores> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
 
-        public UtilizadoresController(ApplicationDbContext context)
+        public UtilizadoresController(ApplicationDbContext context, UserManager<Utilizadores> userManager,
+            SignInManager<Utilizadores> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _roleManager = roleManager;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: UtilizadoresViewModels
@@ -31,8 +41,12 @@ namespace EFS_23298_23306.Areas.Gerir.Controllers
             if (users != null || users.Any())
             {
                 foreach (var u in users)
-                {
-                    var uVM = new UtilizadoresViewModel(u.UserName, u.PrimeiroNome, u.UltimoNome, u.DataCriacao);
+                { 
+                   
+                   
+                   HashSet<String> roles =  _userManager.GetRolesAsync(u).Result.ToHashSet();
+                    var uVM = new UtilizadoresViewModel(u);
+                    uVM.Roles = roles;
                     listaU.Add(uVM);
                 }
             }
@@ -60,7 +74,10 @@ namespace EFS_23298_23306.Areas.Gerir.Controllers
         // GET: UtilizadoresViewModels/Create
         public IActionResult Create()
         {
-            return View();
+
+            var ViewModel = new RegisterViewModel();
+            ViewBag.SelectionIdList = new MultiSelectList(_roleManager.Roles.ToList(), "Name", "Name", ViewModel.Roles);
+            return View(new RegisterViewModel());
         }
 
         // POST: UtilizadoresViewModels/Create
@@ -68,15 +85,36 @@ namespace EFS_23298_23306.Areas.Gerir.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PrimeiroNome,UltimoNome,DataCriacao")] UtilizadoresViewModel utilizadoresViewModel)
+        public async Task<IActionResult> Create(RegisterViewModel rvm)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(utilizadoresViewModel);
+                var user = _context.Utilizadores.Where(u=> u.UserName == rvm.Username).FirstOrDefault();
+                if (user != null) {
+                    ViewBag.UserExiste = "Utilizador \"<strong>" + user.UserName + "</strong>\" já existe!";
+                    ViewBag.SelectionIdList = new MultiSelectList(_roleManager.Roles.ToList(), "Name", "Name", rvm.Roles);
+
+                    return View(rvm);
+                } else {
+                    user = _context.Utilizadores.Where(u => u.Email == rvm.Email).FirstOrDefault();
+                    if (user != null) {
+                        ViewBag.SelectionIdList = new MultiSelectList(_roleManager.Roles.ToList(), "Name", "Name", rvm.Roles);
+
+                        ViewBag.UserExiste = "Utilizador com email \"<strong>" + user.Email + "</strong>\" já existe!";
+                        return View(rvm);
+                    }
+                }
+                Utilizadores u = new Utilizadores(rvm);
+                u.CriadoPorOid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                u.CriadoPorUsername = User.FindFirstValue(ClaimTypes.Name);
+                _context.Add(u);
                 await _context.SaveChangesAsync();
+                foreach (var item in rvm.Roles) {
+                    await _userManager.AddToRoleAsync(u, item);
+                }
                 return RedirectToAction(nameof(Index));
             }
-            return View(utilizadoresViewModel);
+            return View(rvm);
         }
 
         // GET: UtilizadoresViewModels/Edit/5
@@ -167,5 +205,7 @@ namespace EFS_23298_23306.Areas.Gerir.Controllers
         {
             return _context.UtilizadoresViewModel.Any(e => e.Id == id);
         }
+
+        
     }
 }
