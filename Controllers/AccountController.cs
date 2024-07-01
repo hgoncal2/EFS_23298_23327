@@ -1,12 +1,12 @@
-﻿using EFS_23298_23306.Data;
-using EFS_23298_23306.Models;
-using EFS_23298_23306.ViewModel;
+﻿using EFS_23298_23327.Data;
+using EFS_23298_23327.Models;
+using EFS_23298_23327.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace EFS_23298_23306.Controllers
+namespace EFS_23298_23327.Controllers
 {
     public class AccountController : Controller
     {

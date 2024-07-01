@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace EFS_23298_23306.Models
+namespace EFS_23298_23327.Models
 {
     public class Salas : BaseEntity
     {

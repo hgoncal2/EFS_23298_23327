@@ -1,9 +1,9 @@
-﻿using EFS_23298_23306.Data;
-using EFS_23298_23306.Data.Enum;
+﻿using EFS_23298_23327.Data;
+using EFS_23298_23327.Data.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EFS_23298_23306.Models
+namespace EFS_23298_23327.Models
 {
     public class Temas:BaseEntity
     {

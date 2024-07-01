@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EFS_23298_23306.Data;
-using EFS_23298_23306.Models;
+using EFS_23298_23327.Data;
+using EFS_23298_23327.Models;
 
-namespace EFS_23298_23306.Controllers
+namespace EFS_23298_23327.Controllers
 {
     public class FotosController : Controller
     {

@@ -1,4 +1,4 @@
-﻿namespace EFS_23298_23306.ViewModel
+﻿namespace EFS_23298_23327.ViewModel
 {
     public class LoginViewModel
     {
