@@ -88,7 +88,7 @@ namespace EFS_23298_23327.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservaId"));
 
-                    b.Property<string>("ClientesId")
+                    b.Property<string>("ClienteID")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CriadoPorOid")
@@ -112,19 +112,14 @@ namespace EFS_23298_23327.Migrations
                     b.Property<DateTime>("ReservaDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("TemaID")
+                    b.Property<int?>("SalaId")
                         .HasColumnType("int");
-
-                    b.Property<string>("UtilizadorID")
-                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ReservaId");
 
-                    b.HasIndex("ClientesId");
+                    b.HasIndex("ClienteID");
 
-                    b.HasIndex("TemaID");
-
-                    b.HasIndex("UtilizadorID");
+                    b.HasIndex("SalaId");
 
                     b.ToTable("Reservas");
                 });
@@ -554,21 +549,17 @@ namespace EFS_23298_23327.Migrations
 
             modelBuilder.Entity("EFS_23298_23327.Models.Reservas", b =>
                 {
-                    b.HasOne("EFS_23298_23327.Models.Clientes", null)
+                    b.HasOne("EFS_23298_23327.Models.Clientes", "Cliente")
                         .WithMany("ListaReservas")
-                        .HasForeignKey("ClientesId");
+                        .HasForeignKey("ClienteID");
 
-                    b.HasOne("EFS_23298_23327.Models.Temas", "Tema")
-                        .WithMany()
-                        .HasForeignKey("TemaID");
+                    b.HasOne("EFS_23298_23327.Models.Salas", "Sala")
+                        .WithMany("ListaReservas")
+                        .HasForeignKey("SalaId");
 
-                    b.HasOne("EFS_23298_23327.Models.Utilizadores", "Utilizador")
-                        .WithMany()
-                        .HasForeignKey("UtilizadorID");
+                    b.Navigation("Cliente");
 
-                    b.Navigation("Tema");
-
-                    b.Navigation("Utilizador");
+                    b.Navigation("Sala");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Temas", b =>
@@ -629,6 +620,11 @@ namespace EFS_23298_23327.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("EFS_23298_23327.Models.Salas", b =>
+                {
+                    b.Navigation("ListaReservas");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Temas", b =>

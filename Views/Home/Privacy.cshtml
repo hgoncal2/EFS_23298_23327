@@ -1,8 +1,10 @@
-﻿@{
+﻿@model EFS_23298_23327.Models.Salas
+
+@{
     ViewData["Title"] = "Privacy Policy";
 }
 
-<div id='calendar' class="bg-white"></div>
+<div id='calendar' class="bg-white w-50"></div>
 
 <script>
 
@@ -13,17 +15,47 @@
             timeZone: 'UTC',
             nowIndicator:true,
             selectable: true,
+            eventColor: 'red',
+            eventDisplay: 'block',
             headerToolbar: {
                 left: 'prev,next',
                 center: 'title',
                 right: 'timeGridWeek,timeGridDay'
                
+            }, events: [
+                
+                
+    @foreach (var i in Model.ListaReservas) {
+        @if (i.Equals(Model.ListaReservas.Last())) {
+            @:{
+            @:title: '@i.Cliente.UserName',
+            @:start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+            @:allDay: false
+            @:}
+        } else {
+            @:{
+            @:title: '@i.Cliente.UserName',
+            @:start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+            @:allDay: false
+               @:},
+                
+        }}  
+            ],
+            eventTimeFormat: { // like '14:30:00'
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                meridiem: false,
+                hour12: false
             },
+
             dateClick: function (info) {
                 $.post('/Home/Reserva', { date: info.dateStr }, function (result) {
-                    console.log(result);
+                    if(result=="ok"){
+                    location.reload();
+                    }
                 });
-                alert('clicked ' + info.dateStr);
+                
             },
         });
         calendar.render();

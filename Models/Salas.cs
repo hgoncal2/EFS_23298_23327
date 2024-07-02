@@ -19,6 +19,7 @@ namespace EFS_23298_23327.Models
         public Salas()
         {
             this.ListaAnfitrioes = new HashSet<Anfitrioes>();
+            this.ListaReservas = new HashSet<Reservas>();
            
         }
     }

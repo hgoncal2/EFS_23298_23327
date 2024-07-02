@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EFS_23298_23327.Migrations
 {
     /// <inheritdoc />
-    public partial class anfsUtil : Migration
+    public partial class reservascliente : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,6 +28,38 @@ namespace EFS_23298_23327.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PrimeiroNome = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UltimoNome = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    CriadoPorOid = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CriadoPorUsername = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LoginViewModel",
                 columns: table => new
                 {
@@ -42,6 +74,24 @@ namespace EFS_23298_23327.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Salas",
+                columns: table => new
+                {
+                    SalaId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Area = table.Column<int>(type: "int", nullable: false),
+                    Numero = table.Column<int>(type: "int", nullable: false),
+                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    CriadoPorOid = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CriadoPorUsername = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Salas", x => x.SalaId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UtilizadoresViewModel",
                 columns: table => new
                 {
@@ -51,7 +101,8 @@ namespace EFS_23298_23327.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UltimoNome = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Roles = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CriadoPor = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -92,6 +143,12 @@ namespace EFS_23298_23327.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -106,6 +163,12 @@ namespace EFS_23298_23327.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -124,39 +187,12 @@ namespace EFS_23298_23327.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PrimeiroNome = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UltimoNome = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    CriadoPorOid = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CriadoPorUsername = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    SalasSalaId = table.Column<int>(type: "int", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -180,14 +216,40 @@ namespace EFS_23298_23327.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Salas",
+                name: "AnfitrioesSalas",
                 columns: table => new
                 {
-                    SalaId = table.Column<int>(type: "int", nullable: false)
+                    ListaAnfitrioesId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ListaSalasSalaId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnfitrioesSalas", x => new { x.ListaAnfitrioesId, x.ListaSalasSalaId });
+                    table.ForeignKey(
+                        name: "FK_AnfitrioesSalas_AspNetUsers_ListaAnfitrioesId",
+                        column: x => x.ListaAnfitrioesId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnfitrioesSalas_Salas_ListaSalasSalaId",
+                        column: x => x.ListaSalasSalaId,
+                        principalTable: "Salas",
+                        principalColumn: "SalaId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reservas",
+                columns: table => new
+                {
+                    ReservaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Area = table.Column<int>(type: "int", nullable: false),
-                    Numero = table.Column<int>(type: "int", nullable: false),
-                    AnfitrioesId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ReservaDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Preco = table.Column<double>(type: "float", nullable: false),
+                    NumPessoas = table.Column<int>(type: "int", nullable: false),
+                    ClienteID = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    SalaId = table.Column<int>(type: "int", nullable: true),
                     DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false),
                     CriadoPorOid = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -195,12 +257,17 @@ namespace EFS_23298_23327.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Salas", x => x.SalaId);
+                    table.PrimaryKey("PK_Reservas", x => x.ReservaId);
                     table.ForeignKey(
-                        name: "FK_Salas_AspNetUsers_AnfitrioesId",
-                        column: x => x.AnfitrioesId,
+                        name: "FK_Reservas_AspNetUsers_ClienteID",
+                        column: x => x.ClienteID,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Reservas_Salas_SalaId",
+                        column: x => x.SalaId,
+                        principalTable: "Salas",
+                        principalColumn: "SalaId");
                 });
 
             migrationBuilder.CreateTable(
@@ -258,43 +325,6 @@ namespace EFS_23298_23327.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Reservas",
-                columns: table => new
-                {
-                    ReservaId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ReservaDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Preco = table.Column<double>(type: "float", nullable: false),
-                    NumPessoas = table.Column<int>(type: "int", nullable: false),
-                    UtilizadorID = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    TemaID = table.Column<int>(type: "int", nullable: true),
-                    ClientesId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    CriadoPorOid = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CriadoPorUsername = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reservas", x => x.ReservaId);
-                    table.ForeignKey(
-                        name: "FK_Reservas_AspNetUsers_ClientesId",
-                        column: x => x.ClientesId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Reservas_AspNetUsers_UtilizadorID",
-                        column: x => x.UtilizadorID,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Reservas_Temas_TemaID",
-                        column: x => x.TemaID,
-                        principalTable: "Temas",
-                        principalColumn: "TemaId");
-                });
-
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
@@ -304,6 +334,11 @@ namespace EFS_23298_23327.Migrations
                     { "anf", null, "Anfitriao", "ANFITRIAO" },
                     { "cl", null, "Cliente", "CLIENTE" }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnfitrioesSalas_ListaSalasSalaId",
+                table: "AnfitrioesSalas",
+                column: "ListaSalasSalaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -338,11 +373,6 @@ namespace EFS_23298_23327.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_SalasSalaId",
-                table: "AspNetUsers",
-                column: "SalasSalaId");
-
-            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -355,68 +385,26 @@ namespace EFS_23298_23327.Migrations
                 column: "TemaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservas_ClientesId",
+                name: "IX_Reservas_ClienteID",
                 table: "Reservas",
-                column: "ClientesId");
+                column: "ClienteID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservas_TemaID",
+                name: "IX_Reservas_SalaId",
                 table: "Reservas",
-                column: "TemaID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reservas_UtilizadorID",
-                table: "Reservas",
-                column: "UtilizadorID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Salas_AnfitrioesId",
-                table: "Salas",
-                column: "AnfitrioesId");
+                column: "SalaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Temas_SalaID",
                 table: "Temas",
                 column: "SalaID");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUserClaims_AspNetUsers_UserId",
-                table: "AspNetUserClaims",
-                column: "UserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUserLogins_AspNetUsers_UserId",
-                table: "AspNetUserLogins",
-                column: "UserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUserRoles_AspNetUsers_UserId",
-                table: "AspNetUserRoles",
-                column: "UserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_Salas_SalasSalaId",
-                table: "AspNetUsers",
-                column: "SalasSalaId",
-                principalTable: "Salas",
-                principalColumn: "SalaId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Salas_AspNetUsers_AnfitrioesId",
-                table: "Salas");
+            migrationBuilder.DropTable(
+                name: "AnfitrioesSalas");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");

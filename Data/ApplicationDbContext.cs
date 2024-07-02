@@ -20,7 +20,16 @@ namespace EFS_23298_23327.Data
                 WithMany(c => c.ListaFotos)
                 .HasForeignKey(e => e.TemaId);
 
-            
+            modelBuilder.Entity<Reservas>()
+               .HasOne(e => e.Sala).
+               WithMany(c => c.ListaReservas)
+               .HasForeignKey(e => e.SalaId);
+            modelBuilder.Entity<Reservas>()
+              .HasOne(e => e.Cliente).
+              WithMany(c => c.ListaReservas)
+              .HasForeignKey(e => e.ClienteID);
+
+
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<IdentityRole>().HasData(

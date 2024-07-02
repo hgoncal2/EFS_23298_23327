@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace EFS_23298_23327.Controllers
 {
@@ -54,9 +55,11 @@ namespace EFS_23298_23327.Controllers
             
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
+        public async Task<IActionResult> Privacy() {
+
+
+            var r = await _context.Salas.Include(s => s.ListaReservas).ThenInclude(s=> s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaId == 1).FirstOrDefaultAsync();
+            return View(r);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -68,8 +71,18 @@ namespace EFS_23298_23327.Controllers
 
 
         [HttpPost]
-        public JsonResult Reserva(DateTime date) {
-            return Json("recebido");
+        public async Task<JsonResult> Reserva(DateTime date) {
+            var u = await _context.Clientes.FindAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var r = new Reservas(u);
+            r.ReservaDate = date;
+            var s = await _context.Salas.Include(s => s.ListaReservas).Where(r => !r.Deleted).Where(s => s.SalaId == 1).FirstOrDefaultAsync();
+            r.SalaId = s.SalaId;
+            r.Sala = s;
+            s.ListaReservas.Add(r);
+           
+            _context.Update(s);
+            await _context.SaveChangesAsync();
+            return Json("ok");
         }
 
     }
