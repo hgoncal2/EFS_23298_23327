@@ -1,6 +1,32 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div id='calendar' class="bg-white"></div>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            timeZone: 'UTC',
+            nowIndicator:true,
+            selectable: true,
+            headerToolbar: {
+                left: 'prev,next',
+                center: 'title',
+                right: 'timeGridWeek,timeGridDay'
+               
+            },
+            dateClick: function (info) {
+                $.post('/Home/Reserva', { date: info.dateStr }, function (result) {
+                    console.log(result);
+                });
+                alert('clicked ' + info.dateStr);
+            },
+        });
+        calendar.render();
+    });
+
+</script>

@@ -56,9 +56,9 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         // GET: Temas/Create
         public async Task<ActionResult> Create()
         {
-            
+           List<Salas> a = await _context.Temas.Where(s => !s.Deleted).Select(s => s.Sala).ToListAsync();
            List<Salas> s =await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
-            ViewBag.s = s;
+            ViewBag.s = s.Except(a).ToList();
             return View();
         }
 
@@ -203,8 +203,9 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             {
                 return NotFound();
             }
-             List<Salas> s =await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
-            ViewBag.s = s;
+            List<Salas> a = await _context.Temas.Where(s => !s.Deleted && s.TemaId != id).Select(s => s.Sala).ToListAsync();
+            List<Salas> s = await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
+            ViewBag.s = s.Except(a).ToList();
             ViewBag.TemaAntigo = temas.Nome;
 
             return View(temas);

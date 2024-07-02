@@ -65,6 +65,12 @@ namespace EFS_23298_23327.Controllers
            var s= HttpContext.Response.StatusCode;
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-       
+
+
+        [HttpPost]
+        public JsonResult Reserva(DateTime date) {
+            return Json("recebido");
+        }
+
     }
 }

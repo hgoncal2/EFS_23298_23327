@@ -18,9 +18,9 @@ namespace EFS_23298_23327.Models
         [ForeignKey(nameof(Utilizadores))]
         public String? UtilizadorID { get; set; }
         public required Utilizadores? Utilizador { get; set; }
-        [ForeignKey(nameof(Temas))]
-        public int? TemaID { get; set; }
-        public  Temas? Tema { get; set; }
+        [ForeignKey(nameof(Salas))]
+        public int? SalaId { get; set; }
+        public  Salas? Sala { get; set; }
       
       
 

@@ -14,6 +14,7 @@ namespace EFS_23298_23327.Models
         public int Numero { get; set; }
         [DisplayName("Anfitriões")]
         public ICollection<Anfitrioes>? ListaAnfitrioes { get; set; }
+        public ICollection<Reservas>? ListaReservas { get; set; }
 
         public Salas()
         {
