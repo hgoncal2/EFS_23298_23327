@@ -10,17 +10,16 @@
 
 
 
-<div>
+
+<div class="mt-4">
     <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" style="float:left;text-decoration: none;" asp-action="Index"></a>
 
 </div>
 
 
-<h2 class="ms-5">Criar Tema </h2>
+<h2 class="ms-2  mt-4">Criar Tema </h2>
 
-<br />
-
-<hr />
+<hr class="bg-primary " />
 @if (@ViewBag.TemaExistente != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -111,7 +110,7 @@
     
     <br />
     <div class="form-group text-center d-grid gap-2 col-6 mx-auto">
-        <input type="submit" value="Criar" class="btn btn-outline-primary btn-lg" />
+        <input type="submit" value="Criar" class="btn btn-primary btn-lg" />
     </div>
     
 

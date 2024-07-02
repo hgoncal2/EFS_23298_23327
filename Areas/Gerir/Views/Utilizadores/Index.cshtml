@@ -1,14 +1,66 @@
 ﻿@model IEnumerable<EFS_23298_23327.ViewModel.UtilizadoresViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Utilizadores";
 }
 
-<h1>Index</h1>
+<script>
+    function teste(id, nome) {
+        $('#nomeUser').text(nome);
+        $('#apagarUser').attr('action', '/Gerir/Utilizadores/Delete/' + id);
+    }
 
+
+</script>
+<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header modal-header-danger">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar utilizador '<span id="nomeUser">a</span>' ?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-footer ">
+
+                <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
+                <form id="apagarUser"  method="post">
+                    <button type="submit" class="btn btn-danger">Apagar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h1>Utilizadores</h1>
+@if (@TempData["UtilizadorApagado"] != null) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Utilizador <strong>@TempData["UtilizadorApagado"]</strong> apagado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (@TempData["NomeUtilizadorCriado"] != null) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Utilizador <strong>@TempData["NomeUtilizadorCriado"]</strong> criado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (@TempData["ErroAdmin"] != null) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Html.Raw(@TempData["ErroAdmin"])
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<p>
+    <a asp-action="Create">
+        <button class="btn btn-primary"> <i class="fa fa-add me-2"></i>Criar utilizador</button>
+    </a>
+
+</p>
 <table class="table text-center">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Username)
             </th>
@@ -34,16 +86,32 @@
 @foreach (var item in Model) {
         <tr>
                 <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.Username)
                 </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PrimeiroNome)
+                    @if (item.UltimoNome != null) {
+                        @Html.DisplayFor(modelItem => item.PrimeiroNome)
+                    } else {
+                        @:N.A
+                    }
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UltimoNome)
+                @if (item.UltimoNome != null){
+                        @Html.DisplayFor(modelItem => item.UltimoNome)
+                }else{
+                    @:N.A
+                }
+                
             </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Email)
+                    @if (item.UltimoNome != null) {
+                        @Html.DisplayFor(modelItem => item.Email)
+                    } else {
+                        @:N.A
+                    }
                 </td>
                 <td>
 
@@ -77,11 +145,11 @@
             <td>
                 @Html.DisplayFor(modelItem => item.DataCriacao)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
+                <td class="align-content-center text-nowrap">
+                    <a asp-action="Edit" title="Editar" asp-route-id="@item.Id"><i class="fa fa-pencil link-success icons-index"></i></a>
+                    <a asp-action="Details" title="Ver" asp-route-id="@item.Id"><i class="fa-solid fa-circle-info icons-index"></i></a>
+                    <a data-bs-toggle="modal" title="Apagar" style="cursor:pointer" data-bs-target="#modalApagar" onclick="teste('@item.Id','@item.Username')"><i class="fa fa-trash icons-index link-danger delete"></i></a>
+                </td>
         </tr>
 }
     </tbody>

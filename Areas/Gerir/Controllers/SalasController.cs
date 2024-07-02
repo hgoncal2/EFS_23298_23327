@@ -10,6 +10,8 @@ using EFS_23298_23327.Models;
 using EFS_23298_23327.ViewModel;
 using System.Security.Claims;
 using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Identity;
+using System.Data;
 
 namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
@@ -17,11 +19,18 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
     [Area("Gerir")]
     public class SalasController : Controller
     {
+        private readonly UserManager<Utilizadores> _userManager;
+       
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
 
-        public SalasController(ApplicationDbContext context)
+        public SalasController(ApplicationDbContext context, UserManager<Utilizadores> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _roleManager = roleManager;
+            
+            _userManager = userManager;
         }
 
         // GET: Salas
@@ -55,8 +64,10 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         {
 
             var ViewModel = new AnfitriaoSalaViewModel(new Salas(), new HashSet<string>());
-            ViewBag.SelectionIdList = new MultiSelectList(_context.Anfitrioes.Where(a => a.Deleted == false), "Id", "UserName", ViewModel.ListaAnfitrioes);
 
+            var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
+            HashSet<Utilizadores> anfitrioes = userList.ToList().Where(a => a.Deleted == false).ToHashSet();
+            ViewBag.SelectionIdList = anfitrioes;
             return View(ViewModel);
         }
 
@@ -69,11 +80,13 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         {
             if (ModelState.IsValid)
             {
+                var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
+                HashSet<Utilizadores> anfitrioes = userList.ToList().Where(a => a.Deleted == false).ToHashSet();
+                ViewBag.SelectionIdList = anfitrioes;
                 var salaExiste = _context.Salas.FirstOrDefault(m => m.Numero == salasAnf.Sala.Numero);
                 if (salaExiste != null)
                 {
                     ViewBag.SalaExistente = salaExiste.Numero;
-                    ViewBag.SelectionIdList = new MultiSelectList(_context.Anfitrioes.Where(a => a.Deleted == false), "Id", "UserName", salasAnf.ListaAnfitrioes);
 
                     return View(salasAnf);
                 }
@@ -122,8 +135,10 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
             List<String>anfs = salas.ListaAnfitrioes.Select(a => a.Id).ToList();
             var ViewModel = new AnfitriaoSalaViewModel(salas, anfs);
-            ViewBag.SelectionIdList = new MultiSelectList(_context.Anfitrioes.Where(a => a.Deleted == false), "Id", "UserName", ViewModel.ListaAnfitrioes);
 
+            var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
+            HashSet<Utilizadores> anfitrioes = userList.ToList().Where(a => a.Deleted == false).ToHashSet();
+            ViewBag.SelectionIdList = anfitrioes;
             return View(ViewModel);
           
         }
@@ -142,6 +157,9 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
             if (ModelState.IsValid)
             {
+                var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
+                HashSet<Utilizadores> anfitrioes = userList.ToList().Where(a => a.Deleted == false).ToHashSet();
+                ViewBag.SelectionIdList = anfitrioes;
                 Salas? s = null;
                 var sala = _context.Salas.FirstOrDefault(m => m.Numero == salaVM.Sala.Numero && m.SalaId != salaVM.Sala.SalaId);
                 if (sala != null) {
@@ -156,7 +174,8 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                      s =await _context.Salas.Include(s=> s.ListaAnfitrioes).Where(s=> s.SalaId == salaVM.Sala.SalaId).FirstOrDefaultAsync();
                     s.Numero = salaVM.Sala.Numero;
                     s.Area = salaVM.Sala.Area;
-                    s.ListaAnfitrioes = await _context.Anfitrioes.Where(m => salaVM.ListaAnfitrioes.Contains(m.Id)).ToListAsync();
+                    List<Anfitrioes> listaUsers= await _context.Anfitrioes.Where(m => salaVM.ListaAnfitrioes.Contains(m.Id)).ToListAsync();
+                    s.ListaAnfitrioes = listaUsers;
                     _context.Update(s);
                     _context.Entry(s).Property(t => t.DataCriacao).IsModified = false;
                     _context.Entry(s).Property(t => t.CriadoPorOid).IsModified = false;
@@ -176,7 +195,6 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 }
                 ViewBag.TemaAntigo =s.Numero ;
                 ViewBag.ShowAlert = true;
-                ViewBag.SelectionIdList = new MultiSelectList(_context.Anfitrioes.Where(a => a.Deleted == false), "Id", "UserName", salaVM.ListaAnfitrioes);
 
                 return View(salaVM);
             }

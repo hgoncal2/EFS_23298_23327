@@ -1,11 +1,11 @@
-﻿using EFS_23298_23306.Models;
+﻿using EFS_23298_23327.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace EFS_23298_23327.ViewModel
 {
     public class UtilizadoresViewModel
     {
-        public int Id { get; set; }
+        public String Id { get; set; }
         public String Username { get; set; }
         [Display(Name = "Primeiro Nome")]
         public String? PrimeiroNome { get; set; }
@@ -30,6 +30,7 @@ namespace EFS_23298_23327.ViewModel
             this.UltimoNome = u.UltimoNome;
             this.DataCriacao = u.DataCriacao;
             this.Email= u.Email;
+            this.Id = u.Id;
         }
     }
 }

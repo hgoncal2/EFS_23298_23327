@@ -7,19 +7,35 @@
 
 
 
+<script type="text/javascript">
+    // https://github.com/davidstutz/bootstrap-multiselect/issues/1230
+    //Depois de 4 horas à procura de um plugin que funcionasse com bs 5,
+    //Muito Obrigado andyg2
+    $(document).ready(function () {
+        $(".multiple-checkboxes").multiselect({
+            templates: {
+                button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+            },
+            buttonWidth: '100%',
+            nonSelectedText: 'Selecionar anfitriões',
+            includeSelectAllOption: true,
+            selectAllText: 'Selecionar todos',
+            numberDisplayed: 0,
+            allSelectedText: false
 
+        });
+    });
+</script>
 
-<div>
+<div class="mt-4">
     <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" style="float:left;text-decoration: none;" asp-action="Index"></a>
 
 </div>
 
 
-<h2 class="ms-5">Criar Salas </h2>
+<h2 class="ms-2  mt-4">Criar Sala </h2>
 
-<br />
-
-<hr />
+<hr class="bg-primary " />
 @if (@ViewBag.SalaExistente != null) {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         Erro! Sala <strong>@ViewBag.SalaExistente</strong> já existe!
@@ -47,8 +63,20 @@
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.ListaAnfitrioes)
+                    @*
                     @Html.ListBoxFor(model => model.ListaAnfitrioes, (MultiSelectList)ViewBag.SelectionIdList, new { @class = "form-control" })
+                    *@
+                    <select multiple="multiple" class="form-control multiple-checkboxes" asp-for="ListaAnfitrioes">
 
+                        @foreach (var i in @ViewBag.SelectionIdList as HashSet<Utilizadores>) {
+                            @if (Model.ListaAnfitrioes.Contains(@i.Id)) {
+                                <option selected="selected" value="@i.Id">@i</option>
+                            } else {
+                                <option value="@i.Id">@i.UserName</option>
+                            }
+
+                        }
+                    </select>
                     <span asp-validation-for="ListaAnfitrioes" class="text-danger"></span>
                 </div>
             </div>

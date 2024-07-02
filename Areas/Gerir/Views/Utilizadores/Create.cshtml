@@ -1,16 +1,30 @@
-﻿@model EFS_23298_23306.ViewModel.RegisterViewModel
+﻿@model EFS_23298_23327.ViewModel.RegisterViewModel
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Criar Utilizador";
 }
 
-<h1>Register</h1>
-@if (@ViewBag.erro != null) {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        Erro! Username ou password errado/a!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
+
+
+<script type="text/javascript">
+    // https://github.com/davidstutz/bootstrap-multiselect/issues/1230
+    //Depois de 4 horas à procura de um plugin que funcionasse com bs 5,
+    //Muito Obrigado andyg2
+    $(document).ready(function () {
+        $(".multiple-checkboxes").multiselect({
+            templates: {
+                button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+            },
+            buttonWidth: '100%',
+            nonSelectedText: 'Selecionar roles(s)',
+            includeSelectAllOption: true,
+            selectAllText: 'Selecionar todos',
+            numberDisplayed: 0,
+            allSelectedText: false
+            
+        });
+    });
+</script>
 @if (@ViewBag.UserExiste != null) {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         @Html.Raw(@ViewBag.UserExiste)
@@ -18,54 +32,78 @@
     </div>
 }
 
-@{
-    @if (@TempData["Autenticado"] != null) {
-        @if ((bool)@TempData["Autenticado"] == false) {
-            <div class="alert alert-danger alert-dismissible text-center fade show" role="alert">
-                Erro! Não está autenticado!
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
 
-    }
+<div class="mt-4">
+    <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" style="float:left;text-decoration: none;" asp-action="Index"></a>
 
-}
-
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Username" class="control-label"></label>
-                <input asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" type="password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.Roles)
-                @Html.ListBoxFor(model => model.Roles, (MultiSelectList)ViewBag.SelectionIdList, new { @class = "form-control" })
-
-                <span asp-validation-for="Roles" class="text-danger"></span>
-            </div>
-            <br />
-            <br />
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
 </div>
 
+
+<h2 class="ms-2  mt-4">Criar Utilizador </h2>
+
+<hr class="bg-primary " />
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="container-fluid justify-content-center">
+
+                <div class="row">
+                    <div class="col ">
+                        <div class="form-group">
+                            <label asp-for="Username" class="control-label required"></label>
+                            <input asp-for="Username" class="form-control" />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                    <div class="form-group">
+                        <label asp-for="PrimeiroNome" class="control-label "></label>
+                        <input asp-for="PrimeiroNome" class="form-control" />
+                        <span asp-validation-for="PrimeiroNome" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Password" class="control-label required"></label>
+                        <input asp-for="Password" type="password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col ">
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    <div class="form-group">
+                        <label asp-for="UltimoNome" class="control-label "></label>
+                        <input asp-for="UltimoNome" class="form-control" />
+                        <span asp-validation-for="UltimoNome" class="text-danger"></span>
+                    </div>
+                <div class="form-group">
+                    @*  @Html.LabelFor(m => m.Roles, new { @class = "required" })
+                    @Html.ListBoxFor(model => model.Roles, (MultiSelectList)ViewBag.SelectionIdList, new { @class = "form-control" })
+                    *@
+                    @Html.LabelFor(m => m.Roles, new { @class = "required" })<br />
+                    <select multiple="multiple" class="form-control multiple-checkboxes" asp-for="Roles">
+
+                        @foreach (var i in @ViewBag.SelectionIdList) {
+                            @if (Model.Roles.Contains(@i)) {
+                                <option selected="selected" value="@i">@i</option>
+                            } else {
+                                <option value="@i">@i</option>
+                            }
+
+                        }
+                    </select>
+
+                    <span asp-validation-for="Roles" class="text-danger"></span>
+                </div>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+    <div class="form-group text-center d-grid gap-2 col-6 mx-auto">
+        <input type="submit" value="Criar" class="btn btn-primary btn-lg" />
+    </div>
+
+        </form>
 
 
 @section Scripts {

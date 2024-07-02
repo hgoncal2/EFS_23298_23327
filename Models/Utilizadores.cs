@@ -1,9 +1,10 @@
 ﻿
-
+using EFS_23298_23327.ViewModel;
 using EFS_23298_23327.Data.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace EFS_23298_23327.Models;
 
@@ -42,6 +43,15 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
         this.PasswordHash=hasher.HashPassword(null,r.Password);
         this.Email = r.Email;
     }
+    public Utilizadores(UtilizadoresViewModel r) {
+        this.DataCriacao = DateTime.Now;
+      
+        this.PrimeiroNome = r.PrimeiroNome;
+        this.UltimoNome = r.UltimoNome;
+        this.UserName = r.Username;
 
+        this.Email = r.Email;
     }
+
+}
 

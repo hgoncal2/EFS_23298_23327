@@ -5,16 +5,15 @@
     ViewData["Title"] = "Editar";
 }
 
-<div>
+<div class="mt-4">
     <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" style="float:left;text-decoration: none;" asp-action="Index"></a>
 
 </div>
 
+<h2 class="ms-2  mt-4">Editar Tema <span style="color:mediumpurple"><strong>@Model.Nome</strong></span> </h2>
 
-<h2 class="ms-5">Editar Tema <span style="color:mediumpurple"><strong>@Model.Nome</strong></span> </h2>
 
-<br/>
-<hr />
+<hr class="bg-primary " />
 @if (ViewBag.ShowAlert == true)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">

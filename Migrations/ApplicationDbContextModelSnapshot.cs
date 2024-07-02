@@ -324,11 +324,8 @@ namespace EFS_23298_23327.Migrations
 
             modelBuilder.Entity("EFS_23298_23327.ViewModel.UtilizadoresViewModel", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
