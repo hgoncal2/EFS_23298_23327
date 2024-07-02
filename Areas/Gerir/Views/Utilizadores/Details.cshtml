@@ -1,0 +1,94 @@
+﻿@model EFS_23298_23327.ViewModel.UtilizadoresViewModel
+
+@{
+    ViewData["Title"] = "Ver Utilizador";
+}
+
+
+
+<div class="mt-4">
+    <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
+</div>
+
+<h2 class="ms-2  mt-4">Ver Utilizador <span style="color:mediumpurple"><strong>@Model.Username</strong></span> </h2>
+
+
+<hr class="bg-primary " />
+
+
+
+    <div class="container-fluid justify-content-center">
+        <div class="row">
+            <div class="col ">
+                <div class="form-group">
+                    <label asp-for="Username" class="control-label"></label>
+                    
+                        <input disabled="true" asp-for="Username" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="PrimeiroNome" class="control-label "></label>
+                <input asp-for="PrimeiroNome" disabled="true" class="form-control" />
+                    
+                </div>
+
+            </div>
+            <div class="col ">
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" disabled="true" class="form-control" />
+                    
+                </div>
+                <div class="form-group">
+                    <label asp-for="UltimoNome" class="control-label "></label>
+                    <input asp-for="UltimoNome" disabled="true" class="form-control" />
+                    
+                </div>
+
+                <div class="form-group text-center">
+                    @*  @Html.LabelFor(m => m.Roles, new { @class = "required" })
+                    @Html.ListBoxFor(model => model.Roles, (MultiSelectList)ViewBag.SelectionIdList, new { @class = "form-control" })
+                    *@
+                    @Html.LabelFor(m => m.Roles)<br />
+
+
+                <ul class="list-group list-group-horizontal">
+                    @foreach (var role in @Model.Roles) {
+                        @if (role.Equals("Admin")) {
+                            <li class="list-group-item text-white  bg-danger flex-fill ms-2">@role</li>
+
+                        }
+                        @if (role.Equals("Anfitriao")) {
+                            <li class="list-group-item text-white  bg-warning flex-fill ms-2">@role</li>
+
+                        }
+                        @if (role.Equals("Cliente")) {
+                            <li class="list-group-item text-white  bg-primary flex-fill ms-2">@role</li>
+
+                        }
+
+
+
+                    }
+                </ul>
+
+                   
+                </div>
+            </div>
+        </div>
+    <a asp-route-id="@Model?.Id" asp-action="Edit">
+        <button class="btn btn-primary position-absolute mt-lg-5"> <i class="fa fa-pencil me-2"></i>Editar Utilizador</button>
+    </a>
+</div>
+
+  
+    
+
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -74,6 +74,9 @@
                 @Html.DisplayNameFor(model => model.Email)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.CriadoPor)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Roles)
             </th>
             <th>
@@ -109,6 +112,13 @@
                 <td>
                     @if (item.UltimoNome != null) {
                         @Html.DisplayFor(modelItem => item.Email)
+                    } else {
+                        @:N.A
+                    }
+                </td>
+                <td>
+                    @if (item.CriadoPor != null) {
+                        @Html.DisplayFor(modelItem => item.CriadoPor)
                     } else {
                         @:N.A
                     }

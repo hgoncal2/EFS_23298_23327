@@ -19,7 +19,8 @@ namespace EFS_23298_23327.ViewModel
         public HashSet<String> Roles { get; set; } = new HashSet<String>();
         [Display(Name = "Data de criação")]
         public DateTime DataCriacao { get; set; }
-
+        [Display(Name = "Criado Por")]
+        public String? CriadoPor { get; set; }
         public UtilizadoresViewModel() { 
         
         }
@@ -30,6 +31,7 @@ namespace EFS_23298_23327.ViewModel
             this.UltimoNome = u.UltimoNome;
             this.DataCriacao = u.DataCriacao;
             this.Email= u.Email;
+            this.CriadoPor=u.CriadoPorUsername;
             this.Id = u.Id;
         }
     }

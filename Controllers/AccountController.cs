@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using System.Runtime.Intrinsics.Arm;
+using System.Security.Claims;
 
 namespace EFS_23298_23327.Controllers
 {
+    
     public class AccountController : Controller
     {
         private readonly UserManager<Utilizadores> _userManager;
@@ -28,6 +32,7 @@ namespace EFS_23298_23327.Controllers
             _signInManager = signInManager;
             _userManager = userManager;
         }
+        [CustomAuthorize]
         [HttpGet]
         public ActionResult Login(bool unauth)
 
@@ -39,11 +44,11 @@ namespace EFS_23298_23327.Controllers
             }
             return View(new LoginViewModel());
         }
-        
 
 
 
 
+        [CustomAuthorize]
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginVM)
         {
@@ -53,43 +58,40 @@ namespace EFS_23298_23327.Controllers
                 return View(loginVM);
 
             }
-            var u = await _userManager.FindByNameAsync(loginVM.Username);
+            var u = await  _context.Utilizadores.Where(a => !a.Deleted).Where(a => a.UserName == loginVM.Username).FirstOrDefaultAsync();
             if (u != null)
             {
+                var user =await _context.Utilizadores.Where(a => a.Deleted).Where(a => a.Id == u.Id).FirstOrDefaultAsync();
+                
+                if(user != null) {
+                    ViewBag.Erro = true;
+                    return RedirectToAction("Login", "Account", new { area = "" });
+                }
                 var pass = await _userManager.CheckPasswordAsync(u, loginVM.Password);
                 if (pass)
                 {
-                    bool hasChanges = false;
-                    bool adminAnf = false;
+                   
                     var result = await _signInManager.PasswordSignInAsync(u, loginVM.Password, false, false);
 
                     if (result.Succeeded)
                     {
                         if(u.UserName == "admin" && !User.IsInRole("Admin"))
                         {
-                            hasChanges = true;
-                            adminAnf = true;
+                           
                              await _userManager.AddToRoleAsync(u, "Admin");
                             
                         }
-                        var userAnf = await _context.Anfitrioes.Where(m => m.Deleted != true).Where(a=> a.UserName.Equals(u.UserName)).FirstOrDefaultAsync();
-                        if (userAnf != null && !User.IsInRole("Anfitriao")) {
-                            hasChanges = true;
-                            adminAnf = true;
-                            await _userManager.AddToRoleAsync(u, "Anfitriao");
+                        TempData["NomeUtilizadorLogado"] = u.UserName;
+                        if (User.IsInRole("Admin") || User.IsInRole("Anfitriao")){
+                            return RedirectToAction("Index", "Temas", new { area = "Gerir" });
                         }
-                        if ((!User.IsInRole("Admin") && !User.IsInRole("Anfitriao")) && !adminAnf) {
-                            hasChanges = true;
-                            await _userManager.AddToRoleAsync(u, "Cliente");
-                        }
-                        userLogado = u;
-                        if (hasChanges) {
-                            await _context.SaveChangesAsync();
-                        }
+                       
                         
-                        return RedirectToAction("Index", "Temas", new { area = "Gerir" });
+                        return RedirectToAction("Index", "Home", new { area = "" });
                     }
                 }
+                ViewBag.Erro = true;
+                return View(loginVM);
             }
 
             ViewBag.Erro = true;
@@ -98,16 +100,50 @@ namespace EFS_23298_23327.Controllers
 
         }
 
-
+        [CustomAuthorize]
         [HttpGet]
         public  ActionResult Register() {
             
             var ViewModel = new RegisterViewModel();
-            ViewBag.SelectionIdList = new MultiSelectList(_roleManager.Roles.ToList(), "Name", "Name", ViewModel.Roles);
             return View(new RegisterViewModel());
 
         }
 
+       
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel vm) {
+            if (ModelState.IsValid) {
+
+                var user = await _context.Utilizadores.Where(a => !a.Deleted).Where(a => a.UserName == vm.Username).FirstOrDefaultAsync();
+
+                if (user != null) {
+                    ViewBag.UserExiste = "Utilizador \"<strong>" + user.UserName + "</strong>\" já existe!";
+
+                    return View(vm);
+                } else {
+                    if (vm.Email != null && vm.Email.Trim() != "") {
+                        user = _context.Utilizadores.Where(u => u.Email.Trim() == vm.Email.Trim()).FirstOrDefault();
+                        if (user != null) {
+
+
+                            ViewBag.UserExiste = "Utilizador com email \"<strong>" + user.Email + "</strong>\" já existe!";
+                            return View(vm);
+                        }
+                    }
+
+                }
+                var u = new Clientes(vm);
+                _context.Add(u);
+                await _context.SaveChangesAsync();
+                await _userManager.AddToRoleAsync(u, "Cliente");
+                TempData["NomeUtilizadorCriado"] = u.UserName;
+                return await Login(new LoginViewModel(vm.Username, vm.Password));
+            }
+
+
+                return View(new RegisterViewModel());
+
+        }
 
         [HttpPost]
         public async Task<IActionResult> logout()

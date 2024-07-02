@@ -20,27 +20,34 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
     public class UtilizadoresController : Controller
     {
         private readonly UserManager<Utilizadores> _userManager;
-        private readonly SignInManager<Utilizadores> _signInManager;
+        
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
 
+
+        //Construtor para o controller Utilizadores,irá receber uma instancia userManager(usada para gerir utilizadores) e roleManager(para gerir roles)
         public UtilizadoresController(ApplicationDbContext context, UserManager<Utilizadores> userManager,
-            SignInManager<Utilizadores> signInManager, RoleManager<IdentityRole> roleManager)
+             RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _roleManager = roleManager;
-            _signInManager = signInManager;
             _userManager = userManager;
         }
 
-        // GET: UtilizadoresViewModels
+
+        /// <summary>
+        /// Get Index,devolve uma lista de UtilizadoresViewModel(para mostrar os roles dos utilizadores)
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> Index()
         {
-
+            //todos os utilizadores não apagados
             var users = await _context.Utilizadores.Where(u=> u.Deleted != true).OrderByDescending(u=> u.DataCriacao).ToListAsync();
             ICollection<UtilizadoresViewModel> listaU = new List<UtilizadoresViewModel>();
+          
             if (users != null || users.Any())
             {
+                //Ir buscar os roles a que um utilizador pertence,para cada utilizador
                 foreach (var u in users)
                 { 
                    
@@ -62,20 +69,24 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 return NotFound();
             }
 
-            var utilizadoresViewModel = await _context.UtilizadoresViewModel
+            var user = await _context.Utilizadores.Where(m => m.Deleted == false)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (utilizadoresViewModel == null)
+            if (user == null)
             {
                 return NotFound();
             }
+            HashSet<String> roles = _userManager.GetRolesAsync(user).Result.ToHashSet();
+            var uVM = new UtilizadoresViewModel(user);
+            uVM.Roles = roles;
+           
 
-            return View(utilizadoresViewModel);
+            return View(uVM);
         }
 
         // GET: UtilizadoresViewModels/Create
         public IActionResult Create()
         {
-            
+            //cria lista com todos os roles possíveis
             HashSet<String> allRoles = _roleManager.Roles.Select(r => r.Name).ToHashSet();
             ViewBag.SelectionIdList = allRoles;
             return View(new RegisterViewModel());
@@ -88,11 +99,12 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RegisterViewModel rvm)
         {
+            HashSet<String> allRoles = _roleManager.Roles.Select(r => r.Name).ToHashSet();
+            ViewBag.SelectionIdList = allRoles;
             if (ModelState.IsValid)
             {
                 var user = _context.Utilizadores.Where(u=> u.UserName.Trim() == rvm.Username.Trim()).FirstOrDefault();
-                HashSet<String> allRoles = _roleManager.Roles.Select(r => r.Name).ToHashSet();
-                ViewBag.SelectionIdList = allRoles;
+                
                 if (user != null) {
                     ViewBag.UserExiste = "Utilizador \"<strong>" + user.UserName + "</strong>\" já existe!";
 
@@ -110,14 +122,17 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     
                 }
                 if(rvm.Roles.Contains("Anfitriao") && rvm.Roles.Contains("Cliente")) {
-                    ViewBag.UserExiste = "Erro! \"<strong>" + rvm.Username + "</strong>\" não pode ser Ciente <strong>e</strong> Anfitrião!";
+                    ViewBag.UserExiste = "Erro! \"<strong>" + rvm.Username + "</strong>\" não pode ser Cliente <strong>e</strong> Anfitrião!";
                     return View(rvm);
                 }
                 Utilizadores u = null;
                 if (rvm.Roles.Contains("Anfitriao")) {
                      u = new Anfitrioes(rvm);
                 }
-                else{
+                if (rvm.Roles.Contains("Cliente")) {
+                    u = new Clientes(rvm);
+                } 
+                else {
                      u = new Utilizadores(rvm);
                 }
                
@@ -142,7 +157,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Utilizadores.FindAsync(id);
+            var user = await _context.Utilizadores.Where(m => m.Deleted == false).FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
             {
                 return NotFound();
@@ -165,7 +180,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             if (userVM == null) {
                 return NotFound();
             }
-            var user = await _context.Utilizadores.FindAsync(userVM.Id);
+            var user = await _context.Utilizadores.Where(m => m.Deleted == false).FirstOrDefaultAsync(m => m.Id == userVM.Id);
             if (user == null) {
                 return NotFound();
             }
@@ -184,7 +199,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     return View(userVM);
                 }
                 
-                var user2 = _context.Utilizadores.Where(u => u.UserName.Trim() == userVM.Username.Trim() && u.Id != userVM.Id).FirstOrDefault();
+                var user2 =await _context.Utilizadores.Where(u => u.Deleted==false).Where(u => u.UserName.Trim() == userVM.Username.Trim() && u.Id != userVM.Id).FirstOrDefaultAsync();
                
                     
                     if (user2 != null) {
@@ -197,10 +212,10 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     return View(userVM);
                 } else {
                     if (userVM.Email != null && userVM.Email.Trim() != "") {
-                        user2 = _context.Utilizadores.Where(u => u.Email.Trim() == userVM.Email.Trim() && u.Id != userVM.Id).FirstOrDefault();
+                        user2 = await _context.Utilizadores.Where(u => u.Deleted == false).Where(u => u.Email.Trim() == userVM.Email.Trim() && u.Id != userVM.Id).FirstOrDefaultAsync();
                         if (user2 != null) {
            
-                            ViewBag.UserExiste = "Utilizador com email \"<strong>" + user.Email + "</strong>\" já existe!";
+                            ViewBag.UserExiste = "Utilizador com email \"<strong>" + user2.Email + "</strong>\" já existe!";
 
                             userVM.Username = user.UserName;
                             ViewBag.UserAntigo = user.UserName;
@@ -249,6 +264,8 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(userVM);
         }
         // GET: UtilizadoresViewModels/Delete/5
+        //Não está a ser usado 
+        /*
         public async Task<IActionResult> Delete(String? id)
         {
             if (id == null)
@@ -265,6 +282,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
             return View(utilizadoresViewModel);
         }
+        */
 
         // POST: UtilizadoresViewModels/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -296,10 +314,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UtilizadoresViewModelExists(String id)
-        {
-            return _context.UtilizadoresViewModel.Any(e => e.Id == id);
-        }
+     
 
         
     }

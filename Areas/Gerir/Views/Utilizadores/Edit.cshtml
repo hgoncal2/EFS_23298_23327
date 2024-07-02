@@ -91,7 +91,7 @@
                     <span asp-validation-for="UltimoNome" class="text-danger"></span>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group text-center">
                   @*  @Html.LabelFor(m => m.Roles, new { @class = "required" })
                     @Html.ListBoxFor(model => model.Roles, (MultiSelectList)ViewBag.SelectionIdList, new { @class = "form-control" })
                     *@
@@ -100,9 +100,27 @@
                        
                         @foreach (var i in @ViewBag.SelectionIdList) {
                             @if (Model.Roles.Contains(@i)) {
-                                <option selected="selected" value="@i">@i</option>
+                                
+                                @if (i.Equals("Admin")) {
+                                    <option selected="selected" class="list-group-item text-white bg-danger flex-fill" value="@i">@i</option>
+                                }
+                                @if (i.Equals("Anfitriao")) {
+                                    <option selected="selected" class="list-group-item text-white  bg-warning flex-fill" value="@i">@i</option>
+                                }
+                                @if (i.Equals("Cliente")) {
+                                    <option selected="selected" class="list-group-item text-white  bg-primary flex-fill" value="@i">@i</option>
+                                }
+                               
                                 }else{
-                                <option value="@i">@i</option>
+                                @if (i.Equals("Admin")) {
+                                    <option class="list-group-item text-white bg-danger flex-fill" value="@i">@i</option>
+                                }
+                                @if (i.Equals("Anfitriao")) {
+                                    <option  class="list-group-item text-white  bg-warning flex-fill" value="@i">@i</option>
+                                }
+                                @if (i.Equals("Cliente")) {
+                                    <option class="list-group-item text-white  bg-primary flex-fill" value="@i">@i</option>
+                                }
                                 }
                             
                         }

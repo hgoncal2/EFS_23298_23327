@@ -17,14 +17,21 @@ namespace EFS_23298_23327.Data
 
         public override void OnActionExecuting(ActionExecutingContext filterContext) {
             var controller = filterContext.Controller as Controller;
-
+            var controllerName= filterContext.Controller.ToString().Split(".").Last(); 
             //if user isn't logged in.
             if (filterContext.HttpContext.User.Identity == null || !filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
-                controller.TempData["Autenticado"] = false;
-                filterContext.HttpContext.Response.StatusCode = 403;
-                    filterContext.Result = new RedirectToActionResult("Login", "Account", new { area = "",unauth=true});
+                if (controllerName != "AccountController") {
+                    controller.TempData["Autenticado"] = false;
+                    filterContext.HttpContext.Response.StatusCode = 403;
+                    filterContext.Result = new RedirectToActionResult("Login", "Account", new { area = "", unauth = true });
+                }
+               
             } else {
+                if (controllerName == "AccountController") {
+                    filterContext.Result = new RedirectToActionResult("Index", "Home", new { area = "" });
+                    return;
+                }
                 var user = filterContext.HttpContext.User;
                 //Check user rights here
                 bool authorized = false;

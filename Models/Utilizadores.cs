@@ -45,7 +45,7 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
     }
     public Utilizadores(UtilizadoresViewModel r) {
         this.DataCriacao = DateTime.Now;
-      
+        
         this.PrimeiroNome = r.PrimeiroNome;
         this.UltimoNome = r.UltimoNome;
         this.UserName = r.Username;
