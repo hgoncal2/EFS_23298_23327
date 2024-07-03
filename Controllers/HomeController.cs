@@ -72,17 +72,34 @@ namespace EFS_23298_23327.Controllers
 
         [HttpPost]
         public async Task<JsonResult> Reserva(DateTime date) {
-            var u = await _context.Clientes.FindAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var r = new Reservas(u);
-            r.ReservaDate = date;
-            var s = await _context.Salas.Include(s => s.ListaReservas).Where(r => !r.Deleted).Where(s => s.SalaId == 1).FirstOrDefaultAsync();
-            r.SalaId = s.SalaId;
-            r.Sala = s;
-            s.ListaReservas.Add(r);
+            Clientes u = null;
            
-            _context.Update(s);
-            await _context.SaveChangesAsync();
-            return Json("ok");
+                 u = await _context.Clientes.FindAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            if (u == null) {
+                TempData["ErroCliente"] = "Erro! Apenas clientes podem fazer reservas!";
+                return Json("erro");
+            }
+                var r = new Reservas(u);
+               
+                var tema = await _context.Temas.Include(s => s.Sala).Where(r => !r.Deleted).Where(s => s.SalaID == 1).FirstOrDefaultAsync();
+            if (tema == null) {
+                TempData["ErroCliente"] = "Erro! Não é possível reservar uma sala sem tema atribuído!";
+                return Json("erro");
+            }
+            var endDate = date.AddMinutes(tema.TempoEstimado);
+            var sala =await _context.Salas.FindAsync(tema.SalaID);
+                r.SalaId = sala.SalaId;
+                r.Sala = tema.Sala;
+            r.ReservaDate = date;
+            r.ReservaEndDate = endDate;
+                tema.Sala.ListaReservas.Add(r);
+
+                _context.Update(tema.Sala);
+                await _context.SaveChangesAsync();
+                return Json("ok");
+            
+            
         }
 
     }

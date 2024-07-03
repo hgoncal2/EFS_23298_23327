@@ -4,25 +4,89 @@
     ViewData["Title"] = "Privacy Policy";
 }
 
-<div id='calendar' class="bg-white w-50"></div>
+
+
+@if (@TempData["ErroCliente"] != null) {
+    <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+        @TempData["ErroCliente"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div id='calendar' class=" text-white " ></div>
 
 <script>
-
+ 
+   
+   
     document.addEventListener('DOMContentLoaded', function () {
+
+      
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
+            themeSystem: 'bootstrap5',
             initialView: 'timeGridWeek',
+            locale: 'pt',
+            initialDate: new Date(),
             timeZone: 'UTC',
             nowIndicator:true,
             selectable: true,
-            eventColor: 'red',
+            eventColor: 'green',
+            selectAllow: function (info) {
+                console.log(info.start >= new Date())
+                return (info.start >= new Date());
+            },
             eventDisplay: 'block',
+            
+            contentHeight:'auto',
+            
+            allDaySlot: false,
             headerToolbar: {
-                left: 'prev,next',
+                left: 'prev,next today',
                 center: 'title',
-                right: 'timeGridWeek,timeGridDay'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                
                
-            }, events: [
+            }, 
+            buttonText:{
+                    
+                today: 'atual',
+                month: 'ver mês',
+                week: 'ver semana',
+                day: 'ver dia'
+                
+            },
+            
+            eventDidMount: function (info) {
+                $(info.el).tooltip({
+                    title: info.event.extendedProps.description,
+                    placement: "top",
+                    trigger: "hover",
+                    container: "body"
+                });
+            },
+            
+            
+            
+            events: [
+                {
+                    
+                    
+                    startTime: '22:00:01',
+                    endTime: '24:00:00',
+                    description: 'Fechado',
+                    color:'grey'
+                    
+                },
+                {
+
+
+                    startTime: '00:00:01',
+                    endTime: '08:00:00',
+                    description: 'Fechado',
+                    color: 'grey'
+
+                },
                 
                 
     @foreach (var i in Model.ListaReservas) {
@@ -30,12 +94,22 @@
             @:{
             @:title: '@i.Cliente.UserName',
             @:start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+            @:end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+            @:description:'Reserva para  "@i.Cliente.UserName"',
+            @if(i.Cliente.UserName.Equals(User.Identity.Name)){
+            @:color:'purple',
+            }
             @:allDay: false
             @:}
         } else {
             @:{
             @:title: '@i.Cliente.UserName',
             @:start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+            @:end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+            @:description: 'Reserva para  "@i.Cliente.UserName"',
+            @if (i.Cliente.UserName.Equals(User.Identity.Name)) {
+                @:color: 'purple',
+            }
             @:allDay: false
                @:},
                 
@@ -44,14 +118,20 @@
             eventTimeFormat: { // like '14:30:00'
                 hour: '2-digit',
                 minute: '2-digit',
-                second: '2-digit',
+               
                 meridiem: false,
                 hour12: false
             },
 
-            dateClick: function (info) {
-                $.post('/Home/Reserva', { date: info.dateStr }, function (result) {
+        selectAllow: function (info) {
+            return (info.start >= new Date());
+        },
+
+            select: function (info) {
+            $.post('/Home/Reserva', { date: info.startStr }, function (result) {
                     if(result=="ok"){
+                    location.reload();
+                    }else{
                     location.reload();
                     }
                 });

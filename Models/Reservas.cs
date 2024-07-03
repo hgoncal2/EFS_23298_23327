@@ -9,8 +9,10 @@ namespace EFS_23298_23327.Models
 
         [Key]
         public int ReservaId { get; set; }
-        [Display(Name = "Data da reserva")]
+        [Display(Name = "Data de início reserva")]
         public DateTime ReservaDate { get; set; }
+        [Display(Name = "Data de fim reserva")]
+        public DateTime ReservaEndDate { get; set; }
         [Display(Name = "Preço(em Euros)")]
         public double Preco { get; set; }
         [Display(Name = "Número de pessoas")]

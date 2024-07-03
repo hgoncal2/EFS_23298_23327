@@ -34,10 +34,28 @@ html {
     height: 100%;
 }
 
+a.fc-col-header-cell-cushion{
+    color:white;
+}
+.fc-timeGridWeek-view.fc-view.fc-timegrid {
+    background-color: #98b1d1;
+}
 
+.fc-header-toolbar.fc-toolbar.fc-toolbar-ltr{
+    background-color: #768ba6;
+}
+.fc-view-harness.fc-view-harness-active {
+    background-color: #98b1d1;
+}
+
+
+
+.shrinked {
+    zoom: 0.75;
+}
 th {
     background-color: #6b86e2 !important;
-    color:white;
+    color: white;
 }
 footer {
     margin-top: auto;

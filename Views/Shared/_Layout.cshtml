@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Escape from Sellium</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'/>
     <link rel="stylesheet" href="~/lib/multiselect/bootstrap-multiselect.css" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     
@@ -16,7 +17,9 @@
     
     <link href="~/lib/fancybox/css/fancybox.css" rel="stylesheet" />
     <script src="~/lib/fancybox/js/fancybox.umd.js"></script>
-  
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
 
     
     
@@ -27,6 +30,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js"></script>
 
     <link rel="stylesheet" href="~/EFS_23298_23327.styles.css" asp-append-version="true" />
+  
 </head>
 
 <body class="h-100">
@@ -140,10 +144,9 @@
                 &copy; 2024 - EFS_23298_23327 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
             </div>
         </footer>
+
+  
     
-    
-   
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/multiselect/bootstrap-multiselect.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
