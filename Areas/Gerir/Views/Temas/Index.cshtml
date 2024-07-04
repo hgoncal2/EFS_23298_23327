@@ -49,14 +49,14 @@
 }
 <p>
     <a asp-action="Create">
-    <button class="btn btn-primary" > <i  class="fa fa-add me-2"></i>Criar tema</button>
+        <button class="btn btn-info"> <i class="fa fa-add me-2"></i>Criar tema</button>
     </a>
 
 </p>
 
 
-<table id="temas" class="table display compact table-bordered w-100 table-sm table-striped">
-    <thead class="table-primary text-center">
+<table id="temas" class="table table-bordered table-hover table-striped ">
+    <thead class="text-center table-info">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.TemaId)
@@ -98,7 +98,7 @@
         
 @foreach (var item in Model) {
 
-            <tr class="text-center align-text-top">
+            <tr class="text-center table-primary align-text-top">
                 <td scope="row">
                     @Html.DisplayFor(modelItem => item.TemaId)
                 </td>
@@ -177,7 +177,7 @@
                          <ul class="list-group list-group-horizontal">
 
 
-                            <li class="list-group-item text-black list-group-item-success flex-fill ms-2">@Html.DisplayFor(modelItem => item.Sala.Numero)</li>
+                            <li class="list-group-item text-white bg-success flex-fill ms-2">@Html.DisplayFor(modelItem => item.Sala.Numero)</li>
                         </ul>
                     } else {
 

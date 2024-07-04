@@ -37,9 +37,9 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
-@if (@TempData["NomeUtilizadorCriado"] != null) {
+@if (@TempData["NomeUtilizadorCriado2"] != null) {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Utilizador <strong>@TempData["NomeUtilizadorCriado"]</strong> criado com sucesso!
+        Utilizador <strong>@TempData["NomeUtilizadorCriado2"]</strong> criado com sucesso!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
@@ -51,14 +51,14 @@
 }
 <p>
     <a asp-action="Create">
-        <button class="btn btn-primary"> <i class="fa fa-add me-2"></i>Criar utilizador</button>
+        <button class="btn btn-info"> <i class="fa fa-add me-2"></i>Criar utilizador</button>
     </a>
 
 </p>
-<table class="table text-center">
+<table class="table text-center table-bordered table-hover table-striped table-secondary">
     <thead>
-        <tr>
-            <th>
+        <tr class="table-info text-center">
+            <th class="">
                 @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
@@ -87,7 +87,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+            <tr class="table-primary">
                 <td>
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
@@ -137,7 +137,7 @@
 
                                 }
                                 @if (role.Equals("Cliente")) {
-                                    <li class="list-group-item text-white  bg-primary flex-fill ms-2">@role</li>
+                                    <li class="list-group-item text-white  bg-success flex-fill ms-2">@role</li>
 
                                 }
 

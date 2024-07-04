@@ -58,8 +58,11 @@ namespace EFS_23298_23327.Controllers
         public async Task<IActionResult> Privacy() {
 
 
-            var r = await _context.Salas.Include(s => s.ListaReservas).ThenInclude(s=> s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaId == 1).FirstOrDefaultAsync();
-            return View(r);
+            
+            var tema = await _context.Temas.Include(s => s.Sala).ThenInclude(s=>s.ListaReservas).ThenInclude
+                (s=> s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaID == 1).FirstOrDefaultAsync();
+            TempData["tema"] = tema;
+            return View(tema.Sala);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -97,10 +100,23 @@ namespace EFS_23298_23327.Controllers
 
                 _context.Update(tema.Sala);
                 await _context.SaveChangesAsync();
+            TempData["ReservaSucesso"] = "Reserva para " + r.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss") + " efetuada com sucesso";
                 return Json("ok");
             
             
         }
+        [HttpPost]
+        public async Task<JsonResult> AtualizaReserva(DateTime dateI, DateTime dataF) {
+
+
+
+            return Json("ok");
+
+
+        }
 
     }
+
+   
+
 }

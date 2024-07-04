@@ -128,13 +128,15 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 Utilizadores u = null;
                 if (rvm.Roles.Contains("Anfitriao")) {
                      u = new Anfitrioes(rvm);
+                } else {
+                    if (rvm.Roles.Contains("Cliente")) {
+                        u = new Clientes(rvm);
+                    } else {
+                        u = new Utilizadores(rvm);
+                    }
                 }
-                if (rvm.Roles.Contains("Cliente")) {
-                    u = new Clientes(rvm);
-                } 
-                else {
-                     u = new Utilizadores(rvm);
-                }
+                
+                
                
                 u.CriadoPorOid = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 u.CriadoPorUsername = User.FindFirstValue(ClaimTypes.Name);
@@ -143,7 +145,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 foreach (var item in rvm.Roles) {
                     await _userManager.AddToRoleAsync(u, item);
                 }
-                TempData["NomeUtilizadorCriado"] = u.UserName;
+                TempData["NomeUtilizadorCriado2"] = u.UserName;
                 return RedirectToAction(nameof(Index));
             }
             return View(rvm);
@@ -162,8 +164,24 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             {
                 return NotFound();
             }
-            HashSet<String> allRoles = _roleManager.Roles.Select(r=> r.Name).ToHashSet();
+
+            
             HashSet<String> roles = _userManager.GetRolesAsync(user).Result.ToHashSet();
+            HashSet<String> allRoles = _roleManager.Roles.Select(r => r.Name).ToHashSet();
+
+            if (user is Anfitrioes) {
+                allRoles.Remove("Cliente");
+            } else {
+                if (user is Clientes) {
+                    allRoles.Remove("Anfitriao");
+                } else {
+                    allRoles.RemoveWhere(s => s is String);
+                    allRoles.Add("Admin");
+                }
+            }
+
+           
+            
             var ViewModel = new UtilizadoresViewModel(user);
             ViewModel.Roles= roles;
             ViewBag.SelectionIdList = allRoles;  
@@ -185,6 +203,16 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 return NotFound();
             }
             HashSet<String> allRoles = _roleManager.Roles.Select(r => r.Name).ToHashSet();
+            if (user is Anfitrioes) {
+                allRoles.Remove("Cliente");
+            } else {
+                if (user is Clientes) {
+                    allRoles.Remove("Anfitriao");
+                } else {
+                    allRoles.RemoveWhere(s => s is String);
+                    allRoles.Add("Admin");
+                }
+            }
             ViewBag.SelectionIdList = allRoles;
 
             if (ModelState.IsValid) {
@@ -224,7 +252,28 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                         }
                     }
 
-
+                    if(user is Anfitrioes && userVM.Roles.Contains("Cliente")) {
+                        ViewBag.UserExiste = "Erro! \"<strong>" + userVM.Username + "</strong>\" foi <strong> criado como Anfitrião e não pode ser Cliente!</strong>";
+                        userVM.Roles.Remove("Cliente");
+                       
+                       
+                        return View(userVM);
+                    }
+                    if (user is Clientes && userVM.Roles.Contains("Anfitriao")) {
+                        ViewBag.UserExiste = "Erro! \"<strong>" + userVM.Username + "</strong>\" foi <strong> criado como Cliente e não pode ser Anfitrião!</strong> ";
+                        userVM.Roles.Remove("Anfitriao");
+                       
+                        return View(userVM);
+                    } else {
+                        if(user is not Clientes && user is not Anfitrioes) {
+                           
+                        }
+                       
+                    }
+                   
+                    //Se for cliente
+                    
+                 
 
                     user.UserName = userVM.Username;
                     user.Email=userVM.Email;
