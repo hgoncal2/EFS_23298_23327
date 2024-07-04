@@ -20,6 +20,20 @@
         </div>
     }
 
+    <div class="carrousel">
+ @{
+     var t = TempData["tema"] as Temas;
+
+     foreach(var i in t.ListaFotos){
+         <text>
+         <img data-lazy="~/Imagens/@i.Nome" />
+         
+         </text>
+     }
+}
+</div>
+
+
 <div id='calendar' class=" text-white " ></div>
 
 <script>
@@ -27,7 +41,14 @@
    
    
     document.addEventListener('DOMContentLoaded', function () {
-
+         $('.carrousel').slick({
+       dots: true,
+  infinite: true,
+  speed: 300,
+  slidesToShow: 1,
+  centerMode: true,
+  variableWidth: true
+      });
       
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -41,7 +62,7 @@
             slotMinTime: "08:00:00",
             slotMaxTime: "22:00:00",
             @{
-                var t= TempData["tema"] as Temas;
+                
                 var tempo= (int) t.TempoEstimado + 30;
                 var strTempo = TimeSpan.FromMinutes(tempo).ToString(@"hh\:mm\:ss");
                 

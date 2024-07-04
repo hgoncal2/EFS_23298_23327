@@ -17,8 +17,12 @@
                 if (i == 0)
                 {
                     <div class="carousel-item active text-center">
+
                         <span>Tema @item.Tema</span>
-                        <img class="d-block w-100" style="max-height:600px" src="/Imagens/@item.Foto" alt="First slide" title="@item.Tema">
+                        <a data-fancybox="gallery" data-caption="Imagem do tema '@item.Tema'"
+                               href="~/Imagens/@item.Foto">
+                        <img class="d-block w-100" style="max-height:600px" src="/Imagens/@item.Foto" alt="Imagem do tema @item.Tema" title="Ver imagem do tema @item.Tema">
+                        </a>
                 </div>
                     i++;
                 }
@@ -27,7 +31,10 @@
                 {
                     <div class="carousel-item text-center">
                         <span>Tema @item.Tema</span>
-                        <img class="d-block w-100" style="max-height:600px" src="/Imagens/@item.Foto" alt="First slide" title="@item.Tema">
+                        <a data-fancybox="gallery" data-caption="Imagem do tema '@item.Tema'"
+                           href="~/Imagens/@item.Foto">
+                            <img class="d-block w-100" style="max-height:600px" src="/Imagens/@item.Foto" alt="Imagem do tema @item.Tema" title="Ver imagem do tema @item.Tema">
+                        </a>
                     </div>
                 }
             }
