@@ -2,7 +2,7 @@
 {
     using EFS_23298_23327.Models;
     using Microsoft.AspNetCore.Identity;
-
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
     namespace Aulas.Data
     {
@@ -29,7 +29,7 @@
                 bool haAdicao = false;
 
 
-
+                
                 // Se não houver Admins, cria-os
                 var users = Array.Empty<Utilizadores>();
                 var hasher = new PasswordHasher<Utilizadores>();
@@ -40,23 +40,11 @@
                     
                     ];
                     await dbContext.Utilizadores.AddRangeAsync(users);
+                    
+
                     haAdicao = true;
                 }
-                var anfs = Array.Empty<Anfitrioes>();
-                var hasherAnf = new PasswordHasher<Anfitrioes>();
-                if (!dbContext.Anfitrioes.Any()) {
-                    anfs = [
-                       new Anfitrioes{UserName="jonSilva",NormalizedUserName="JONSILVA",Email="testejon@teste.com",PrimeiroNome="Jon",UltimoNome="Silva",PasswordHash=hasherAnf.HashPassword(null,"teste123")},
-                       new Anfitrioes{UserName="jorgeMiguel",NormalizedUserName="JORGEMIGUEL",Email="testeJorge@teste.com",PrimeiroNome="Jorge",UltimoNome="Miguel",PasswordHash=hasherAnf.HashPassword(null,"teste123")},
-                       new Anfitrioes{UserName="jorginaMiguelina",NormalizedUserName="JORGINAMIGUELINA",Email="testejorgina@teste.com",PrimeiroNome="Jorgina",UltimoNome="Miguelina",PasswordHash=hasherAnf.HashPassword(null,"teste123")}
-
-
-                    ];
-                    await dbContext.Anfitrioes.AddRangeAsync(anfs);
-                    haAdicao = true;
-                }
-
-
+               
 
                 try
                 {

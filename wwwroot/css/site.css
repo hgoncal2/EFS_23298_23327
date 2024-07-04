@@ -11,6 +11,18 @@ html {
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
+
+#carouselHero .carousel-item img {
+    object-fit: fill;
+    object-position: center;
+    overflow: hidden;
+    height: 50vh;
+
+    width:100vw;
+}
+
+
+
 .modal-header-danger {
     color: #fff;
     padding: 9px 15px;

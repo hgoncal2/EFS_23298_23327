@@ -18,6 +18,10 @@ namespace EFS_23298_23327.Models
         //Tempo em Minutos
         [Display(Name = "Tempo Estimado (Em minutos)")]
         public int TempoEstimado { get; set; }
+        [Display(Name = "Preço (Por pessoa)")]
+        public double Preco { get; set; }
+        [Display(Name = "Ícone")]
+        public String Icone { get; set; }
         [Display(Name = "Lotação mínima")]
         [Range( 0, 10)]
         public int? MinPessoas { get; set; }

@@ -216,7 +216,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID")] Temas temas, string nomeAntigo)
+        public async Task<IActionResult> Edit(int id, [Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Icone,Preco")] Temas temas, string nomeAntigo)
         {
             if (id != temas.TemaId)
             {

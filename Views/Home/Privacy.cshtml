@@ -1,10 +1,37 @@
 ﻿@model EFS_23298_23327.Models.Salas
-
+@using EFS_23298_23327.Data
 @{
     ViewData["Title"] = "Privacy Policy";
 }
 
+@{
+     var t = TempData["tema"] as Temas;
 
+     
+} @{
+                        String d = null;
+                        String c = null;
+                        @if ((int)t.Dificuldade == 0)
+                                {
+                                    d = DifficultiesValue.facil.ToString();
+                            c = "success";
+                        }
+                                @if ((int)t.Dificuldade == 1)
+                                {
+                                    d = DifficultiesValue.normal.ToString();
+                                    c = "warning";
+                                }
+                                @if ((int)t.Dificuldade == 2)
+                                {
+                                    d = DifficultiesValue.dificil.ToString();
+                                    c = "danger";
+                                }
+                                @if ((int)t.Dificuldade == 3)
+                                {
+                                    d = DifficultiesValue.sherlock.ToString();
+                                    c = "secondary";
+                                }
+                                }
 
 @if (@TempData["ErroCliente"] != null) {
     <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
@@ -20,19 +47,65 @@
         </div>
     }
 
-    <div class="carrousel">
- @{
-     var t = TempData["tema"] as Temas;
+    
+    <div class="card border-secondary mb-3 " >
+   <div class="card-header border border-@c border-2 h3 text-center text-@c">@t.Nome <i class=" ms-5 bi bi-magic fa-1x"></i></div>
+  <div class="card-body">
 
-     foreach(var i in t.ListaFotos){
-         <text>
-         <img data-lazy="~/Imagens/@i.Nome" />
-         
-         </text>
-     }
-}
+    <h4 class="card-title text-center"></h4>
+
+    <div id="carouselHero" class="carousel slide card-text "  data-bs-ride="carousel">
+  <div class="carousel-inner">
+       @foreach(var i in t.ListaFotos){
+         @if(i.FotoId == t.ListaFotos.First().FotoId){
+             <div class="carousel-item active" data-bs-interval="2000">
+                 <img src="/Imagens/@i.Nome" class="d-block w-100 " >
+                </div>
+            }
+            else
+            {
+                <div class="carousel-item" data-bs-interval="2000">
+                    <img src="/Imagens/@i.Nome" class="d-block w-100" alt="...">
+                 </div>
+            }
+        }
+  </div>
+<div class="text-center card-text mt-3">
+    <div class="d-flex justify-content-center">
+    <div class="row text-center"> 
+          <span class="bi bi-people fa-2x"> </span>
+          <span>@t.MinPessoas - @t.MaxPessoas</span>
+    </div>
+    <div class="row text-center"> 
+          <span class="bi bi-stopwatch fa-2x"> </span>
+          <span>@t.TempoEstimado Minutos</span>
+    </div>
+    <div class="row text-center"> 
+          <span class="bi bi-stopwatch fa-2x"> </span>
+          <span>@t.TempoEstimado Minutos</span>
+    </div>
+    </div>
+
+    </div>
+    <div class="text-center mt-5">
+        <span class="h2 text-light">
+            @t.Dificuldade
+        </span>
+            <div class="progress mt-3">
+                   
+            <div class="progress-bar progress-bar-striped bg-@c" role="progressbar" style="width:@d%;" aria-valuenow="@d" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+    </div>
+
+</div>
+</div>
+  </div>
 </div>
 
+
+    
+
+    @********************************************************@
 
 <div id='calendar' class=" text-white " ></div>
 
@@ -41,15 +114,7 @@
    
    
     document.addEventListener('DOMContentLoaded', function () {
-         $('.carrousel').slick({
-       dots: true,
-  infinite: true,
-  speed: 300,
-  slidesToShow: 1,
-  centerMode: true,
-  variableWidth: true
-      });
-      
+        
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             themeSystem: 'bootstrap5',

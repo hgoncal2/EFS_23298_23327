@@ -59,8 +59,12 @@ namespace EFS_23298_23327.Controllers
 
 
             
-            var tema = await _context.Temas.Include(f=>f.ListaFotos).Include(s => s.Sala).ThenInclude(s=>s.ListaReservas).ThenInclude
+            var tema = await _context.Temas.Include(f=>f.ListaFotos.Where(f => f.Deleted == false)).Include(s => s.Sala).ThenInclude(s=>s.ListaReservas).ThenInclude
                 (s=> s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaID == 1).FirstOrDefaultAsync();
+            if(tema == null)
+            {
+                return NotFound();
+            }
             TempData["tema"] = tema;
             return View(tema.Sala);
         }
