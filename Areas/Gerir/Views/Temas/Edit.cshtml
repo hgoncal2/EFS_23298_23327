@@ -61,6 +61,11 @@
                     <input asp-for="TempoEstimado" class="form-control" />
                     <span asp-validation-for="TempoEstimado" class="text-danger"></span>
                 </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Preco, new { @class = "required" })
+                    <input asp-for="Preco" class="form-control" />
+                    <span asp-validation-for="Preco" class="text-danger"></span>
+                </div>
             </div>
 
             <div class="col">
@@ -83,6 +88,11 @@
                         }
                     </select>
                     <span asp-validation-for="Dificuldade" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Icone)
+                    <input asp-for="Icone" class="form-control" id="temasIcon" />
+                    <span asp-validation-for="Icone" class="text-danger"></span>
                 </div>
                 <div class="form-group">
 

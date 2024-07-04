@@ -67,7 +67,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID")] Temas temas)
+        public async Task<IActionResult> Create([Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Preco,Icone")] Temas temas)
         {
             var Imagens = HttpContext.Request.Form.Files;
             if (ModelState.ContainsKey("Imagem"))

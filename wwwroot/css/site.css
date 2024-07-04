@@ -16,9 +16,24 @@ html {
     object-fit: fill;
     object-position: center;
     overflow: hidden;
-    height: 50vh;
+    height: 70vh;
 
     width:100vw;
+}
+#carouselIndex .carousel-item img {
+    object-fit: fill;
+    object-position: center;
+    overflow: hidden;
+    height: 15vh;
+    width: 100vw;
+}
+
+#carouselIndex .carousel-item:before {
+    object-fit: fill;
+    object-position: center;
+    overflow: hidden;
+    height: 15vh;
+    width: 100vw;
 }
 
 
@@ -41,10 +56,7 @@ html {
     color: #4BF38A !important;
 }
 
-html {
-    position: relative;
-    height: 100%;
-}
+
 
 .iconesConf:hover {
     color: #563D7C !important;

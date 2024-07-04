@@ -55,8 +55,8 @@
 </p>
 
 
-<table id="temas" class="table table-bordered table-hover table-striped ">
-    <thead class="text-center table-info">
+<table id="temas" class="table table-bordered table-sm table-hover table-striped ">
+    <thead class="text-center  table-info">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.TemaId)
@@ -79,11 +79,17 @@
             <th>
                 @Html.DisplayNameFor(model => model.Dificuldade)
             </th>
-            <th>
+            <th class="th-lg">
                 @Html.DisplayNameFor(model => model.ListaFotos)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Sala)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Preco)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Icone)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.DataCriacao)
@@ -108,9 +114,11 @@
             <td>
                     @if (item.MinPessoas != null)
                     {
-
-                        @Html.DisplayFor(modelItem => item.Descricao)
-                        ;
+                        <div style="width:15vw ;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" title="@item.Descricao">
+                            @Html.DisplayFor(modelItem => item.Descricao)
+                        </div>
+                       
+                        
                     }
                     else
                     {
@@ -149,20 +157,36 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Dificuldade)
             </td>
-                <td>
+                <td class="align-content-center">
                    
+
+
+
                     @if (@item.ListaFotos != null || @item.ListaFotos.Any())
                     {
-                        @foreach (var foto in @item.ListaFotos)
-                        {
-                            <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                               href="~/Imagens/@foto.Nome">
-                                <img src="~/Imagens/@Html.DisplayFor(modelItem => @foto.Nome)"
-                                     alt="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                                     title="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                                     class="rounded img-thumbnail expandeImagem" style="max-height:50px;min-height:50px;"/>
-                            </a>
-                        }
+                            <div id="carouselIndex" class="carousel slide card-text "  data-bs-ride="carousel">
+
+                            <div class="carousel-inner" style="height=200px;width:200px;">
+                            @foreach (var i in @item.ListaFotos) {
+                                @if (i.FotoId == @item.ListaFotos.First().FotoId) {
+                                    <div class="carousel-item active" data-bs-interval="2000">
+                                       <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                               href="~/Imagens/@i.Nome"> <img height="200px;width:200px;" src="/Imagens/@i.Nome" class="d-block w-100 "></a>
+
+                                    </div>
+                                } else {
+                                    <div class="carousel-item" data-bs-interval="2000">
+                                         <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                               href="~/Imagens/@i.Nome"><img height="200px;width:200px;" src="/Imagens/@i.Nome" class="d-block w-100"></a>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        </div>
+
+
+
+
                         
                     }
                     else
@@ -184,6 +208,33 @@
                         <span>N.A.</span>
                     }
             </td>
+                <td>
+                    @if (item.Preco != null) {
+                        
+
+
+                            @Html.DisplayFor(modelItem => item.Preco)@:€
+                       
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+                </td>
+                <td class="text-center">
+                    @if (item.Icone != null) {
+                       
+
+
+                            
+
+                                <i class="@item.Icone fa-2x"></i>
+                            
+                       
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.DataCriacao)
                 </td>

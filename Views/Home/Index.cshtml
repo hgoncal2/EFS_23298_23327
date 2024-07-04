@@ -5,50 +5,39 @@
 }
 
 
-<div style="min-height:90%;max-height:90%;background-color:lightblue">
-    <div  id="carouselExampleControls" class="carousel carousel-dark slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            @{
-                int i = 0;
-            }
-            @foreach (var item in Model)
-            {
-                
-                if (i == 0)
-                {
-                    <div class="carousel-item active text-center">
+<div id="carouselHero" class="carousel slide " data-bs-ride="carousel">
+    <div class="carousel-inner">
+            
+            @foreach (var item in Model){
+            
 
-                        <span>Tema @item.Tema</span>
-                        <a data-fancybox="gallery" data-caption="Imagem do tema '@item.Tema'"
-                               href="~/Imagens/@item.Foto">
-                        <img class="d-block w-100" style="max-height:600px" src="/Imagens/@item.Foto" alt="Imagem do tema @item.Tema" title="Ver imagem do tema @item.Tema">
-                        </a>
-                </div>
-                    i++;
-                }
                 
-                else
-                {
-                    <div class="carousel-item text-center">
-                        <span>Tema @item.Tema</span>
-                        <a data-fancybox="gallery" data-caption="Imagem do tema '@item.Tema'"
-                           href="~/Imagens/@item.Foto">
-                            <img class="d-block w-100" style="max-height:600px" src="/Imagens/@item.Foto" alt="Imagem do tema @item.Tema" title="Ver imagem do tema @item.Tema">
-                        </a>
+                       
+                            @if (item.Foto == Model.First().Foto) {
+                                <div class="carousel-item active" data-bs-interval="2000">
+                                    <img src="/Imagens/@item.Foto" class="d-block w-100 ">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>@item.Tema</h5>
+                       
                     </div>
-                }
-            }
+                                </div>
+                            } else {
+                                <div class="carousel-item" data-bs-interval="2000">
+                                    <img src="/Imagens/@item.Foto" class="d-block w-100" alt="...">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>@item.Tema</h5>
+
+                    </div>
+                                </div>
+                            
+                             }
+
+        }
+                    </div>
+                </div>
+           
             
            
-        </div>
-        <button class="carousel-control-prev btn-secondary" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next btn-secondary" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
     </div>
 
 </div>
