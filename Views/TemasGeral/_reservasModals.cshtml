@@ -21,7 +21,7 @@
 
    
     
-<form asp-action="Index" method="post" enctype="multipart/form-data">
+<form asp-controller="TemasGeral" asp-action="Reserva" asp-route-id="@Model.Sala.SalaId" method="post">
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -42,7 +42,8 @@
                     <input  asp-for="nPessoas" />
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    
+                    <button type="button" asp class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                     <input type="submit" value="Confirmar Reserva" class="btn btn-success btn-lg" />
                 </div>
                

@@ -58,7 +58,7 @@
                             <a class="nav-link text-white" asp-area="" asp-controller="Utilizadores" asp-action="Index">PlaceHolder</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="Gerir" asp-controller="Temas" asp-action="Index">PlaceHolder</a>
+                            <a class="nav-link text-white"  asp-controller="TemasGeral" asp-area="" asp-action="Index">Temas</a>
                         </li>
                         @{
                             if ((User.Identity?.IsAuthenticated ?? false || User.IsInRole("Cliente"))  && (User.IsInRole("Admin") || User.IsInRole("Anfitriao"))) {

@@ -27,7 +27,9 @@
                                             @Html.DisplayFor(modelItem => item.Descricao)
                                 </div>
                         <div class="mt-4">
+                            <a asp-action="Reserva" title="Ver" asp-route-id="@item.SalaID">
                                     <button type="button" class="btn btn-outline-@c ">VER TEMA</button>
+                            </a>
                                 </div>
                                 
                             </td>
@@ -45,7 +47,9 @@
                                         @Html.DisplayFor(modelItem => item.Descricao)
                                 </div>
                                 <div class="mt-4">
-                                    <button type="button" class="btn btn-outline-@c ">VER TEMA</button>
+                            <a asp-action="Reserva" title="Ver" asp-route-id="@item.SalaID">
+                                <button type="button" class="btn btn-outline-@c ">VER TEMA</button>
+                            </a>
                                 </div>
                             </td>
                             <td style="width:50%">
