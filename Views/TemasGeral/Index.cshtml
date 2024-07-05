@@ -1,0 +1,59 @@
+﻿@model IEnumerable<EFS_23298_23327.Models.Temas>
+@using EFS_23298_23327.Data
+
+@{
+    ViewData["Title"] = "Index";
+    var i = 0;
+}
+
+
+<table class="table">
+    <tbody>
+        
+        @foreach (var item in Model) {
+                    String c = DifficultiesValue.GetDifficultyColor((int)item.Dificuldade);
+            @if (i % 2 == 0){
+                        <tr class="border border-@c border-2 m-4">
+                            <td style="width:50%; ">
+                                 <img class="d-block w-100" style="height:300px" src="/Imagens/@item.ListaFotos.First().Nome" alt="First slide" title="@item.Nome">
+                            </td>
+                            <td class="text-center">
+                                <div class ="h3 text-center text-@c mt-4">
+                                
+                                            @Html.DisplayFor(modelItem => item.Nome)
+                               
+                                </div>
+                        <div class="text-center text-info mt-4">
+                                            @Html.DisplayFor(modelItem => item.Descricao)
+                                </div>
+                        <div class="mt-4">
+                                    <button type="button" class="btn btn-outline-@c ">VER TEMA</button>
+                                </div>
+                                
+                            </td>
+                        </tr>
+            }
+            else
+            {
+                        <tr class="border border-@c border-2 border">                        
+                            <td class="text-center">
+                            <div class ="h3 text-center text-@c mt-4">
+                                        @Html.DisplayFor(modelItem => item.Nome)
+
+                                </div>
+                                <div class="text-center text-info mt-4">
+                                        @Html.DisplayFor(modelItem => item.Descricao)
+                                </div>
+                                <div class="mt-4">
+                                    <button type="button" class="btn btn-outline-@c ">VER TEMA</button>
+                                </div>
+                            </td>
+                            <td style="width:50%">
+                                <img class="d-block w-100" style="height:300px" src="/Imagens/@item.ListaFotos.First().Nome" alt="First slide" title="@item.Nome">
+                            </td>
+                        </tr>
+            }
+            i++;
+        }
+    </tbody>
+</table>

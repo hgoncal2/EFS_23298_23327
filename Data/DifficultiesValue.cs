@@ -18,7 +18,7 @@
             return "";
 
         }
-        public static int GetDifficultyStr(int difficulty) {
+        public static int GetDifficultyVal(int difficulty) {
 
 
 
