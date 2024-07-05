@@ -1,5 +1,6 @@
 ﻿using Azure.Identity;
 using EFS_23298_23327.Models;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EFS_23298_23327.ViewModel
@@ -8,6 +9,7 @@ namespace EFS_23298_23327.ViewModel
     {
         public Temas Tema { get; set; }
         public Salas Sala { get; set; }
+        [DisplayName("Número de pessoas")]
         public int nPessoas { get; set; }
         public DateTime dataI { get; set; }
         

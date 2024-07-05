@@ -9,21 +9,25 @@ using EFS_23298_23327.Data;
 using EFS_23298_23327.Models;
 using EFS_23298_23327.ViewModel;
 using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
+using EFS_23298_23327.Hubs;
 
 namespace EFS_23298_23327.Controllers
 {
     public class TemasGeralController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public TemasGeralController(ApplicationDbContext context)
-        {
+        private readonly IHubContext<ClassHub> _progressHubContext;
+        public TemasGeralController(ApplicationDbContext context, IHubContext<ClassHub> progressHubContext)
+        {   
+            _progressHubContext = progressHubContext;
             _context = context;
         }
 
         // GET: TemasGeral
         public async Task<IActionResult> Index()
         {
+
             var applicationDbContext = _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
             ICollection<TemasFotoViewModel> TmVm = new List<TemasFotoViewModel>();
             var lista = await applicationDbContext.ToListAsync();
@@ -164,6 +168,7 @@ namespace EFS_23298_23327.Controllers
 
         public async Task<IActionResult> Reserva(int? id) {
 
+            
             var tema = await _context.Temas.Include(f => f.ListaFotos.Where(f => f.Deleted == false)).Include(s => s.Sala).ThenInclude(s => s.ListaReservas).ThenInclude(s => s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaID == id).FirstOrDefaultAsync();
             if (tema == null) {
                 return NotFound();
@@ -180,7 +185,10 @@ namespace EFS_23298_23327.Controllers
 
         [HttpPost]
         public async Task<IActionResult> ReservaData(DateTime dateI, int salaId, string viewType, DateTime viewStart, DateTime viewEnd) {
-
+            if (User.Identity.IsAuthenticated==false) {
+                ViewBag.erroUserAuth = true;
+                return PartialView("_erroUserPartial");
+            }
 
             var tema = await _context.Temas.Include(f => f.ListaFotos.Where(f => f.Deleted == false)).Include(s => s.Sala).ThenInclude(s => s.ListaReservas).ThenInclude(s => s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaID == salaId).FirstOrDefaultAsync();
 
@@ -204,8 +212,9 @@ namespace EFS_23298_23327.Controllers
         [HttpPost]
         public async Task<IActionResult> Reserva(int id,ReservaViewModel rvm) {
 
-            if (ModelState.IsValid) {
-                var t = "s";
+            if (User.Identity.IsAuthenticated == false) {
+                ViewBag.erroUserAuth = true;
+                return View(new RegisterViewModel());
             }
 
             Clientes u = null;

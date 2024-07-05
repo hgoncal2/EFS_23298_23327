@@ -12,11 +12,13 @@
         console.log("@Model.viewStart");
         console.log("@Model.dataI");
         console.log("@Model.viewEnd");
-
+        $("#nPessoas").on('input', function () {
+            $("#preco").text(parseInt($(this).val()) * parseInt(@Model.Tema.Preco));
+        });
     });
    
 
-
+    
 </script>
 
    
@@ -37,9 +39,24 @@
                     @Html.HiddenFor(m => m.viewType)
                     @Html.HiddenFor(m => m.viewStart)
                     @Html.HiddenFor(m => m.dataI)
+
+
+                    <div class="input-group">
+                        <span class="input-group-text">€
+                            <span id="preco" class="input-group-text">@(@Model.Tema.MinPessoas * @Model.Tema.Preco)</span>
+
+                        </span>
+                        
+                        <div class="form-floating">
+                            <input type="number" class="form-control " id="nPessoas" min="@Model.Tema.MinPessoas" value="@Model.Tema.MinPessoas" asp-for="nPessoas" max="@Model.Tema.MaxPessoas">
+                            <label for="nPessoas">@Html.LabelFor(m => m.nPessoas)</label>
+                        </div>
+                    </div>
                     
-                Numero de pessoas:
-                    <input  asp-for="nPessoas" />
+                        
+
+                   
+                
                 </div>
                 <div class="modal-footer">
                     

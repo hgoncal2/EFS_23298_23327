@@ -47,6 +47,38 @@ function deleteDialog(controller, action, id) {
     
 }
 
+var connection = new signalR.HubConnectionBuilder().withUrl("/hub").build();
+
+connection.on("tema", function (user, message) {
+
+    // We can assign user-supplied strings to an element's textContent because it
+    // is not interpreted as markup. If you're assigning in any other way, you 
+    // should be aware of possible script injection concerns.
+    console.log(message);
+    var id = message.split(",")[0];
+    var color = message.split(",")[1];
+    console.log(color);
+    console.log(id);
+
+
+    $("#testeTema").html([
+`<div class="alert alert-dismissible  text-center fade show border-${color} border-3" role="alert">`,
+        `<h4 class="alert-heading text-secondary">Novo tema disponível!</h4>`,
+        `<h2 text-info>Vê  o novo tema disponível <a  class="text-decoration-none link-${color}" href='/TemasGeral/Reserva/${id}'>aqui</a></h2>`,
+        `<button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"   aria-label="Close"></button>`,
+    `</div>`
+
+    ].join(''))
+});
+
+
+
+connection.start().then(function () {
+    console.log("ligado")
+}).catch(function (err) {
+    return console.error(err.toString());
+});
+
 $(document).ready(function () {
 
     Fancybox.bind("[data-fancybox]", {

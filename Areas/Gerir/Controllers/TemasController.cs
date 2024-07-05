@@ -9,6 +9,8 @@ using EFS_23298_23327.Data;
 using EFS_23298_23327.Models;
 using System.Numerics;
 using System.Security.Claims;
+using EFS_23298_23327.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
@@ -20,9 +22,12 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         private readonly ApplicationDbContext _context;
         private string? temaAntigo;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IHubContext<ClassHub> _progressHubContext;
 
-        public TemasController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+
+        public TemasController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IHubContext<ClassHub> hubContext)
         {
+            _progressHubContext = hubContext;
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
@@ -157,6 +162,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 temas.CriadoPorUsername = User.FindFirstValue(ClaimTypes.Name);
                 _context.Add(temas);
                 await _context.SaveChangesAsync();
+
                 if (hasImagem)
                 {
                     string localizacaoImagem = _webHostEnvironment.WebRootPath;
@@ -180,6 +186,10 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     // adicionar à raiz da parte web, o nome da pasta onde queremos guardar as imagens
 
                     // atribuir ao caminho o nome da imagem
+
+                }
+                if (temas.SalaID != null) {
+                    await _progressHubContext.Clients.All.SendAsync("tema","system", temas.SalaID+"," + DifficultiesValue.GetDifficultyColor(1));
 
                 }
                 TempData["NomeTemaCriado"] = temas.Nome;

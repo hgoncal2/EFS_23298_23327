@@ -1,4 +1,5 @@
 using EFS_23298_23327.Data;
+using EFS_23298_23327.Hubs;
 using EFS_23298_23327.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,7 +18,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
 
-
+builder.Services.AddSignalR();
 
 builder.Services.AddDefaultIdentity<Utilizadores>(options => options.SignIn.RequireConfirmedAccount = false)
    .AddRoles<IdentityRole>()
@@ -55,6 +56,7 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapHub<ClassHub>("/hub");
 
 
 app.MapRazorPages();
