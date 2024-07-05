@@ -166,5 +166,8 @@
     
     <script src="~/lib/multiselect/bootstrap-multiselect.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        $(document).ready(function () { if (typeof partialScript !== "undefined") partialScript(); });
+    </script>
 </body>
 </html>

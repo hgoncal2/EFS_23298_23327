@@ -1,18 +1,24 @@
-﻿@model EFS_23298_23327.Models.Salas
+﻿@model EFS_23298_23327.ViewModel.ReservaViewModel
 @using EFS_23298_23327.Data
 @{
     ViewData["Title"] = "Privacy Policy";
 }
-
+ 
 @{
-     var t = TempData["tema"] as Temas;
-
+     var t = Model.Tema;
+    
      
 } @{
-                        String d = DifficultiesValue.GetDifficultyStr((int)t.Dificuldade).ToString();
+                        String d = DifficultiesValue.GetDifficultyVal((int)t.Dificuldade).ToString();
                         String c = DifficultiesValue.GetDifficultyColor((int)t.Dificuldade);
                         
                                 }
+
+                                
+
+
+    
+
 
 @if (@TempData["ErroCliente"] != null) {
     <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
@@ -22,13 +28,17 @@
 }
 @if (@TempData["ReservaSucesso"] != null)
     {
+        
         <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+            
           @TempData["ReservaSucesso"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     
+
+
     <div class="card border-secondary mb-3 " id="tema"  >
    <div class="card-header border border-@c border-2 h3 text-center text-@c">@t.Nome <i class=" ms-5 @t.Icone fa-1x"></i></div>
   <div class="card-body">
@@ -95,15 +105,18 @@
 
 <script>
  
-   $(document).ready(function () {
-    // Handler for .ready() called.
-    
-});
+   
    
     document.addEventListener('DOMContentLoaded', function () {
         $('html, body').animate({
-        scrollTop: $('#tema').offset().top
-    }, 'slow');
+             @if(Model.viewStart != DateTime.MinValue){
+        @:scrollTop: $('#calendar').offset().top}, 'slow');
+            }else{
+                @:scrollTop: $('#tema').offset().top}, 'slow');
+            }
+       
+
+
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             themeSystem: 'bootstrap5',
@@ -142,16 +155,16 @@
             
             allDaySlot: false,
             headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                left: 'prev',
+                center: 'title,today',
+                right:"next"
                 
                
             }, 
             
             buttonText:{
                     
-                today: 'atual',
+                today: 'Ver dia atual',
                 month: 'ver mês',
                 week: 'ver semana',
                 day: 'ver dia'
@@ -166,20 +179,22 @@
                     container: "body"
                 });
             },
-            
+            eventRender: function(info){
+      $(info.el).find('.fc-title').html(info.event.title);
+},
             
             
             events: [
                 
                 
                 
-    @foreach (var i in Model.ListaReservas) {
-        @if (i.Equals(Model.ListaReservas.Last())) {
+    @foreach (var i in Model.Sala.ListaReservas) {
+        @if (i.Equals(Model.Sala.ListaReservas.Last())) {
             <text>{
-            title: '@i.NumPessoas/@t.MaxPessoas Pessoas',
+            title: '@t.Nome',
             start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
             end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-            description:'Reserva para  "@i.Cliente.UserName".',
+            description:'@i.NumPessoas/@t.MaxPessoas Pessoas',
             
            
             @if(i.Cliente.UserName.Equals(User.Identity.Name)){
@@ -217,27 +232,54 @@
         },
 
             select: function (info) {
-                @if(User.IsInRole("Admin")){
-                     @:console.log(info.startStr);
-                     @:console.log(info.endStr);
-                     @:console.log(info.view)
+                @if(User.IsInRole("Admin") || true){
+                    <text>  
+                   
+                    
+                  $.post('/Home/ReservaData', { dateI: info.startStr,salaId:@Model.Sala.SalaId,viewType:info.view.type,viewStart:calendar.formatIso(info.view.activeStart),viewEnd:calendar.formatIso(info.view.activeEnd) }, function (result) {
+                   
+                  if(result.failed){
+console.log("wdwad");
+                   }else{
+                       $('#mod1').html(result);
+                      $('#exampleModal').modal("show");
+                   }
+                       
+                    });
+                    </text>
                 }
                 else{
-                    <text>
+                    <text>@*
                      $.post('/Home/Reserva', { date: info.startStr }, function (result) {
                     if(result=="ok"){
                     location.reload();
                     }else{
                     location.reload();
                     }
-                })
+                })*@
                     </text>
                 }
                 
                 
             },
         });
+            
+        
+            @if(Model.viewStart != DateTime.MinValue){
+                 @:calendar.changeView('timeGridWeek','@Model.viewStart.ToString("yyyy-MM-dd")');
+            }
+        
+       
+            
+        
         calendar.render();
+
     });
 
 </script>
+
+            <div id="mod1">
+
+                 
+            
+            </div>
