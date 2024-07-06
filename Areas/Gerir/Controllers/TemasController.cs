@@ -48,7 +48,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 return NotFound();
             }
 
-            var temas = await _context.Temas.Include(m => m.ListaFotos).Include(s=>s.Sala)
+            var temas = await _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Include(s=>s.Sala)
 .FirstOrDefaultAsync(m => m.TemaId == id);
             if (temas == null)
             {
@@ -58,27 +58,40 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(temas);
         }
 
-        // GET: Temas/Create
+        /// <summary>
+        /// GET: Temas/Create
+        /// </summary>
+        /// <returns>View("Create")</returns>
         public async Task<ActionResult> Create()
         {
+            //Remove da lista salas que estão a ser usadas por outro tema
            List<Salas> a = await _context.Temas.Where(s => !s.Deleted).Select(s => s.Sala).ToListAsync();
            List<Salas> s =await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
             ViewBag.s = s.Except(a).ToList();
             return View();
         }
 
-        // POST: Temas/Create
+        /// <summary>
+        /// POST: Temas/Create
+        /// </summary>
+        /// <param name="temas"></param>
+        /// <returns>View("Create",Objeto Tema)</returns>
+        // 
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Preco,Icone")] Temas temas)
+        public async Task<IActionResult> Create([Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Preco,Icone,AnunciarTema")] Temas temas)
         {
             var Imagens = HttpContext.Request.Form.Files;
+            //Remove 
             if (ModelState.ContainsKey("Imagem"))
             {
                 ModelState.Remove("Imagem");
             }
+             List<Salas> a = await _context.Temas.Where(s => !s.Deleted).Select(s => s.Sala).ToListAsync();
+           List<Salas> s =await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
+            ViewBag.s = s.Except(a).ToList();
             if (ModelState.IsValid)
             {
 
@@ -188,14 +201,14 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     // atribuir ao caminho o nome da imagem
 
                 }
-                if (temas.SalaID != null) {
-                    await _progressHubContext.Clients.All.SendAsync("tema","system", temas.SalaID+"," + DifficultiesValue.GetDifficultyColor(1));
+                if (temas.SalaID != null && temas.AnunciarTema) {
+                    await _progressHubContext.Clients.All.SendAsync("tema","system", temas.SalaID+"," + DifficultiesValue.GetDifficultyColor(1), "Novo tema disponível!");
 
                 }
                 TempData["NomeTemaCriado"] = temas.Nome;
                 return RedirectToAction(nameof(Index));
             }
-
+            @ViewBag.ErroTema = "Erro ao criar tema!";
             return View(temas);
         }
 
@@ -226,12 +239,15 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Icone,Preco")] Temas temas, string nomeAntigo)
+        public async Task<IActionResult> Edit(int id, [Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Icone,Preco,AnunciarTema")] Temas temas, string nomeAntigo)
         {
             if (id != temas.TemaId)
             {
                 return NotFound();
             }
+            List<Salas> a = await _context.Temas.Where(s => !s.Deleted && s.TemaId != temas.TemaId).Select(s => s.Sala).Where(s=>!s.Deleted && s.SalaId!=temas.SalaID).ToListAsync();
+            List<Salas> s = await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
+            ViewBag.s = s.Except(a).ToList();
             if (ModelState.ContainsKey("nomeAntigo"))
             {
                 ModelState.Remove("nomeAntigo");
@@ -365,10 +381,13 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 }
                 ViewBag.TemaAntigo = temas.Nome;
                 ViewBag.ShowAlert = true;
-                var temasAtual = await _context.Temas.Include(m => m.ListaFotos).FirstOrDefaultAsync(m => m.TemaId == id);
-                List<Salas> s =await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
-            ViewBag.s = s;
-                return View(temasAtual);
+                 if (temas.SalaID != null && temas.AnunciarTema) {
+                    await _progressHubContext.Clients.All.SendAsync("tema","system", temas.SalaID+"," + DifficultiesValue.GetDifficultyColor(1)+ "," + "Tema Atualizado!");
+
+                }
+                
+            
+                return View(temas);
             }
 
             return View(temas);

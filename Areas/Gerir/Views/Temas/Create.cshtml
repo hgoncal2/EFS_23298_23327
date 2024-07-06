@@ -1,17 +1,25 @@
 ﻿@using EFS_23298_23327.Data.Enum
 @model EFS_23298_23327.Models.Temas
-
+@using EFS_23298_23327.Data
 @{
     ViewData["Title"] = "Criar";
     
 }
 
+@{
+
+    var nenhumaSala=false;
+}
+
 <script>
 
-    
+   
+
+   
+
+
+
 </script>
-
-
 
 
 <div class="mt-4">
@@ -23,6 +31,12 @@
 <h2 class="ms-2  mt-4">Criar Tema </h2>
 
 <hr class="bg-primary " />
+@if (@ViewBag.ErroTema != null) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @ViewBag.ErroTema
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 @if (@ViewBag.TemaExistente != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -43,9 +57,9 @@
                     <input asp-for="Nome"  class="form-control" />
                     <span asp-validation-for="Nome" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+                <div class="form-group h-50">
                     <label asp-for="Descricao" class="control-label required"></label>
-                    <textarea asp-for="Descricao" class="form-control">
+                    <textarea asp-for="Descricao" class="form-control h-75">
 
                     </textarea>  
                     <span asp-validation-for="Descricao" class="text-danger"></span>
@@ -75,19 +89,24 @@
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.Dificuldade, new { @class = "required" })
-                    <select class="form-select" asp-for="Dificuldade" aria-label="Escolher dificuldade">
+                    <select class="form-select text-@DifficultiesValue.GetDifficultyColor(0)" id="dif" asp-for="Dificuldade" aria-label="Escolher dificuldade">
                         
                     @foreach (var dif in Html.GetEnumSelectList<Dificuldade>())
                     {
-                            <option value="@dif.Value">@dif.Text</option>
+                            <option class="text-@DifficultiesValue.GetDifficultyColorStr(dif.Value)" value="@dif.Value">@dif.Text</option>
                     }
                     </select>
                     <span asp-validation-for="Dificuldade" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Icone)
-                    <input asp-for="Icone" class="form-control" id="temasIcon" />
-                    <span asp-validation-for="Icone" class="text-danger"></span>
+                    @Html.LabelFor(m => m.Icone)<span data-bs-toggle="tooltip" data-html="true" data-bs-placement="right" data-bs-html='true' title="Ver todos os ícones disponíveis"><a href="https://icons.getbootstrap.com/" target="_blank"><i class=" ms-2 bi bi-patch-question"></i></a></span>
+                    <div class="input-group">
+
+                        </br>
+                        <input asp-for="Icone" placeholder="bi bi-icon" class="form-control border-end-0 " id="temasIcon" />
+                        <i id="icon" class=" ms-2 fa-2x"></i>
+
+                    </div>
                 </div>
                 <div class="form-group">
 
@@ -101,11 +120,28 @@
                             }
                         </select>
                     }else{
-                       <p>Nenhuma sala criada</p>
+                        
+                         nenhumaSala=true;
+                        
+                       <p>Nenhuma sala disponível</p>
                     }
                     
                     
                     <span asp-validation-for="SalaID" class="text-danger"></span>
+                </div>
+                <div class="form-group form-check mt-2">
+                    
+                    @if(nenhumaSala){
+                        <input class="form-check-input form-control" disabled="true" asp-for="AnunciarTema" type="checkbox" id="flexCheckDefault">
+
+                    }else{
+                    <input class="form-check-input form-control" asp-for="AnunciarTema" type="checkbox"  id="flexCheckDefault">
+
+                    }
+                    <label class="form-check-label ms-2" for="flexCheckDefault">
+                        @Html.LabelFor(m => m.AnunciarTema)<span data-bs-toggle="tooltip" data-bs-placement="right" title="Anuncia a criação do tema a todos os utilizadores via websockets.Necessita de sala associdada"><i class=" ms-2 bi bi-patch-question" id="anunciaTema"></i></span>
+
+                    </label>
                 </div>
             </div>
         </div>
@@ -125,7 +161,7 @@
     
     <br />
     <div class="form-group text-center d-grid gap-2 col-6 mx-auto">
-        <input type="submit" value="Criar" class="btn btn-outline-secondary btn-lg" />
+        <input type="submit"  value="Criar" class="btn btn-outline-secondary btn-lg" />
     </div>
     
 

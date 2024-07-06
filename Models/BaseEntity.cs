@@ -6,9 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EFS_23298_23327.Models
 {
     public class BaseEntity : BaseEntityInterface
-    { 
-        
-    
+    {
+
         [Display(Name = "Data de Criação")]
         public DateTime DataCriacao { get; set; }
         public bool Deleted { get; set; }

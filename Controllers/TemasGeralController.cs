@@ -11,9 +11,11 @@ using EFS_23298_23327.ViewModel;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using EFS_23298_23327.Hubs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EFS_23298_23327.Controllers
 {
+    [CustomAuthorize(Roles ="Cliente,Admin,Anfitriao")]
     public class TemasGeralController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,10 +27,13 @@ namespace EFS_23298_23327.Controllers
         }
 
         // GET: TemasGeral
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
+            //Usado para testes ws
+           // await _progressHubContext.Clients.All.SendAsync("tema", "system", "teste");
 
-            var applicationDbContext = _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao);
+            var applicationDbContext = _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Where(m => m.Deleted != true).Where(t=>t.ListaFotos.Any()).Where(t=> t.SalaID!=null).OrderByDescending(m => m.DataCriacao);
             ICollection<TemasFotoViewModel> TmVm = new List<TemasFotoViewModel>();
             var lista = await applicationDbContext.ToListAsync();
             if (lista != null)
@@ -165,7 +170,7 @@ namespace EFS_23298_23327.Controllers
 
             return View(temas);
         }
-
+        [AllowAnonymous]
         public async Task<IActionResult> Reserva(int? id) {
 
             
@@ -182,7 +187,7 @@ namespace EFS_23298_23327.Controllers
 
             return View(rvm);
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> ReservaData(DateTime dateI, int salaId, string viewType, DateTime viewStart, DateTime viewEnd) {
             if (User.Identity.IsAuthenticated==false) {
@@ -208,7 +213,7 @@ namespace EFS_23298_23327.Controllers
 
         }
 
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Reserva(int id,ReservaViewModel rvm) {
 

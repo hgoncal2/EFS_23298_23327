@@ -6,4 +6,45 @@
 
         $("#temas").addClass("active")
     
+    $(document).ready(function () {
+
+
+        $(document).ready(function () {
+
+            $('#temasIcon').on('input', function () {
+                $("#icon").removeClass();
+                $("#icon").addClass("ms-2 fa-2x")
+
+
+
+                console.log(this.value);
+                $("#icon").addClass(this.value);
+
+
+            });
+        });
+
+
+        $('#dif').on('change', function () {
+            console.log(this.value);
+            $("#dif").removeClass();
+            $("#dif").addClass('form-select');
+            if (this.value == 0) {
+
+                $("#dif").addClass('text-success');
+            };
+            if (this.value == 1) {
+                $("#dif").addClass('text-warning');
+            };
+            if (this.value == 2) {
+                $("#dif").addClass('text-danger');
+            };
+            if (this.value == 3) {
+                $("#dif").addClass('text-secondary');
+            };
+           
+        });
+    });
+   
+
 </script>

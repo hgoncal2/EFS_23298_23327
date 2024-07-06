@@ -57,13 +57,14 @@ connection.on("tema", function (user, message) {
     console.log(message);
     var id = message.split(",")[0];
     var color = message.split(",")[1];
-    console.log(color);
+    var msg = message.split(",")[2];
+    console.log(msg);
     console.log(id);
 
 
     $("#testeTema").html([
 `<div class="alert alert-dismissible  text-center fade show border-${color} border-3" role="alert">`,
-        `<h4 class="alert-heading text-secondary">Novo tema disponível!</h4>`,
+        `<h4 class="alert-heading text-${color}">${msg}</h4>`,
         `<h2 text-info>Vê  o novo tema disponível <a  class="text-decoration-none link-${color}" href='/TemasGeral/Reserva/${id}'>aqui</a></h2>`,
         `<button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"   aria-label="Close"></button>`,
     `</div>`

@@ -4,6 +4,7 @@ using EFS_23298_23327.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFS_23298_23327.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240706012517_validacoesTemas")]
+    partial class validacoesTemas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,6 +55,7 @@ namespace EFS_23298_23327.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DataTirada")
@@ -98,6 +102,7 @@ namespace EFS_23298_23327.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Deleted")
@@ -145,6 +150,7 @@ namespace EFS_23298_23327.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Deleted")
@@ -173,6 +179,7 @@ namespace EFS_23298_23327.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Deleted")
