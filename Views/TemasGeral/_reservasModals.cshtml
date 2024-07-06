@@ -4,7 +4,7 @@
 @{
     
 
-   
+   var precoTema = Model.Tema.Preco.ToString().Replace(",",".");
 
 }
 <script>
@@ -13,7 +13,8 @@
         console.log("@Model.dataI");
         console.log("@Model.viewEnd");
         $("#nPessoas").on('input', function () {
-            $("#preco").text(parseInt($(this).val()) * parseInt(@Model.Tema.Preco));
+            var preco = parseInt($(this).val()) * parseFloat((@precoTema));
+            $("#preco").text(preco.toFixed(1))
         });
     });
    

@@ -1,5 +1,6 @@
 ﻿using EFS_23298_23327.Data;
 using EFS_23298_23327.Data.Enum;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -39,7 +40,16 @@ namespace EFS_23298_23327.Models
 
         [Display(Name = "Preço (Por pessoa)")]
         [Required(ErrorMessage = "Por favor indique o {0}")]
-        public double Preco { get; set; }
+        [DisplayFormat(DataFormatString = "{0:F1}", ApplyFormatInEditMode = true)]
+        public decimal Preco { get; set; }
+
+        [NotMapped] 
+        [Required(ErrorMessage = "Por favor indique o {0}")]
+       
+        [StringLength(9)]
+        [RegularExpression("[0-9]{1,6}([,.][0-9]{1})?", ErrorMessage = "Escreva um número com, no máximo 1 casa decimal, separadas por . ou ,")]
+        [Display(Name = "Preço  (Por pessoa)")]
+        public string PrecoStr { get; set; }
 
 
         [Display(Name = "Ícone")]

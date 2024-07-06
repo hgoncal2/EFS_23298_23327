@@ -7,7 +7,8 @@ namespace EFS_23298_23327.Models
 {
     public class BaseEntity : BaseEntityInterface
     {
-
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        [DataType(DataType.Date)]
         [Display(Name = "Data de Criação")]
         public DateTime DataCriacao { get; set; }
         public bool Deleted { get; set; }

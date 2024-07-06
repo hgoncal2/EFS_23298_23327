@@ -4,6 +4,7 @@ using EFS_23298_23327.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFS_23298_23327.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240706132458_strpreco")]
+    partial class strpreco
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasIndex("ListaSalasSalaId");
 
-                    b.ToTable("AnfitrioesSalas", (string)null);
+                    b.ToTable("AnfitrioesSalas");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Fotos", b =>
@@ -77,7 +80,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasIndex("TemaId");
 
-                    b.ToTable("Fotos", (string)null);
+                    b.ToTable("Fotos");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Reservas", b =>
@@ -124,7 +127,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasIndex("SalaId");
 
-                    b.ToTable("Reservas", (string)null);
+                    b.ToTable("Reservas");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Salas", b =>
@@ -155,7 +158,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasKey("SalaId");
 
-                    b.ToTable("Salas", (string)null);
+                    b.ToTable("Salas");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Temas", b =>
@@ -214,7 +217,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasIndex("SalaID");
 
-                    b.ToTable("Temas", (string)null);
+                    b.ToTable("Temas");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Utilizadores", b =>
@@ -327,7 +330,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LoginViewModel", (string)null);
+                    b.ToTable("LoginViewModel");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.ViewModel.UtilizadoresViewModel", b =>
@@ -360,7 +363,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UtilizadoresViewModel", (string)null);
+                    b.ToTable("UtilizadoresViewModel");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

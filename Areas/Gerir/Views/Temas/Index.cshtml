@@ -6,12 +6,12 @@
 
 
 <script>
-    function teste(id,nome){
+    function teste(id, nome) {
         $('#nomeTema').text(nome);
         $('#apagarTema').attr('action', 'Gerir/Temas/Delete/' + id);
     }
-    
-    
+
+
 </script>
 
 <div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -22,10 +22,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-footer ">
-                
+
                 <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
-                <form id="apagarTema" method="post" >
-                 <button type="submit" class="btn btn-danger" >Apagar</button>
+                <form id="apagarTema" method="post">
+                    <button type="submit" class="btn btn-danger">Apagar</button>
                 </form>
             </div>
         </div>
@@ -33,16 +33,21 @@
 </div>
 
 <h1>Temas</h1>
-@if (TempData["TemaApagado"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+@if (TempData["MensagemErro"] != null) {
+    <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["MensagemErro"])
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+}
+@if (TempData["TemaApagado"] != null) {
+    <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
         Tema <strong>@TempData["TemaApagado"]</strong> apagado com sucesso!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
-@if (@TempData["NomeTemaCriado"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+@if (@TempData["NomeTemaCriado"] != null) {
+    <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
         Tema <strong>@TempData["NomeTemaCriado"]</strong> criado com sucesso!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -101,104 +106,94 @@
         </tr>
     </thead>
     <tbody>
-        
-@foreach (var item in Model) {
+
+        @foreach (var item in Model) {
 
             <tr class="text-center table-primary align-text-top">
                 <td scope="row">
                     @Html.DisplayFor(modelItem => item.TemaId)
                 </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                    @if (item.MinPessoas != null)
-                    {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @if (item.MinPessoas != null) {
                         <div style="width:15vw ;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" title="@item.Descricao">
                             @Html.DisplayFor(modelItem => item.Descricao)
                         </div>
-                       
-                        
-                    }
-                    else
-                    {
+
+
+                    } else {
 
                         <span>N.A.</span>
                     }
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TempoEstimado) Minutos
-            </td>
-            <td>
-                
-                    @if(item.MinPessoas != null)
-                    {
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TempoEstimado) Minutos
+                </td>
+                <td>
 
-                        @Html.DisplayFor(modelItem => item.MinPessoas);
-                    }
-                    else{
+                    @if (item.MinPessoas != null) {
+
+                        @Html.DisplayFor(modelItem => item.MinPessoas)
+                        ;
+                    } else {
 
                         <span>N.A.</span>
-                        }
-                    </td>
-            <td>
-                    @if (item.MinPessoas != null)
-                    {
+                    }
+                </td>
+                <td>
+                    @if (item.MinPessoas != null) {
 
                         @Html.DisplayFor(modelItem => item.MaxPessoas)
                         ;
-                    }
-                    else
-                    {
+                    } else {
 
                         <span>N.A.</span>
                     }
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Dificuldade)
-            </td>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dificuldade)
+                </td>
                 <td class="align-content-center">
-                   
 
 
 
-                    @if (@item.ListaFotos != null || @item.ListaFotos.Any())
-                    {
-                            <div id="carouselIndex" class="carousel slide card-text "  data-bs-ride="carousel">
+
+                    @if (@item.ListaFotos != null || @item.ListaFotos.Any()) {
+                        <div id="carouselIndex" class="carousel slide card-text " data-bs-ride="carousel">
 
                             <div class="carousel-inner" style="height=200px;width:200px;">
-                            @foreach (var i in @item.ListaFotos) {
-                                @if (i.FotoId == @item.ListaFotos.First().FotoId) {
-                                    <div class="carousel-item active" data-bs-interval="2000">
-                                       <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                @foreach (var i in @item.ListaFotos) {
+                                    @if (i.FotoId == @item.ListaFotos.First().FotoId) {
+                                        <div class="carousel-item active" data-bs-interval="2000">
+                                            <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
                                                href="~/Imagens/@i.Nome"> <img height="200px;width:200px;" src="/Imagens/@i.Nome" class="d-block w-100 "></a>
 
-                                    </div>
-                                } else {
-                                    <div class="carousel-item" data-bs-interval="2000">
-                                         <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                        </div>
+                                    } else {
+                                        <div class="carousel-item" data-bs-interval="2000">
+                                            <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
                                                href="~/Imagens/@i.Nome"><img height="200px;width:200px;" src="/Imagens/@i.Nome" class="d-block w-100"></a>
-                                    </div>
+                                        </div>
+                                    }
                                 }
-                            }
+                            </div>
                         </div>
-                        </div>
 
 
 
 
-                        
-                    }
-                    else
-                    {
+
+                    } else {
 
                         <span>N.A.</span>
                     }
-                    
-            </td>
-            <td>
+
+                </td>
+                <td>
                     @if (item.Sala != null) {
-                         <ul class="list-group list-group-horizontal">
+                        <ul class="list-group list-group-horizontal">
 
 
                             <li class="list-group-item text-white bg-success flex-fill ms-2">@Html.DisplayFor(modelItem => item.Sala.Numero)</li>
@@ -207,14 +202,16 @@
 
                         <span>N.A.</span>
                     }
-            </td>
+                </td>
                 <td>
                     @if (item.Preco != null) {
-                        
 
 
-                            @Html.DisplayFor(modelItem => item.Preco)@:€
-                       
+
+                        @Html.DisplayFor(modelItem => item.Preco)
+
+                        @:€
+
                     } else {
 
                         <span>N.A.</span>
@@ -222,14 +219,14 @@
                 </td>
                 <td class="text-center">
                     @if (item.Icone != null) {
-                       
 
 
-                            
 
-                                <i class="@item.Icone fa-2x"></i>
-                            
-                       
+
+
+                        <i class="@item.Icone fa-2x"></i>
+
+
                     } else {
 
                         <span>N.A.</span>
@@ -245,11 +242,11 @@
                     <a asp-action="Edit" title="Editar" asp-route-id="@item.TemaId"><i class="fa fa-pencil link-success icons-index"></i></a>
                     <a asp-action="Details" title="Ver" asp-route-id="@item.TemaId"><i class="fa-solid fa-circle-info icons-index"></i></a>
                     <a data-bs-toggle="modal" title="Apagar" style="cursor:pointer" data-bs-target="#modalApagar" onclick="teste('@item.TemaId','@item.Nome')"><i class="fa fa-trash icons-index link-danger delete"></i></a>
-            </td>
-        </tr>
-}
+                </td>
+            </tr>
+        }
     </tbody>
-  
+
 </table>
 
 @Html.AntiForgeryToken()
