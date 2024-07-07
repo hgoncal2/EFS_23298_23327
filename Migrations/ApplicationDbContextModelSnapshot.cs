@@ -22,6 +22,21 @@ namespace EFS_23298_23327.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AnfitrioesReservas", b =>
+                {
+                    b.Property<string>("ListaAnfitrioesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ListaReservasReservaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ListaAnfitrioesId", "ListaReservasReservaId");
+
+                    b.HasIndex("ListaReservasReservaId");
+
+                    b.ToTable("AnfitrioesReservas");
+                });
+
             modelBuilder.Entity("AnfitrioesSalas", b =>
                 {
                     b.Property<string>("ListaAnfitrioesId")
@@ -34,7 +49,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasIndex("ListaSalasSalaId");
 
-                    b.ToTable("AnfitrioesSalas", (string)null);
+                    b.ToTable("AnfitrioesSalas");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Fotos", b =>
@@ -77,7 +92,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasIndex("TemaId");
 
-                    b.ToTable("Fotos", (string)null);
+                    b.ToTable("Fotos");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Reservas", b =>
@@ -106,9 +121,6 @@ namespace EFS_23298_23327.Migrations
                     b.Property<int>("NumPessoas")
                         .HasColumnType("int");
 
-                    b.Property<double>("Preco")
-                        .HasColumnType("float");
-
                     b.Property<DateTime>("ReservaDate")
                         .HasColumnType("datetime2");
 
@@ -118,13 +130,22 @@ namespace EFS_23298_23327.Migrations
                     b.Property<int?>("SalaId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TemaDif")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TemaNome")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalPreco")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("ReservaId");
 
                     b.HasIndex("ClienteID");
 
                     b.HasIndex("SalaId");
 
-                    b.ToTable("Reservas", (string)null);
+                    b.ToTable("Reservas");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Salas", b =>
@@ -155,7 +176,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasKey("SalaId");
 
-                    b.ToTable("Salas", (string)null);
+                    b.ToTable("Salas");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Temas", b =>
@@ -201,8 +222,7 @@ namespace EFS_23298_23327.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Preco")
-                        .HasPrecision(8, 1)
-                        .HasColumnType("decimal(8,1)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("SalaID")
                         .HasColumnType("int");
@@ -214,7 +234,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasIndex("SalaID");
 
-                    b.ToTable("Temas", (string)null);
+                    b.ToTable("Temas");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.Models.Utilizadores", b =>
@@ -327,7 +347,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LoginViewModel", (string)null);
+                    b.ToTable("LoginViewModel");
                 });
 
             modelBuilder.Entity("EFS_23298_23327.ViewModel.UtilizadoresViewModel", b =>
@@ -360,7 +380,7 @@ namespace EFS_23298_23327.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UtilizadoresViewModel", (string)null);
+                    b.ToTable("UtilizadoresViewModel");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -532,6 +552,21 @@ namespace EFS_23298_23327.Migrations
                     b.HasBaseType("EFS_23298_23327.Models.Utilizadores");
 
                     b.HasDiscriminator().HasValue("Clientes");
+                });
+
+            modelBuilder.Entity("AnfitrioesReservas", b =>
+                {
+                    b.HasOne("EFS_23298_23327.Models.Anfitrioes", null)
+                        .WithMany()
+                        .HasForeignKey("ListaAnfitrioesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EFS_23298_23327.Models.Reservas", null)
+                        .WithMany()
+                        .HasForeignKey("ListaReservasReservaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AnfitrioesSalas", b =>

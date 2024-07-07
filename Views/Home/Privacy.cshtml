@@ -1,3 +1,261 @@
-﻿<div class="text-center">
+﻿@model IEnumerable<EFS_23298_23327.Models.Reservas>
+
+
+    @{
+
+        var r = Model.First();
+    }
+<div class="text-center">
     <h1>Em Construção</h1>
 </div>
+
+
+
+<div id="rModal">dw</div>
+<div id='calendar' class=" text-white "></div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    $("#ex").modal("show");
+
+
+            var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        themeSystem: 'bootstrap5',
+
+        initialView: 'timeGridWeek',
+        locale: 'pt',
+        slotEventOverlap: false,
+         resourceGroupField: 'groupId',
+
+        initialDate: new Date(),
+        stickyHeaderDates:true,
+        
+        eventMouseEnter: function(info){
+            $(info.el).css('cursor','pointer');
+        },
+        
+        slotMinTime: "05:00:00",
+        slotMaxTime: "24:00:00",
+    
+        hiddenDays: [0],
+        eventOverlap: false,
+        timeZone: 'UTC',
+        selectOverlap: false,
+        nowIndicator: true,
+        selectable: false,
+        validRange: {
+            start: '@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")'
+        },
+        eventColor: '#2a602a',
+        selectAllow: function (info) {
+            console.log(info.start >= new Date())
+            return (info.start >= new Date());
+        },
+        editable: false,
+        eventDisplay: 'block',
+        eventStartEditable: false,
+        eventDurationEditable: false,
+        contentHeight: 'auto',
+
+        allDaySlot: false,
+        headerToolbar: {
+        left: 'prev,dayGridMonth',
+        center: 'title,today',
+        right: "next"
+
+
+    },
+
+        buttonText: {
+
+        today: 'Ver dia atual',
+        month: 'ver mês',
+        week: 'ver semana',
+        day: 'ver dia'
+
+    },
+
+        eventDidMount: function (info) {
+            $(info.el).tooltip({
+                title: info.event.extendedProps.description,
+                placement: "top",
+                trigger: "hover",
+                container: "body"
+            });
+        },
+       
+
+
+        events: [
+
+
+
+    @foreach (var i in Model) {
+        @if (i.Equals(Model.Last())) {
+            <text>{
+                    title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                    start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                    end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                    description: 'Sala @i.Sala.Numero',
+                    groupId:'@i.SalaId',
+                    extendedProps: {
+        nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+        idReserva:'@i.ReservaId',
+        dataI: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+        dataF: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+        temaNome: '@i.TemaNome',
+        diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
+         sala: "@i.Sala.Numero",
+        nPessoas:'@i.NumPessoas',
+        totalPreco:'@i.TotalPreco',
+        @{
+            var anfStr="";
+            @foreach(var a in i.ListaAnfitrioes){
+                anfStr+=a.PrimeiroNome;
+                anfStr+=@a.UltimoNome + ",";
+            }
+            anfStr=anfStr.Remove(anfStr.Length-1);
+        }
+        nomesAnf:'@anfStr'
+       
+      },
+
+
+                @if (i.Cliente.UserName.Equals(User.Identity.Name)) {
+                    @:color: '#a463eb',
+                }
+                allDay: false
+                        }</text>
+        } else {
+            <text>{
+                    title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                    start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                    end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                    description: 'Sala @i.Sala.Numero',
+                    groupId:'@i.SalaId',
+                    extendedProps: {
+         nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+        dataI: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+        idReserva:'@i.ReservaId',
+        dataF: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+        temaNome: '@i.TemaNome',
+        diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
+         sala: "@i.Sala.Numero",
+        nPessoas:'@i.NumPessoas',
+        totalPreco:'@i.TotalPreco',
+        @{
+            var anfStr="";
+            @foreach(var a in i.ListaAnfitrioes){
+                anfStr+=a.PrimeiroNome;
+                anfStr+=@a.UltimoNome + ",";
+            }
+            anfStr=anfStr.Remove(anfStr.Length-1);
+        }
+        nomesAnf:'@anfStr'
+       
+      },
+
+
+
+                @if (i.Cliente.UserName.Equals(User.Identity.Name)) {
+                    @:color: '#a463eb',
+                }
+                    allDay: false
+                           }, </text>
+
+        }       }
+                ],
+                 eventClick: function(info) {
+                     console.log(info.event.extendedProps);
+                     var nome = info.event.extendedProps.nome;
+                     var dataI = info.event.extendedProps.dataI;
+                     var dataF = info.event.extendedProps.dataF;
+                     var reservaId= info.event.extendedProps.idReserva;
+                     var anfs = info.event.extendedProps.nomesAnf;
+                     console.log(anfs)
+                     var totalPreco = info.event.extendedProps.totalPreco;
+                     var tema = info.event.extendedProps.temaNome;
+                     var nPessoas = info.event.extendedProps.nPessoas;
+                      var difStr = info.event.extendedProps.diffStr;
+                     var sala = info.event.extendedProps.sala;
+                     console.log(info.event.extendedProps);
+                    var anfsArr = anfs.split(',');
+
+
+                    var str="";
+                    $.each(anfsArr,function(i,v){
+                        str+="<li class='list-group-item text-white  bg-warning flex-fill ms-2'>" + v + "</li>"
+                    });
+
+                     $("#rModal").html([
+                  `<div class="modal text-center" id="ex" tabindex="-1">`,
+  `<div class="modal-dialog text-center">`,
+    `<div class="modal-content border-${difStr} border-2">`,
+      `<div class="modal-header text-center">`,
+        `<h5 class="modal-title text-center">Reserva ${reservaId} - ${nome}</h5>`,
+        `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`,
+     `</div>`,
+      `<div class="modal-body">`,
+          `<div class="container-fluid text-center justify-content-center">`,
+        `<div class="row">`,
+       ` <div class="col ">`,
+                `<div class="text-success">`,
+                   `Ínicio: ${dataI}`,
+     
+              `</div>`,
+              `<div class="text-danger">`,
+                   `Fim: ${dataF}`,
+     
+              `</div>`,
+            `</div> `,
+           ` <div class="col">`,
+                `<div class="text-info">`,
+                  ` Número de pessoas: ${nPessoas}`,
+              `</div>`,
+              `<div class="text-light">`,
+                   `Sala: ${sala}`,
+              `</div>`,
+            `</div> `,
+         `</div>` , 
+         `<div class="mt-2 text-center  ">`,
+         `Tema: <span class="text-${difStr}">${tema}</span>`,
+            ` </div>`,
+             `<div class="mt-2 text-center  ">`,
+        ` Preço Total: <span class="">${totalPreco}€</span>`,
+            ` </div>`,
+        ` <div class="mt-5 text-center  ">`,
+         `<span class="">Anfitriões</span></br>`,
+         `<ul class="list-group list-group-horizontal mt-2 mb-2">`,
+         `${str}`,
+         `</div>`,
+         ` </div>`,
+     ` </div>`,
+
+      `<div class="modal-footer">`,
+
+        `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`,
+      `</div>`,
+    `</div>`,
+  `</div>`,
+`</div>`  ].join(""));  
+
+$("#ex").modal("show");
+                 },
+    eventTimeFormat: { // like '14:30:00'
+        hour: '2-digit',
+            minute: '2-digit',
+
+                meridiem: false,
+                    hour12: false
+    },
+
+    
+    });
+    
+        calendar.render();
+    
+            });
+</script>

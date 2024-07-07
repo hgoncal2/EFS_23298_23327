@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<EFS_23298_23327.Models.Temas>
-
+@using EFS_23298_23327.Data
 @{
     ViewData["Title"] = "Index";
 }
@@ -153,7 +153,9 @@
                     }
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Dificuldade)
+                    <span class="text-@DifficultiesValue.GetDifficultyColor((int) item.Dificuldade)">
+                        @Html.DisplayFor(modelItem => item.Dificuldade)
+                    </span>
                 </td>
                 <td class="align-content-center">
 
@@ -224,7 +226,7 @@
 
 
 
-                        <i class="@item.Icone fa-2x"></i>
+                        <i class="text-@DifficultiesValue.GetDifficultyColor((int) item.Dificuldade) @item.Icone fa-2x"></i>
 
 
                     } else {

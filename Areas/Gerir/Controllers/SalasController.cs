@@ -12,6 +12,7 @@ using System.Security.Claims;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Identity;
 using System.Data;
+using System.Globalization;
 
 namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
@@ -35,10 +36,27 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
         // GET: Salas
         public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.Salas.Include(m => m.ListaAnfitrioes.Where(f => f.Deleted != true)).OrderByDescending(m => m.DataCriacao);
 
-            return View(await applicationDbContext.ToListAsync());
+            
+        {
+
+
+            Dictionary<int, int> mapSalaRes = new Dictionary<int,int>();
+
+            var r = await _context.Reservas.Include(s=>s.Sala).Where(r => !r.Deleted).Where(r => r.ReservaEndDate > DateTime.Now).ToListAsync();
+            var d = new DateTime();
+            var applicationDbContext = _context.Salas.Include(m => m.ListaAnfitrioes.Where(f => f.Deleted != true)).OrderByDescending(m => m.DataCriacao);
+            var s = await applicationDbContext.ToListAsync();
+            foreach (var item in s)
+            {  
+
+                mapSalaRes.Add(item.SalaId, r.Where(r => !r.Deleted && r.SalaId == item.SalaId && ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now)).Count());
+
+               // var s3 =await _context.Reservas.Where(r => !r.Deleted).Where(r => r.SalaId == item.SalaId).Where(r => r.ReservaEndDate > DateTime.Now).Where(r=>ISOWeek.GetWeekOfYear(r.ReservaDate)==ISOWeek.GetWeekOfYear(new DateTime()) ).CountAsync();
+            }
+
+            ViewBag.SalasCount = mapSalaRes;
+            return View(s);
         }
 
         // GET: Salas/Details/5

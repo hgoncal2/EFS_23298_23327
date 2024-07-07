@@ -11,6 +11,7 @@ using System.Numerics;
 using System.Security.Claims;
 using EFS_23298_23327.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using System.Globalization;
 
 namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
@@ -223,10 +224,11 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     TempData["MensagemErro"] = "Não foi possível anunciar tema porque <strong class=''>nenhuma sala foi associada</strong>";
                 } else {
                     if (temas.SalaID != null && temas.AnunciarTema) {
-                        await _progressHubContext.Clients.All.SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor(1), "Novo tema disponível!");
+                        await _progressHubContext.Clients.All.SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor((int)temas.Dificuldade) + ","+ "Novo tema disponível!");
 
                     }
                 }
+                
                 //Guarda nome do tema criado no dicionário TempData,usado pela view para mostrar uma mensagem ao utilizador a dizer que o tema "x" foi criado com sucesso
                 TempData["NomeTemaCriado"] = temas.Nome;
                 //Redireciona para o Index,daí não podermos usar o objeto ViewBag na instrução anterior
@@ -400,14 +402,16 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     ViewBag.MensagemErro = "Não foi possível anunciar tema porque <strong class=''>nenhuma sala foi associada</strong>";
                 } else {
                     if (temas.SalaID != null && temas.AnunciarTema) {
-                        await _progressHubContext.Clients.All.SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor(1) + "," + "Tema Atualizado!");
+                        await _progressHubContext.Clients.All.SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor((int)temas.Dificuldade) + "," + "Tema Atualizado!");
 
                     }
                 }
 
+                tema = await _context.Temas.Include(f => f.ListaFotos.Where(f => !f.Deleted)).Where(t => t.TemaId == temas.TemaId).FirstOrDefaultAsync();
 
 
-                return View(temas);
+
+                return View(tema);
             }
 
             return View(temas);

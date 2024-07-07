@@ -75,6 +75,9 @@
                 @Html.DisplayNameFor(model => model.ListaAnfitrioes)
             </th>
             <th>
+                Nº Reservas<i class=" ms-2 bi bi-patch-question" data-bs-toggle="tooltip" data-html="true" data-bs-placement="top" data-bs-html='true' title="Nº de reservas restantes <strong>da semana atual</strong> "></i>
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.DataCriacao)
             </th>
             <th>
@@ -131,6 +134,14 @@
                     }
 
                 </td>
+                <td>
+                    @{
+                        var s = ((Dictionary<int, int>)ViewBag.SalasCount).GetValueOrDefault(item.SalaId);
+                    }
+                    
+                       <span>@s</span>
+
+                </td>
               
                 <td>
                     @Html.DisplayFor(modelItem => item.DataCriacao)
@@ -150,3 +161,8 @@
 </table>
 
 @Html.AntiForgeryToken()
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

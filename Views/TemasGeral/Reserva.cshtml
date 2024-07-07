@@ -152,6 +152,9 @@
         selectOverlap: false,
         nowIndicator: true,
         selectable: true,
+        validRange: {
+            start: '@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")'
+        },
         eventColor: '#2a602a',
         selectAllow: function (info) {
             console.log(info.start >= new Date())
@@ -244,7 +247,7 @@
         @if((User.Identity?.IsAuthenticated ?? false) || true){
 
        @*No futuro não permitir users que são apenas admins fazerem reservas*@
-    @if (User.IsInRole("Admin") || true) {
+    @if (User.IsInRole("Cliente")) {
         <text>
 
 
@@ -263,14 +266,15 @@
                 });
         </text>
     } else {
-        <text>@*
-            $.post('/Home/Reserva', { date: info.startStr }, function (result) {
-            if(result=="ok"){
-            location.reload();
-            }else{
-            location.reload();
-            }
-            })*@
+        <text>
+            $("#erroUser").html([
+             `<div class="alert alert-danger alert-dismissible fade show text-center" id="erroUserAuth" role="alert">`,
+                   ` Erro!Apenas Clientes  podem fazer reservas!`,
+                   ` <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`,
+                   `</div>`
+         ].join(''));
+         $('html, body').animate({
+         scrollTop: $('#erroUserAuth').offset().top}, 'slow');
         </text>
     }
      }else{

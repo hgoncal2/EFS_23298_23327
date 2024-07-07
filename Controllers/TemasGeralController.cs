@@ -228,25 +228,32 @@ namespace EFS_23298_23327.Controllers
 
             if (u == null) {
                 TempData["ErroCliente"] = "Erro! Apenas clientes podem fazer reservas!";
-                return NotFound();
+                return RedirectToAction(nameof(Reserva), rvm.Sala.SalaId);
+
             }
 
             var r = new Reservas(u);
-
+            r.ListaAnfitrioes=rvm.Sala.ListaAnfitrioes;
             var tema = await _context.Temas.Include(s => s.Sala).Where(r => !r.Deleted).Where(s => s.SalaID == rvm.Sala.SalaId).FirstOrDefaultAsync();
             if (tema == null) {
                 TempData["ErroCliente"] = "Erro! Não é possível reservar uma sala sem tema atribuído!";
-                return View("Privacy");
+                return RedirectToAction(nameof(Reserva), rvm.Sala.SalaId);
+
             }
+
             var endDate = rvm.dataI.AddMinutes(tema.TempoEstimado);
-            var sala = await _context.Salas.FindAsync(tema.SalaID);
+            var sala = await _context.Salas.Where(s=>s.SalaId==tema.SalaID).Include(s=>s.ListaAnfitrioes).FirstOrDefaultAsync();
             r.SalaId = sala.SalaId;
             r.NumPessoas = rvm.nPessoas;
             r.Sala = tema.Sala;
+            r.ListaAnfitrioes = sala.ListaAnfitrioes;
             r.ReservaDate = rvm.dataI;
+            var precoStr = (tema.Preco * rvm.nPessoas).ToString();
+            r.TotalPreco = Convert.ToDecimal(precoStr.Replace('.', ','));
+            r.TemaNome = tema.Nome;
+            r.TemaDif = tema.Dificuldade;
             r.ReservaEndDate = endDate;
             tema.Sala.ListaReservas.Add(r);
-
             _context.Update(tema.Sala);
             await _context.SaveChangesAsync();
             TempData["viewEnd"] = rvm.viewEnd;

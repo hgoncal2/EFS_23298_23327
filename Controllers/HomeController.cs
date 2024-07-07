@@ -58,13 +58,16 @@ namespace EFS_23298_23327.Controllers
             return View(TmVm);
             
         }
-
+        [CustomAuthorize(Roles ="Anfitriao")]
         public async Task<IActionResult> Privacy() {
 
-
+            var ud = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var u = await  _context.Anfitrioes.Where(u=>u.Id == ud).FirstOrDefaultAsync();
+            var r = await _context.Reservas.Include(c=>c.Cliente).Include(a=>a.Sala).Include(a=>a.ListaAnfitrioes).Where(a=>a.ListaAnfitrioes.Contains(u)).ToListAsync();
           
-           
-            return View();
+            
+
+            return View(r);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
