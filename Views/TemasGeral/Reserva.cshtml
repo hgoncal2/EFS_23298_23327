@@ -150,6 +150,9 @@
         hiddenDays: [0],
         eventOverlap: false,
         timeZone: 'UTC',
+         validRange: {
+                start: '@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")',
+            },
         selectOverlap: false,
         nowIndicator: true,
         selectable: true,
@@ -206,6 +209,9 @@
                     title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
                     start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                     end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                     @if(i.ReservaEndDate<DateTime.Now){
+                    @:display:'background',
+                }
                     description: '@i.NumPessoas  Pessoas',
 
 
@@ -218,6 +224,9 @@
             <text>{
                     title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
                     start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                @if (i.ReservaEndDate < DateTime.Now) {
+                    @:display:'background',
+                }
                     end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                     description: '@i.ReservaDate.ToString("HH:mm") - @i.ReservaEndDate.ToString("HH:mm")',
 

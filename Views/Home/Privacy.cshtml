@@ -112,8 +112,8 @@
 
 }
 
-
-
+@Model.ElementAt(4  ).ReservaId
+@DateTime.UtcNow.AddHours((Model.ElementAt(4).ReservaDate - DateTime.Now).TotalHours).Humanize()
 <div class="container vh-99 w-100 d-flex justify-content-center align-items-center">
 
     <div class="d-inline-block w-100   d-flex flex-row">
@@ -150,20 +150,20 @@
         <div class="card border-primary  mb-5" style="flex-shrink:2">
             <div class="card-header text-center h3 border-bottom border-secondary border-3">Próximas reservas</div>
             <div class="card-body ">
-                <btn class="card-title h4 w-100 btn" style="background-color:@randColorsSala.GetValueOrDefault(@r.SalaId)" onclick='showModal(
+                <btn class="card-title h4 w-100 btn btn-outline-secondary border-4" style="border-color:@randColorsSala.GetValueOrDefault(@r.SalaId) !important" onclick='showModal(
 "@DifficultiesValue.GetDifficultyColor((int)@r.TemaDif)","@r.ReservaId","@r.Cliente.PrimeiroNome @r.Cliente.UltimoNome","@r.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")","@r.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")"
       ,"@r.NumPessoas","@randColorsSala.GetValueOrDefault(r.SalaId)",
-      "@r.Sala.Numero","@r.TemaNome","@r.TotalPreco","@GeraAnfsStringHtmlSingle(r)")'>Reserva nº @r.ReservaId - @DateTime.Now.AddHours((r.ReservaDate - DateTime.Now).Hours).Humanize(true) - Sala @Model.First().Sala.Numero</btn>
+      "@r.Sala.Numero","@r.TemaNome","@r.TotalPreco","@GeraAnfsStringHtmlSingle(r)")'>Reserva nº @r.ReservaId - Em @TimeSpan.FromHours((r.ReservaDate - DateTime.Now).TotalHours).Humanize(2) - Sala @Model.First().Sala.Numero</btn>
 
                 <div class="justify-content-center">
                     <div class="row">
 
-                        @foreach (var s in reservasProx.Skip(1).Take(5)) {
+                        @foreach (var s in reservasProx.Skip(1).Take(3)) {
                             <div class="col">
-                                <btn class="card-title h2 w-80 btn" style="background-color:@randColorsSala.GetValueOrDefault(@s.SalaId)" onclick='showModal(
+                                <btn class="card-title h2 w-80 btn btn-outline-info border-2" style="border-color:@randColorsSala.GetValueOrDefault(@r.SalaId) !important" onclick='showModal(
 "@DifficultiesValue.GetDifficultyColor((int)@s.TemaDif)","@s.ReservaId","@s.Cliente.PrimeiroNome @s.Cliente.UltimoNome","@s.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")","@s.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")"
       ,"@s.NumPessoas","@randColorsSala.GetValueOrDefault(s.SalaId)",
-      "@s.Sala.Numero","@s.TemaNome","@s.TotalPreco","@GeraAnfsStringHtmlSingle(s)")'>Reserva nº @s.ReservaId - @DateTime.Now.AddHours((s.ReservaDate - DateTime.Now).Hours).Humanize(true) - Sala @s.Sala.Numero</btn>
+      "@s.Sala.Numero","@s.TemaNome","@s.TotalPreco","@GeraAnfsStringHtmlSingle(s)")'>Reserva nº @s.ReservaId - Em @TimeSpan.FromHours((s.ReservaDate - DateTime.Now).TotalHours).Humanize(2) - Sala @s.Sala.Numero</btn>
                             </div>
 
                         }
@@ -245,9 +245,9 @@
                 console.log("wdawwd");
            }
 
-           
-      var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+          var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
        });
 
 
@@ -280,20 +280,17 @@
             selectOverlap: false,
             nowIndicator: true,
             selectable: false,
-            validRange: {
-                start: '@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")'
-            },
             //eventColor: '#2a602a',
             selectAllow: function (info) {
                 console.log(info.start >= new Date())
                 return (info.start >= new Date());
             },
             editable: false,
-            eventDisplay: 'block',
+            eventDisplay: 'bock',
             eventStartEditable: false,
             eventDurationEditable: false,
             contentHeight: 'auto',
-
+            eventTextColor:'white',
             allDaySlot: false,
             headerToolbar: {
             left: 'prev,dayGridMonth',
@@ -319,9 +316,17 @@
                     trigger: "hover",
                     container: "body"
                 });
+               
             },
 
-
+            eventClassNames: function(arg) {
+                console.log(arg)
+                  if (arg.event.extendedProps.isUrgent) {
+                    return [ 'urgent' ]
+                  } else {
+                    return [ 'normal' ]
+                  }
+                },
 
             events: [
 
@@ -330,7 +335,18 @@
     @foreach (var i in Model) {
         @if (i.Equals(Model.Last())) {
             <text>{
-                                title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                @if (i.ReservaDate < DateTime.Now) {
+                    @: title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero -  @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize() atrás',
+
+                } else {
+                    @: title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+
+                }
+
+
+                @if(i.ReservaEndDate<DateTime.Now){
+                    @:display:'background',
+                }
                                 id:'@i.ReservaId',
                                 start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                                 end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
@@ -370,7 +386,18 @@
                                     }</text>
         } else {
             <text>{
-                                title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome; @TimeSpan.FromMilliseconds((i.ReservaDate - DateTime.Now).TotalMilliseconds).Humanize(2)',
+                             @if(i.ReservaDate<DateTime.Now){
+                                @: title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero - @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize() atrás',
+
+                             }else{
+                                 @: title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+
+                             }
+
+                             
+                @if(i.ReservaEndDate<DateTime.Now){
+                    @:display:'background',
+                }
                                 start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                                 id:'@i.ReservaId',
                                 end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
@@ -559,7 +586,7 @@
                   var salaColor= info.extendedProps.salaColor;
               calendar.gotoDate(info.start);
               info.setProp( "borderColor","yellow");
-                  ~//info.setProp( "backgroundColor","yellow");
+               //info.setProp( "backgroundColor","yellow");
                    $('html, body').animate({
         scrollTop: $('#calendar').offset().top}, 'slow');
         

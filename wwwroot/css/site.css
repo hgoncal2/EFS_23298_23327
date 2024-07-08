@@ -65,9 +65,12 @@ html {
 .shrinked {
     zoom: 0.75;
 }
+fc-event-title{
+    color:white !important; 
+}
 
 .fc-event-inner {
-  border: 20px !important solid red;
+    border: 20px !important solid red;
 }
 
 footer {
