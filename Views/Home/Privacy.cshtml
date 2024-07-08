@@ -3,471 +3,643 @@
 @model IEnumerable<EFS_23298_23327.Models.Reservas>
 
 
-    @{
+@{
 
-      @* IEnumerable<Reservas> reservasProx = Model.Where(r=> r.ReservaDate>DateTime.Now).ToList().OrderBy(r=>r.ReservaDate);*@
+    IEnumerable<Reservas> reservasProx = Model.Where(r => r.ReservaDate > DateTime.Now).ToList().OrderBy(r => r.ReservaDate);
 
-        var r = Model.First();
+    var r = reservasProx.First();
 
-    Dictionary<int?,string>  randColorsSala=new Dictionary<int?, string>();
-        Dictionary<int,int?> idSalasnome=new Dictionary<int, int?>();
-        HashSet<int> numSalas = Model.Select(s=> s.Sala.Numero).ToHashSet();
-       
-        
-            
-foreach(var c in Model){
+    Dictionary<int?, string> randColorsSala = new Dictionary<int?, string>();
+    Dictionary<int, int?> idSalasnome = new Dictionary<int, int?>();
+    HashSet<int> numSalas = Model.Select(s => s.Sala.Numero).ToHashSet();
+
+
+
+    foreach (var c in Model) {
         var random = new Random();
-        if(!randColorsSala.ContainsKey(c.SalaId)){
-           randColorsSala.Add(c.SalaId,String.Format("#{0:X6}", random.Next(0x1000000))); // = "#A197B9")
+        if (!randColorsSala.ContainsKey(c.SalaId)) {
+            randColorsSala.Add(c.SalaId, String.Format("#{0:X6}", random.Next(0x1000000))); // = "#A197B9")
 
         }
-        if(!idSalasnome.ContainsKey(c.Sala.Numero)){
-           idSalasnome.Add(c.Sala.Numero,c.SalaId); // = "#A197B9")
+        if (!idSalasnome.ContainsKey(c.Sala.Numero)) {
+            idSalasnome.Add(c.Sala.Numero, c.SalaId); // = "#A197B9")
 
         }
+
+    }
+    ViewBag.RandColors = randColorsSala;
+    ViewBag.SalaNome = idSalasnome;
+    ((Dictionary<int?, string>)ViewBag.RandColors).GetValueOrDefault(1);
+    var resHojeLst = reservasProx.Where(r => DateTime.Now.Day == r.ReservaDate.Day).ToList();
+    var resAmanhaLst = reservasProx.Where(r => DateTime.Now.Day + 1 == r.ReservaDate.Day).ToList();
+    var resSemanaLst = reservasProx.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now)).ToList();
+    var resProxSemanaLst = reservasProx.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) + 1).ToList();
+    var resMesLst = reservasProx.Where(r => DateTime.Now.Month == r.ReservaDate.Month).ToList();
+    var resAnoLst = reservasProx.Where(r => DateTime.Now.Year == r.ReservaDate.Year).ToList();
+        var resTodasLst = reservasProx.ToList();
+
+
+    var resHojeCount = resHojeLst.Count();
+    var resAmanhaCount = resAmanhaLst.Count();
+    var resSemanaCount = resSemanaLst.Count();
+    var resProxSemanaCount = resProxSemanaLst.Count();
+    var resMesCount = resMesLst.Count();
+    var resAnoCount = resAnoLst.Count();
+       var resTodasCount = resTodasLst.Count();
+
+
+
+
+
+
+
+    @functions {
+
+        public string GeraAnfsStringHtmlSingle(Reservas s) {
+            var str = "";
+            foreach (var a in s.ListaAnfitrioes) {
+                var v = a.PrimeiroNome + " " + a.UltimoNome;
+                if (v.Equals(@TempData["userLoggedNome"])) {
+                    str += "<li class='list-group-item text-white border-success border-3 bg-secondary flex-fill ms-2' data-bs-toggle='tooltip' data-html='true' data-bs-placement='top' title='EU'>" + v + "</li>";
+                }
+                str += "<li class='list-group-item text-white bg-warning flex-fill ms-2'>" + v + "</li>";
+            }
+
+            return str;
+        }
+
+        public string GetHumanReadableCount(string s, int c) {
+            return s.ToQuantity(c);
+
+
+
+        }
+        public string getHtmlStrForAccordeon(IEnumerable<Reservas> lstReservas) {
+            var str = "";
+            foreach (var r in lstReservas) {
+                var salaCor = ((Dictionary<int?, string>)ViewBag.RandColors).GetValueOrDefault(r.Sala.SalaId);
+                //str+= "<li class='list-group-item text-white border-success border-3 bg-secondary flex-fill ms-2' >" + r.Sala.Numero + "</li>";
+                str += @"<div class='accordion-body rounded-pill border border-2 mb-3 text-white flex-fill' style='border-color:" + salaCor +" !important'><table class='table text-center justify-content-center align-items-center table-hover table-sm'><thead><tr><th scope='col'>Nº Reserva</th><th scope='col'>Sala</th><th scope='col'>Data</th><th scope='col'>Tema</th><th scope='col'>Criada Por</th><th scope='col'>Ações</th></tr></thead><tbody><tr><th scope='row'>"+ r.ReservaId + "</th><td style='color:"+salaCor+"'>" + r.Sala.Numero + "</td><td>"+r.ReservaDate.ToString("dd/MM/yyyy HH:mm")+"</td><td><span class='text-"+@DifficultiesValue.GetDifficultyColor((int)r.TemaDif)+"'>"+r.TemaNome+"</span></td><td>"+r.Cliente.PrimeiroNome +" "+ r.Cliente.UltimoNome+"</td><td><i class='bi bi-eye-fill me-2 ver' style='font-size:1.5rem;cursor:pointer'  id='"+ r.ReservaId+"Ver' data-bs-toggle='tooltip' data-bs-placement='top' title='Mais informações sobre a reserva' ></i><i class='bi bi-calendar-event cal' data-bs-toggle='tooltip' data-bs-placement='top' title='Ver no calendário' style='font-size:1.5rem;cursor:pointer' id='"+ r.ReservaId+"Cal' ></i></td></tr></tbody></table> </div>";
+
+            }
+            return str;
+
+
+
+
+        }
+
+
+
+    }
+
+
+
+
+
+
+    var salasLegenda = "";
+
+
+    foreach (var s in numSalas) {
+
+        salasLegenda += "<span class='me-2'>Sala" + s + "<i class='ms-2 bi bi-circle-fill' style='color:" + randColorsSala.GetValueOrDefault(idSalasnome.GetValueOrDefault(s)) + "'></i></span>";
+        salasLegenda += "\t\t";
+    }
+
+
+
 
 }
-ViewBag.RandColors = randColorsSala;
-ViewBag.SalaNome = idSalasnome;
-((Dictionary<int?,string>)ViewBag.RandColors).GetValueOrDefault(1);
-var resHoje = Model.Where(r=> DateTime.Now.Day == r.ReservaDate.Day).Count();
-var resAmanha = Model.Where(r=> DateTime.Now.Day+1 == r.ReservaDate.Day).Count();
-var resSemana = Model.Where(r=> ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now)).Count();
-var resMes = Model.Where(r=> DateTime.Now.Month == r.ReservaDate.Month).Count();
-var resAno = Model.Where(r=> DateTime.Now.Year == r.ReservaDate.Year).Count();
 
 
 
+<div class="container vh-99 w-100 d-flex justify-content-center align-items-center">
+
+    <div class="d-inline-block w-100   d-flex flex-row">
+
+        <div class="card border-primary flex-grow-1 w-100 me-5 mb-5" style="overflow-y: auto;max-height: 50vh;">
+            <select class="form-select text-center" id="selectCount" aria-label="Default select example">
+                <option value="hoje" selected>Hoje <i class="bi bi-arrow-down-circle float-end"></i></option>
+                <option value="amanha">Amanhã</option>
+                <option value="semana">Esta semana</option>
+                <option value="proxSemana">Próxima semana</option>
+                <option value="mes">Este mês</option>
+                <option value="ano">Este ano</option>
+                <option value="todas">Todas</option>
+
+            </select>
+            <div class="card-header text-center h3 border-bottom align-content-center align-items-center accordion-button">
+                <button class="card-header w-100 text-center h3 btn btn-outline-secondary text-center collapsed" type="button"  data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                    <span id="countText">@GetHumanReadableCount("reserva", resHojeCount)</span><i class="bi bi-arrow-down-circle float-end"></i>
+
+                </button>
+            </div>
+            <div class="card-body h-50 ">
+                <div class="accordion accordion-flush " id="accordionFlushExample">
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div id="placeholderAccordeon">
+                        </div>
 
 
+                    </div>
+                </div>
+            </div>
+        </div>
 
-
-        @functions{
-
-    public string GeraAnfsStringHtmlSingle(Reservas s){
-       var str="";
-       foreach(var a in s.ListaAnfitrioes){
-        var v = a.PrimeiroNome + " " + a.UltimoNome;
-        if(v.Equals(@TempData["userLoggedNome"])){
-       str+= "<li class='list-group-item text-white border-success border-3 bg-secondary flex-fill ms-2' data-bs-toggle='tooltip' data-html='true' data-bs-placement='top' title='EU'>" + v + "</li>";
-        }
-        str+="<li class='list-group-item text-white bg-warning flex-fill ms-2'>" + v + "</li>";
-        }
-        
-        return str;
-       }
-       
-        public string GetHumanReadableCount(string s,int c){
-              return s.ToQuantity(c);
-       
-           
-
-    }   
-
-    }
-
-    
-
-
-
-
-var str="";
-
-
-        foreach(var s in numSalas){
-            
-           str+= "<span class='me-2'>Sala"+s+"<i class='ms-2 bi bi-circle-fill' style='color:"+randColorsSala.GetValueOrDefault(idSalasnome.GetValueOrDefault(s))+"'></i></span>";
-           str+="\t\t";
-        }
-        var o = str;
-
-
-
-    }
-
-     
-
-
-    <div class="container vh-99 d-flex justify-content-center align-items-center">
-
-        <div class="d-inline-block d-flex flex-row">
-            
-     <div class="card border-primary me-5 mb-5" style="max-width: 50rem;">
-         <select class="form-select text-center" aria-label="Default select example">
-  <option value="hoje" selected>Hoje</option>
-  <option value="amanha">Amanhã</option>
-  <option value="semana">Esta semana</option>
-  <option value="mes">Este mês</option>
-</select>
-  <div class="card-header text-center h3 border-bottom border-secondary border-3">@GetHumanReadableCount("reserva",resHoje)</div>
-  <div class="card-body ">
-      
-  </div>
-</div>
-
-            <div class="card border-primary mb-5" style="max-width: 50rem;">
-  <div class="card-header text-center h3 border-bottom border-secondary border-3">Próximas reservas</div>
-  <div class="card-body ">
-      <btn class="card-title h4 w-100 btn" style="background-color:@randColorsSala.GetValueOrDefault(@r.SalaId)" onclick='showModal(
+        <div class="card border-primary  mb-5" style="flex-shrink:2">
+            <div class="card-header text-center h3 border-bottom border-secondary border-3">Próximas reservas</div>
+            <div class="card-body ">
+                <btn class="card-title h4 w-100 btn" style="background-color:@randColorsSala.GetValueOrDefault(@r.SalaId)" onclick='showModal(
 "@DifficultiesValue.GetDifficultyColor((int)@r.TemaDif)","@r.ReservaId","@r.Cliente.PrimeiroNome @r.Cliente.UltimoNome","@r.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")","@r.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")"
       ,"@r.NumPessoas","@randColorsSala.GetValueOrDefault(r.SalaId)",
-      "@r.Sala.Numero","@r.TemaNome","@r.TotalPreco","@GeraAnfsStringHtmlSingle(r)")'>Reserva nº @r.ReservaId - @DateTime.Now.AddHours((r.ReservaDate-DateTime.Now).Hours).Humanize(true) - Sala @Model.First().Sala.Numero</btn>
-   
-      <div class="justify-content-center">
-          <div class="row">
-              
-      @foreach(var s in Model.Skip(1).Take(5)){
-          <div class="col">
-           <btn class="card-title h2 w-80 btn" style="background-color:@randColorsSala.GetValueOrDefault(@s.SalaId)" onclick='showModal(
+      "@r.Sala.Numero","@r.TemaNome","@r.TotalPreco","@GeraAnfsStringHtmlSingle(r)")'>Reserva nº @r.ReservaId - @DateTime.Now.AddHours((r.ReservaDate - DateTime.Now).Hours).Humanize(true) - Sala @Model.First().Sala.Numero</btn>
+
+                <div class="justify-content-center">
+                    <div class="row">
+
+                        @foreach (var s in reservasProx.Skip(1).Take(5)) {
+                            <div class="col">
+                                <btn class="card-title h2 w-80 btn" style="background-color:@randColorsSala.GetValueOrDefault(@s.SalaId)" onclick='showModal(
 "@DifficultiesValue.GetDifficultyColor((int)@s.TemaDif)","@s.ReservaId","@s.Cliente.PrimeiroNome @s.Cliente.UltimoNome","@s.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")","@s.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")"
       ,"@s.NumPessoas","@randColorsSala.GetValueOrDefault(s.SalaId)",
-      "@s.Sala.Numero","@s.TemaNome","@s.TotalPreco","@GeraAnfsStringHtmlSingle(s)")'>Reserva nº @s.ReservaId - @DateTime.Now.AddHours((s.ReservaDate-DateTime.Now).Hours).Humanize(true) - Sala @s.Sala.Numero</btn>
-   </div>
+      "@s.Sala.Numero","@s.TemaNome","@s.TotalPreco","@GeraAnfsStringHtmlSingle(s)")'>Reserva nº @s.ReservaId - @DateTime.Now.AddHours((s.ReservaDate - DateTime.Now).Hours).Humanize(true) - Sala @s.Sala.Numero</btn>
+                            </div>
 
-      }
-      </div>
-      </div>
-  </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
 </div>
 
-
-            </div>
-        
-    </div>
-        
-    <div id="teste" class="text-end">@Html.Raw(str)</div>
+<div id="teste" class="text-end">@Html.Raw(salasLegenda)</div>
 <div id="rModal"></div>
 <div id='calendar' class=" text-white "></div>
-    
+
 </div>
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    $("#ex").modal("show");
 
-
-            var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        themeSystem: 'bootstrap5',
-
-        initialView: 'timeGridWeek',
-        locale: 'pt',
-        slotEventOverlap: false,
-         resourceGroupField: 'groupId',
-
-        initialDate: new Date(),
-        stickyHeaderDates:true,
-        
-        eventMouseEnter: function(info){
-            $(info.el).css('cursor','pointer');
-        },
-        
-        slotMinTime: "05:00:00",
-        slotMaxTime: "24:00:00",
     
-        hiddenDays: [0],
-        eventOverlap: false,
-        timeZone: 'UTC',
-        selectOverlap: false,
-        nowIndicator: true,
-        selectable: false,
-        validRange: {
-            start: '@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")'
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+    @* $("#ex").modal("show");*@
+
+
+    
+    $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resHojeLst))");
+    
+    
+      var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+
+       $("#selectCount").on('change',function(){
+
+          
+           var novoTxt="";
+            if(this.value=="hoje"){
+               $("#countText").text("@GetHumanReadableCount("reserva", resHojeCount)");
+               $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resHojeLst))");
+                console.log("wdawwd");
+              
+           }
+           if(this.value=="amanha"){
+               $("#countText").text("@GetHumanReadableCount("reserva", resAmanhaCount)");
+            $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resAmanhaLst))");
+             console.log("wdawwd");
+
+           }
+           if(this.value=="semana"){
+               $("#countText").text("@GetHumanReadableCount("reserva", resSemanaCount)");
+              $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resSemanaLst))");
+               console.log("wdawwd");
+
+           }
+            if(this.value=="proxSemana"){
+               $("#countText").text("@GetHumanReadableCount("reserva", resProxSemanaCount)");
+               $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resProxSemanaLst))");
+                console.log("wdawwd");
+
+           }
+           if(this.value=="mes"){
+               $("#countText").text("@GetHumanReadableCount("reserva", resMesCount)");
+               $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resMesLst))");
+                console.log("wdawwd");
+           }
+           if(this.value=="ano"){
+               $("#countText").text("@GetHumanReadableCount("reserva", resAnoCount)");
+               $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resAnoLst))");
+                console.log("wdawwd");
+           }
+           if(this.value=="todas"){
+               $("#countText").text("@GetHumanReadableCount("reserva", resTodasCount)");
+               $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resTodasLst))");
+                console.log("wdawwd");
+           }
+
+           
+      var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+       });
+
+
+
+
+    @************************************************************************@
+
+                var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            themeSystem: 'bootstrap5',
+
+            initialView: 'timeGridWeek',
+            locale: 'pt',
+            slotEventOverlap: false,
+             resourceGroupField: 'groupId',
+
+            initialDate: new Date(),
+            stickyHeaderDates:true,
+
+            eventMouseEnter: function(info){
+                $(info.el).css('cursor','pointer');
+            },
+            slotDuration:'00:15:00',
+            slotMinTime: "06:00:00",
+            slotMaxTime: "22:00:00",
+
+            hiddenDays: [0],
+            eventOverlap: false,
+            timeZone: 'UTC',
+            selectOverlap: false,
+            nowIndicator: true,
+            selectable: false,
+            validRange: {
+                start: '@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")'
+            },
+            //eventColor: '#2a602a',
+            selectAllow: function (info) {
+                console.log(info.start >= new Date())
+                return (info.start >= new Date());
+            },
+            editable: false,
+            eventDisplay: 'block',
+            eventStartEditable: false,
+            eventDurationEditable: false,
+            contentHeight: 'auto',
+
+            allDaySlot: false,
+            headerToolbar: {
+            left: 'prev,dayGridMonth',
+            center: 'title,today',
+            right: "next,timeGridWeek"
+
+
         },
-        eventColor: '#2a602a',
-        selectAllow: function (info) {
-            console.log(info.start >= new Date())
-            return (info.start >= new Date());
+
+            buttonText: {
+
+            today: 'Ver dia atual',
+            month: 'ver mês',
+            week: 'ver semana',
+            day: 'ver dia'
+
         },
-        editable: false,
-        eventDisplay: 'block',
-        eventStartEditable: false,
-        eventDurationEditable: false,
-        contentHeight: 'auto',
 
-        allDaySlot: false,
-        headerToolbar: {
-        left: 'prev,dayGridMonth',
-        center: 'title,today',
-        right: "next,timeGridWeek"
+            eventDidMount: function (info) {
+                $(info.el).tooltip({
+                    title: info.event.extendedProps.description,
+                    placement: "top",
+                    trigger: "hover",
+                    container: "body"
+                });
+            },
 
 
-    },
 
-        buttonText: {
-
-        today: 'Ver dia atual',
-        month: 'ver mês',
-        week: 'ver semana',
-        day: 'ver dia'
-
-    },
-
-        eventDidMount: function (info) {
-            $(info.el).tooltip({
-                title: info.event.extendedProps.description,
-                placement: "top",
-                trigger: "hover",
-                container: "body"
-            });
-        },
-       
-
-
-        events: [
+            events: [
 
 
 
     @foreach (var i in Model) {
         @if (i.Equals(Model.Last())) {
             <text>{
-                    title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
-                    start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                    end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                    description: 'Sala @i.Sala.Numero',
-                    groupId:'@i.SalaId',
-                    color:'@randColorsSala.GetValueOrDefault(i.SalaId)',
-                    extendedProps: {
-        nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
-        idReserva:'@i.ReservaId',
-        dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
-        dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
-                salaColor: '@randColorsSala.GetValueOrDefault(i.SalaId)',
+                                title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                                id:'@i.ReservaId',
+                                start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                description: 'Sala @i.Sala.Numero',
 
-        temaNome: '@i.TemaNome',
-        diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
-         sala: "@i.Sala.Numero",
-        nPessoas:'@i.NumPessoas',
-        totalPreco:'@i.TotalPreco',
-        @{
-            var anfStr="";
-            @foreach(var a in i.ListaAnfitrioes){
-                anfStr+=a.PrimeiroNome + " ";
-                anfStr+=@a.UltimoNome + ",";
-            }
-            anfStr=anfStr.Remove(anfStr.Length-1);
-        }
-        nomesAnf:'@anfStr'
-       
-      },
+                                //groupId:'@i.SalaId',
+                                color:'@randColorsSala.GetValueOrDefault(i.SalaId)',
+                                extendedProps: {
+                    nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                    idReserva:'@i.ReservaId',
+                    dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                    dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                            salaColor: '@randColorsSala.GetValueOrDefault(i.SalaId)',
+
+                    temaNome: '@i.TemaNome',
+                    diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
+                     sala: "@i.Sala.Numero",
+                    nPessoas:'@i.NumPessoas',
+                    totalPreco:'@i.TotalPreco',
+                @{
+                    var anfStr = "";
+                    @foreach (var a in i.ListaAnfitrioes) {
+                        anfStr += a.PrimeiroNome + " ";
+                        anfStr += @a.UltimoNome + ",";
+                    }
+                    anfStr = anfStr.Remove(anfStr.Length - 1);
+                }
+                    nomesAnf:'@anfStr'
+
+                  },
 
 
                 @if (i.Cliente.UserName.Equals(User.Identity.Name)) {
                     @:color: '#a463eb',
                 }
-                allDay: false
-                        }</text>
+                            allDay: false
+                                    }</text>
         } else {
             <text>{
-                    title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome; @TimeSpan.FromMilliseconds((i.ReservaDate-DateTime.Now).TotalMilliseconds).Humanize(2    )',
-                    start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                    end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                    description: 'Sala @i.Sala.Numero',
-                    color:'@randColorsSala.GetValueOrDefault(i.SalaId)',
-                    groupId:'@i.SalaId',
-                    extendedProps: {
-         nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
-        dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
-        idReserva:'@i.ReservaId',
-        dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
-        temaNome: '@i.TemaNome',
-        salaColor: '@randColorsSala.GetValueOrDefault(i.SalaId)',
-        diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
-         sala: "@i.Sala.Numero",
-        nPessoas:'@i.NumPessoas',
-        totalPreco:'@i.TotalPreco',
-        @{
-            var anfStr="";
-            @foreach(var a in i.ListaAnfitrioes){
-                anfStr+=a.PrimeiroNome + " ";
+                                title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome; @TimeSpan.FromMilliseconds((i.ReservaDate - DateTime.Now).TotalMilliseconds).Humanize(2)',
+                                start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                id:'@i.ReservaId',
+                                end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                description: 'Sala @i.Sala.Numero',
+                                color:'@randColorsSala.GetValueOrDefault(i.SalaId)',
+                                //groupId:'@i.SalaId',
+                                extendedProps: {
+                     nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                    dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                    idReserva:'@i.ReservaId',
+                    dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                    temaNome: '@i.TemaNome',
+                    salaColor: '@randColorsSala.GetValueOrDefault(i.SalaId)',
+                    diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
+                     sala: "@i.Sala.Numero",
+                    nPessoas:'@i.NumPessoas',
+                    totalPreco:'@i.TotalPreco',
+                @{
+                    var anfStr = "";
+                    @foreach (var a in i.ListaAnfitrioes) {
+                        anfStr += a.PrimeiroNome + " ";
 
-                anfStr+=@a.UltimoNome + ",";
-            }
-            anfStr=anfStr.Remove(anfStr.Length-1);
-        }
-        nomesAnf:'@anfStr'
-       
-      },
+                        anfStr += @a.UltimoNome + ",";
+                    }
+                    anfStr = anfStr.Remove(anfStr.Length - 1);
+                }
+                    nomesAnf:'@anfStr'
+
+                  },
 
 
 
                 @if (i.Cliente.UserName.Equals(User.Identity.Name)) {
                     @:color: '#a463eb',
-                    
+
                 }
-                    allDay: false
-                           }, </text>
+                                allDay: false
+                                       }, </text>
 
         }       }
-                ],
-                 eventClick: function(info) {
-                     console.log(info.event.extendedProps);
-                     var nome = info.event.extendedProps.nome;
-                     var dataI = info.event.extendedProps.dataI;
-                     var dataF = info.event.extendedProps.dataF;
-                     var salaColor= info.event.extendedProps.salaColor;
-                     var reservaId= info.event.extendedProps.idReserva;
-                     var anfs = info.event.extendedProps.nomesAnf;
-                     console.log(anfs)
-                     var totalPreco = info.event.extendedProps.totalPreco;
-                     var tema = info.event.extendedProps.temaNome;
-                     var nPessoas = info.event.extendedProps.nPessoas;
-                      var difStr = info.event.extendedProps.diffStr;
-                     var sala = info.event.extendedProps.sala;
-                     console.log(info.event.extendedProps);
-                    var anfsArr = anfs.split(',');
-                    var nomeUser = '@TempData["userLoggedNome"]';
+                    ],
+                     eventClick: function(info) {
+                         console.log(info.event.extendedProps);
+                         var nome = info.event.extendedProps.nome;
+                         var dataI = info.event.extendedProps.dataI;
+                         var dataF = info.event.extendedProps.dataF;
+                         var salaColor= info.event.extendedProps.salaColor;
+                         var reservaId= info.event.extendedProps.idReserva;
+                         var anfs = info.event.extendedProps.nomesAnf;
+                         console.log(anfs)
+                         var totalPreco = info.event.extendedProps.totalPreco;
+                         var tema = info.event.extendedProps.temaNome;
+                         var nPessoas = info.event.extendedProps.nPessoas;
+                          var difStr = info.event.extendedProps.diffStr;
+                         var sala = info.event.extendedProps.sala;
+                         console.log(info.event.extendedProps);
+                        var anfsArr = anfs.split(',');
+                        var nomeUser = '@TempData["userLoggedNome"]';
 
-                    var str="";
-                    $.each(anfsArr,function(i,v){
-                      
-                        if(v==nomeUser){
-                            str+="<li class='list-group-item text-white border-success border-3 bg-secondary flex-fill ms-2' data-bs-toggle='tooltip' data-html='true' data-bs-placement='top' title='EU'>" + v + "</li>"
-                        }else{
-                          str+="<li class='list-group-item text-white bg-warning flex-fill ms-2'>" + v + "</li>"
+                        var str="";
+                        $.each(anfsArr,function(i,v){
 
-                        }
-                        
-                    });
+                            if(v==nomeUser){
+                                str+="<li class='list-group-item text-white border-success border-3 bg-secondary flex-fill ms-2' data-bs-toggle='tooltip' data-html='true' data-bs-placement='top' title='EU'>" + v + "</li>"
+                            }else{
+                              str+="<li class='list-group-item text-white bg-warning flex-fill ms-2'>" + v + "</li>"
+
+                            }
+
+                        });
 
 
 
-                     $("#rModal").html([
-                  `<div class="modal text-center" id="ex" tabindex="-1">`,
-  `<div class="modal-dialog text-center">`,
-    `<div class="modal-content border-${difStr} border-2">`,
-      `<div class="modal-header text-center">`,
-        `<h5 class="modal-title text-center">Reserva ${reservaId} - ${nome}</h5>`,
-        `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`,
-     `</div>`,
-      `<div class="modal-body">`,
-          `<div class="container-fluid text-center justify-content-center">`,
-        `<div class="row">`,
-       ` <div class="col ">`,
-                `<div >`,
-                   `Ínicio :<span class="text-success ms-1">${dataI}</span>`,
-     
-              `</div>`,
-              `<div >`,
-                   `Fim : <span class="text-danger ms-1">${dataF}</span>`,
-     
-              `</div>`,
-            `</div> `,
-           ` <div class="col">`,
-                `<div class="text-info">`,
-                  ` Número de pessoas: ${nPessoas}`,
-              `</div>`,
-              `<div >`,
-                   `Sala: <span style="color:${salaColor}">${sala}</span>`,
-              `</div>`,
-            `</div> `,
-         `</div>` , 
-         `<div class="mt-2 text-center  ">`,
-         `Tema: <span class="text-${difStr}">${tema}</span>`,
-            ` </div>`,
-             `<div class="mt-2 text-center  ">`,
-        ` Preço Total: <span class="">${totalPreco}€</span>`,
-            ` </div>`,
-        ` <div class="mt-5 text-center  ">`,
-         `<span class="">Anfitriões</span></br>`,
-         
-         `<ul class="list-group text-break list-group-horizontal mt-2 mb-2">`,
-         `${str}`,
+                         $("#rModal").html([
+                      `<div class="modal text-center" id="ex" tabindex="-1">`,
+      `<div class="modal-dialog text-center">`,
+        `<div class="modal-content border-${difStr} border-2">`,
+          `<div class="modal-header text-center">`,
+            `<h5 class="modal-title text-center">Reserva ${reservaId} - ${nome}</h5>`,
+            `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`,
          `</div>`,
+          `<div class="modal-body">`,
+              `<div class="container-fluid text-center justify-content-center">`,
+            `<div class="row">`,
+           ` <div class="col ">`,
+                    `<div >`,
+                       `Ínicio :<span class="text-success ms-1">${dataI}</span>`,
+
+                  `</div>`,
+                  `<div >`,
+                       `Fim : <span class="text-danger ms-1">${dataF}</span>`,
+
+                  `</div>`,
+                `</div> `,
+               ` <div class="col">`,
+                    `<div class="text-info">`,
+                      ` Número de pessoas: ${nPessoas}`,
+                  `</div>`,
+                  `<div >`,
+                       `Sala: <span style="color:${salaColor}">${sala}</span>`,
+                  `</div>`,
+                `</div> `,
+             `</div>` ,
+             `<div class="mt-2 text-center  ">`,
+             `Tema: <span class="text-${difStr}">${tema}</span>`,
+                ` </div>`,
+                 `<div class="mt-2 text-center  ">`,
+            ` Preço Total: <span class="">${totalPreco}€</span>`,
+                ` </div>`,
+            ` <div class="mt-5 text-center  ">`,
+             `<span class="">Anfitriões</span></br>`,
+
+             `<ul class="list-group text-break list-group-horizontal mt-2 mb-2">`,
+             `${str}`,
+             `</div>`,
+             ` </div>`,
          ` </div>`,
-     ` </div>`,
 
-      `<div class="modal-footer">`,
+          `<div class="modal-footer">`,
 
-        `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`,
+            `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`,
+          `</div>`,
+        `</div>`,
       `</div>`,
-    `</div>`,
-  `</div>`,
-`</div>`  ].join(""));  
+    `</div>`  ].join(""));
 
-$("#ex").modal("show");
-                 },
-    eventTimeFormat: { // like '14:30:00'
-        hour: '2-digit',
-            minute: '2-digit',
+    $("#ex").modal("show");
+                     },
+        eventTimeFormat: { // like '14:30:00'
+            hour: '2-digit',
+                minute: '2-digit',
 
-                meridiem: false,
-                    hour12: false
-    },
+                    meridiem: false,
+                        hour12: false
+        },
 
-    
-    });
+
+        });
+
+
+
+         $(document).on('click', ".ver" , function() {
+             var idSala=$(this).attr("id").split("Ver")[0];
+            
 
             
- 
+             var info= calendar.getEventById(idSala);
+             console.log(info)
+              var nome = info.extendedProps.nome;
+               var dataI = info.extendedProps.dataI;
+              var dataF = info.extendedProps.dataF;
+              var salaColor= info.extendedProps.salaColor;
+              var reservaId= info.extendedProps.idReserva;
+              var anfs = info.extendedProps.nomesAnf;
+              console.log(anfs)
+              var totalPreco = info.extendedProps.totalPreco;
+              var tema = info.extendedProps.temaNome;
+              var nPessoas = info.extendedProps.nPessoas;
+               var difStr = info.extendedProps.diffStr;
+              var sala = info.extendedProps.sala;
+              console.log(info.extendedProps);
+             var anfsArr = anfs.split(',');
+             var nomeUser = '@TempData["userLoggedNome"]';
+               var str="";
+                        $.each(anfsArr,function(i,v){
+
+                            if(v==nomeUser){
+                                str+="<li class='list-group-item text-white border-success border-3 bg-secondary flex-fill ms-2' data-bs-toggle='tooltip' data-html='true' data-bs-placement='top' title='EU'>" + v + "</li>"
+                            }else{
+                              str+="<li class='list-group-item text-white bg-warning flex-fill ms-2'>" + v + "</li>"
+
+                            }
+
+                        });
+           
+             showModal(difStr,reservaId,nome,dataI,dataF,nPessoas,salaColor,sala,tema,totalPreco,str);
 
 
-        calendar.render();
-    
-            });
-            function showModal(difStr,reservaId,nome,dataI,dataF,nPessoas,salaColor,sala,tema,totalPreco,str){
+         });
 
-     
-                     $("#rModal").html([
-                  `<div class="modal text-center" id="ex" tabindex="-1">`,
-  `<div class="modal-dialog text-center">`,
-    `<div class="modal-content border-${difStr} border-2">`,
-      `<div class="modal-header text-center">`,
-        `<h5 class="modal-title text-center">Reserva ${reservaId} - ${nome}</h5>`,
-        `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`,
-     `</div>`,
-      `<div class="modal-body">`,
-          `<div class="container-fluid text-center justify-content-center">`,
-        `<div class="row">`,
-       ` <div class="col ">`,
-                `<div >`,
-                   `Ínicio :<span class="text-success ms-1">${dataI}</span>`,
-     
-              `</div>`,
-              `<div >`,
-                   `Fim : <span class="text-danger ms-1">${dataF}</span>`,
-     
-              `</div>`,
-            `</div> `,
-           ` <div class="col">`,
-                `<div class="text-info">`,
-                  ` Número de pessoas: ${nPessoas}`,
-              `</div>`,
-              `<div >`,
-                   `Sala: <span style="color:${salaColor}">${sala}</span>`,
-              `</div>`,
-            `</div> `,
-         `</div>` , 
-         `<div class="mt-2 text-center  ">`,
-         `Tema: <span class="text-${difStr}">${tema}</span>`,
-            ` </div>`,
-             `<div class="mt-2 text-center  ">`,
-        ` Preço Total: <span class="">${totalPreco}€</span>`,
-            ` </div>`,
-        ` <div class="mt-5 text-center  ">`,
-         `<span class="">Anfitriões</span></br>`,
-         
-         `<ul class="list-group text-break list-group-horizontal mt-2 mb-2">`,
-         `${str}`,
+         $(document).on('click', ".cal" , function() {
+          
+    var idSala=$(this).attr("id").split("Cal")[0];
+              var info= calendar.getEventById(idSala);
+              var difStr = info.extendedProps.diffStr;
+                  var salaColor= info.extendedProps.salaColor;
+              calendar.gotoDate(info.start);
+              info.setProp( "borderColor","yellow");
+                  ~//info.setProp( "backgroundColor","yellow");
+                   $('html, body').animate({
+        scrollTop: $('#calendar').offset().top}, 'slow');
+        
+});
+
+
+
+            calendar.render();
+
+            
+
+
+                });
+
+               
+
+
+                function showModal(difStr,reservaId,nome,dataI,dataF,nPessoas,salaColor,sala,tema,totalPreco,str){
+
+
+                         $("#rModal").html([
+                      `<div class="modal text-center" id="ex" tabindex="-1">`,
+      `<div class="modal-dialog text-center">`,
+        `<div class="modal-content border-${difStr} border-2">`,
+          `<div class="modal-header text-center">`,
+            `<h5 class="modal-title text-center">Reserva ${reservaId} - ${nome}</h5>`,
+            `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`,
          `</div>`,
+          `<div class="modal-body">`,
+              `<div class="container-fluid text-center justify-content-center">`,
+            `<div class="row">`,
+           ` <div class="col ">`,
+                    `<div >`,
+                       `Ínicio :<span class="text-success ms-1">${dataI}</span>`,
+
+                  `</div>`,
+                  `<div >`,
+                       `Fim : <span class="text-danger ms-1">${dataF}</span>`,
+
+                  `</div>`,
+                `</div> `,
+               ` <div class="col">`,
+                    `<div class="text-info">`,
+                      ` Número de pessoas: ${nPessoas}`,
+                  `</div>`,
+                  `<div >`,
+                       `Sala: <span style="color:${salaColor}">${sala}</span>`,
+                  `</div>`,
+                `</div> `,
+             `</div>` ,
+             `<div class="mt-2 text-center  ">`,
+             `Tema: <span class="text-${difStr}">${tema}</span>`,
+                ` </div>`,
+                 `<div class="mt-2 text-center  ">`,
+            ` Preço Total: <span class="">${totalPreco}€</span>`,
+                ` </div>`,
+            ` <div class="mt-5 text-center  ">`,
+             `<span class="">Anfitriões</span></br>`,
+
+             `<ul class="list-group text-break list-group-horizontal mt-2 mb-2">`,
+             `${str}`,
+             `</div>`,
+             ` </div>`,
          ` </div>`,
-     ` </div>`,
 
-      `<div class="modal-footer">`,
+          `<div class="modal-footer">`,
 
-        `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`,
+            `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`,
+          `</div>`,
+        `</div>`,
       `</div>`,
-    `</div>`,
-  `</div>`,
-`</div>`  ].join(""));  
+    `</div>`  ].join(""));
 
-$("#ex").modal("show");
-
+    $("#ex").modal("show");
+    
 
 
 
- }
+
+     }
 </script>
 @section Scripts {
     @{

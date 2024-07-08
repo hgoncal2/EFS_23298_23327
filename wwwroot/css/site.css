@@ -66,6 +66,10 @@ html {
     zoom: 0.75;
 }
 
+.fc-event-inner {
+  border: 20px !important solid red;
+}
+
 footer {
     margin-top: auto;
     background-color: #6e8495;
