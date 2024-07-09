@@ -92,8 +92,8 @@
                                         <button type="button" class="btn btn-danger rounded-circle dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                             @User.Identity.Name
                                         </button>
-                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">                                 
-                                            <li><a class="dropdown-item" href="Perfil">Perfil</a></li>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">
+                                            <li><a class="dropdown-item" asp-area="" asp-action="Index" asp-controller="Perfil">Perfil</a></li>
                                             <li><hr class="dropdown-divider"></li>
                                             <li class="dropdown-item">
                                                 <form class="form-inline" asp-area="" asp-action="Logout" asp-controller="Account" method="post">
