@@ -32,6 +32,7 @@
 
     }
 
+
     var nResSemana = Model.Sala.ListaReservas.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now)).Count();
 
 }

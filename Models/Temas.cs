@@ -40,14 +40,14 @@ namespace EFS_23298_23327.Models
 
         [Display(Name = "Preço (Por pessoa)")]
         [Required(ErrorMessage = "Por favor indique o {0}")]
-        [DisplayFormat(DataFormatString = "{0:F1}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:F2}", ApplyFormatInEditMode = true)]
         public decimal Preco { get; set; }
 
         [NotMapped] 
         [Required(ErrorMessage = "Por favor indique o {0}")]
        
         [StringLength(9)]
-        [RegularExpression("[0-9]{1,6}([,.][0-9]{1})?", ErrorMessage = "Escreva um número com, no máximo 1 casa decimal, separadas por . ou ,")]
+        [RegularExpression("[0-9]{1,6}([,.][0-9]{1,2})?", ErrorMessage = "Escreva um número com, no máximo 2 casa decimal, separadas por . ou ,")]
         [Display(Name = "Preço  (Por pessoa)")]
         public string PrecoStr { get; set; }
 
