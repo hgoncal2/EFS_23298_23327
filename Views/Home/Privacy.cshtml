@@ -5,7 +5,13 @@
 
 @{
 
-    IEnumerable<Reservas> reservasProx = Model.Where(r => r.ReservaDate > DateTime.Now).ToList().OrderBy(r => r.ReservaDate);
+    IEnumerable<Reservas> reservasProx = Model.Where(r => r.ReservaDate >= DateTime.Now && !r.Cancelada).OrderBy(r => r.ReservaDate).ToList();
+        IEnumerable<Reservas> reservasAnt = Model.Where(r => r.ReservaEndDate < DateTime.Now && !r.Cancelada).OrderByDescending(r => r.ReservaEndDate).ToList();
+                IEnumerable<Reservas> reservasCanc = Model.Where(r => r.Cancelada).OrderBy(r => r.ReservaEndDate).ToList();
+
+
+
+
 
     var r = reservasProx.First();
 
@@ -30,13 +36,20 @@
     ViewBag.RandColors = randColorsSala;
     ViewBag.SalaNome = idSalasnome;
     ((Dictionary<int?, string>)ViewBag.RandColors).GetValueOrDefault(1);
-    var resHojeLst = reservasProx.Where(r => DateTime.Now.Day == r.ReservaDate.Day).ToList();
-    var resAmanhaLst = reservasProx.Where(r => DateTime.Now.Day + 1 == r.ReservaDate.Day).ToList();
-    var resSemanaLst = reservasProx.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now)).ToList();
-    var resProxSemanaLst = reservasProx.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) + 1).ToList();
-    var resMesLst = reservasProx.Where(r => DateTime.Now.Month == r.ReservaDate.Month).ToList();
-    var resAnoLst = reservasProx.Where(r => DateTime.Now.Year == r.ReservaDate.Year).ToList();
+    var resHojeLst = reservasProx.Where(r => DateTime.Now.Day == r.ReservaDate.Day);
+    var resAmanhaLst = reservasProx.Where(r => DateTime.Now.Day + 1 == r.ReservaDate.Day);
+    var resSemanaLst = reservasProx.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now));
+    var resProxSemanaLst = reservasProx.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) + 1);
+    var resMesLst = reservasProx.Where(r => DateTime.Now.Month == r.ReservaDate.Month);
+    var resAnoLst = reservasProx.Where(r => DateTime.Now.Year == r.ReservaDate.Year);
         var resTodasLst = reservasProx.ToList();
+
+        var resConcluidasSemana = Model.Where(r => r.ReservaEndDate <= DateTime.Now && ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) && !r.Cancelada).ToList().Count();
+        var resCancelSemana = Model.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) && r.Cancelada).ToList().Count();
+         var resFaltaSemana = Model.Where(r => r.ReservaDate > DateTime.Now && ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) && !r.Cancelada).ToList().Count();
+
+
+
 
 
     var resHojeCount = resHojeLst.Count();
@@ -46,6 +59,9 @@
     var resMesCount = resMesLst.Count();
     var resAnoCount = resAnoLst.Count();
        var resTodasCount = resTodasLst.Count();
+              var resCancCount = reservasCanc.Count();
+
+       var resAntCount = reservasAnt.Count();
 
 
 
@@ -112,15 +128,18 @@
 
 }
 
-@Model.ElementAt(4  ).ReservaId
-@DateTime.UtcNow.AddHours((Model.ElementAt(4).ReservaDate - DateTime.Now).TotalHours).Humanize()
+
+
+
 <div class="container vh-99 w-100 d-flex justify-content-center align-items-center">
 
     <div class="d-inline-block w-100   d-flex flex-row">
 
-        <div class="card border-primary flex-grow-1 w-100 me-5 mb-5" style="overflow-y: auto;max-height: 50vh;">
-            <select class="form-select text-center" id="selectCount" aria-label="Default select example">
-                <option value="hoje" selected>Hoje <i class="bi bi-arrow-down-circle float-end"></i></option>
+        <div class="card border-primary flex-grow-1 w-100 me-5 mb-5" style="overflow-y: auto;max-height: 60vh;" id="container">
+            <div class="border-warning border-4 float-end ">
+                <i class=" ms-2 bi bi-patch-question fa-1x text-white" data-bs-toggle="tooltip" data-html="true" data-bs-placement="top" data-bs-html='true' title="A seleção temporal apenas se aplica às próximas reservas!"></i>
+            <select class="form-select text-center border-info  border-top border-4" id="selectCount" aria-label="Default select example">
+                <option value="hoje" selected>Hoje</option>
                 <option value="amanha">Amanhã</option>
                 <option value="semana">Esta semana</option>
                 <option value="proxSemana">Próxima semana</option>
@@ -129,22 +148,69 @@
                 <option value="todas">Todas</option>
 
             </select>
-            <div class="card-header text-center h3 border-bottom align-content-center align-items-center accordion-button">
-                <button class="card-header w-100 text-center h3 btn btn-outline-secondary text-center collapsed" type="button"  data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+            <div class="text-center mb-0    " >  
+             <span class="text-center h5">Próximas Reservas</span>
+            <div class="card-header text-center h3 border-top align-content-center align-items-center accordion-button">
+               
+                <button class="card-header w-100 text-center h3 btn btn-outline-secondary text-center collapsed" type="button"  data-bs-toggle="collapse" data-bs-target="#flush-collapseOneProx" aria-expanded="false" aria-controls="flush-collapseOne">
                     <span id="countText">@GetHumanReadableCount("reserva", resHojeCount)</span><i class="bi bi-arrow-down-circle float-end"></i>
 
                 </button>
+
             </div>
-            <div class="card-body h-50 ">
-                <div class="accordion accordion-flush " id="accordionFlushExample">
-                    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                        <div id="placeholderAccordeon">
+            <div class="card-body border-warning border-warning border-bottom border-left">
+                     <div class="accordion accordion-flush " id="accordionFlushProx">
+                            <div id="flush-collapseOneProx" class="accordion-collapse collapse" data-bs-parent="#accordionFlushProx">
+                            <div id="placeholderAccordeon"></div>
+                            </div>
                         </div>
+            </div>
 
+            </div>
+            </div>
+             <div class="text-center">
+                 <span class="h5" >
+            <div class="text-center" >  
+             <span class="text-center">Reservas Anteriores</span>
+            <div class="card-header text-center h3 border-bottom align-content-center align-items-center accordion-button">
+               
+                <button class="card-header w-100 text-center h3 btn btn-outline-secondary text-center collapsed" type="button"  data-bs-toggle="collapse" data-bs-target="#flush-collapseOneAnt" aria-expanded="false" aria-controls="flush-collapseOne">
+                    <span id="countText">@GetHumanReadableCount("reserva", resAntCount)</span><i class="bi bi-arrow-down-circle float-end"></i>
 
+                </button>
+
+            </div>
+            <div class="card-body">
+                <div class="accordion accordion-flush " id="accordionFlushAnt">
+                    <div id="flush-collapseOneAnt" class="accordion-collapse collapse" data-bs-parent="#accordionFlushAnt">
+                        <div id="placeholderAccordeonAnt"></div>
                     </div>
                 </div>
             </div>
+            </div>
+             </div>
+
+              <div class="text-center" >  
+             <span class="text-center h5">Reservas Canceladas</span>
+            <div class="card-header text-center h3 border-bottom align-content-center align-items-center accordion-button">
+               
+                <button class="card-header w-100 text-center h3 btn btn-outline-secondary text-center collapsed" type="button"  data-bs-toggle="collapse" data-bs-target="#flush-collapseOneCanc" aria-expanded="false" aria-controls="flush-collapseOne">
+                    <span id="countText">@GetHumanReadableCount("reserva", resCancCount)</span><i class="bi bi-arrow-down-circle float-end"></i>
+
+                </button>
+
+            </div>
+            <div class="card-body">
+                <div class="accordion accordion-flush " id="accordionFlushCanc">
+                    <div id="flush-collapseOneCanc" class="accordion-collapse collapse" data-bs-parent="#accordionFlushCanc">
+                        <div id="placeholderAccordeonCanc"></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+                    
+
+
         </div>
 
         <div class="card border-primary  mb-5" style="flex-shrink:2">
@@ -153,7 +219,7 @@
                 <btn class="card-title h4 w-100 btn btn-outline-secondary border-4" style="border-color:@randColorsSala.GetValueOrDefault(@r.SalaId) !important" onclick='showModal(
 "@DifficultiesValue.GetDifficultyColor((int)@r.TemaDif)","@r.ReservaId","@r.Cliente.PrimeiroNome @r.Cliente.UltimoNome","@r.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")","@r.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")"
       ,"@r.NumPessoas","@randColorsSala.GetValueOrDefault(r.SalaId)",
-      "@r.Sala.Numero","@r.TemaNome","@r.TotalPreco","@GeraAnfsStringHtmlSingle(r)")'>Reserva nº @r.ReservaId - Em @TimeSpan.FromHours((r.ReservaDate - DateTime.Now).TotalHours).Humanize(2) - Sala @Model.First().Sala.Numero</btn>
+      "@r.Sala.Numero","@r.TemaNome","@r.TotalPreco","@GeraAnfsStringHtmlSingle(r)","@r.Cancelada")'>Reserva nº @r.ReservaId - Em @TimeSpan.FromHours((r.ReservaDate - DateTime.Now).TotalHours).Humanize(2) - Sala @Model.First().Sala.Numero</btn>
 
                 <div class="justify-content-center">
                     <div class="row">
@@ -163,7 +229,7 @@
                                 <btn class="card-title h2 w-80 btn btn-outline-info border-2" style="border-color:@randColorsSala.GetValueOrDefault(@r.SalaId) !important" onclick='showModal(
 "@DifficultiesValue.GetDifficultyColor((int)@s.TemaDif)","@s.ReservaId","@s.Cliente.PrimeiroNome @s.Cliente.UltimoNome","@s.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")","@s.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")"
       ,"@s.NumPessoas","@randColorsSala.GetValueOrDefault(s.SalaId)",
-      "@s.Sala.Numero","@s.TemaNome","@s.TotalPreco","@GeraAnfsStringHtmlSingle(s)")'>Reserva nº @s.ReservaId - Em @TimeSpan.FromHours((s.ReservaDate - DateTime.Now).TotalHours).Humanize(2) - Sala @s.Sala.Numero</btn>
+      "@s.Sala.Numero","@s.TemaNome","@s.TotalPreco","@GeraAnfsStringHtmlSingle(s)","@s.Cancelada")'>Reserva nº @s.ReservaId - Em @TimeSpan.FromHours((s.ReservaDate - DateTime.Now).TotalHours).Humanize(2) - Sala @s.Sala.Numero</btn>
                             </div>
 
                         }
@@ -177,7 +243,7 @@
 
 </div>
 
-<div id="teste" class="text-end">@Html.Raw(salasLegenda)</div>
+<div id="teste" class="text-end">@Html.Raw(salasLegenda)</div><span class="h6"><span class="text-success">@GetHumanReadableCount("reservas concluídas",resConcluidasSemana)</span>  <span class="text-danger">@GetHumanReadableCount("reservas canceladas",resCancelSemana)</span> <span class="text-warning">@GetHumanReadableCount("reservas",resFaltaSemana) em falta</span></span>
 <div id="rModal"></div>
 <div id='calendar' class=" text-white "></div>
 
@@ -186,7 +252,12 @@
 
 <script>
 
-    
+    function testeBtn(){
+        console.log("dwadwa")
+       $("#fsContainer").html($("#container").html())
+       $("#modalFS").modal("show")
+
+    }
 
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -194,7 +265,12 @@
 
 
     
+    
     $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resHojeLst))");
+        $("#placeholderAccordeonAnt").html("@Html.Raw(@getHtmlStrForAccordeon(reservasAnt))");
+         $("#placeholderAccordeonCanc").html("@Html.Raw(@getHtmlStrForAccordeon(reservasCanc))");
+
+
     
     
       var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
@@ -319,14 +395,13 @@
                
             },
 
-            eventClassNames: function(arg) {
-                console.log(arg)
-                  if (arg.event.extendedProps.isUrgent) {
-                    return [ 'urgent' ]
-                  } else {
-                    return [ 'normal' ]
-                  }
-                },
+           
+                eventClassNames: function(arg) {
+                    console.log(arg.event.extendedProps.cancelada)
+  if (arg.event.extendedProps.cancelada == "True") {
+    return [ 'strike-class' ]
+  } 
+},
 
             events: [
 
@@ -350,7 +425,13 @@
                                 id:'@i.ReservaId',
                                 start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                                 end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                                description: 'Sala @i.Sala.Numero',
+                                @if (i.ReservaDate < DateTime.Now) {
+                    @: description: 'Reserva @i.ReservaId - Sala @i.Sala.Numero -  @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize() atrás',
+
+                } else {
+                    @: description : 'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+
+                }
 
                                 //groupId:'@i.SalaId',
                                 color:'@randColorsSala.GetValueOrDefault(i.SalaId)',
@@ -364,6 +445,7 @@
                     temaNome: '@i.TemaNome',
                     diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
                      sala: "@i.Sala.Numero",
+                     cancelada: '@i.Cancelada',
                     nPessoas:'@i.NumPessoas',
                     totalPreco:'@i.TotalPreco',
                 @{
@@ -401,7 +483,13 @@
                                 start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                                 id:'@i.ReservaId',
                                 end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                                description: 'Sala @i.Sala.Numero',
+                                 @if (i.ReservaDate < DateTime.Now) {
+                    @: description: 'Reserva @i.ReservaId - Sala @i.Sala.Numero -  @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize() atrás',
+
+                } else {
+                    @: description: 'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+
+                }
                                 color:'@randColorsSala.GetValueOrDefault(i.SalaId)',
                                 //groupId:'@i.SalaId',
                                 extendedProps: {
@@ -415,6 +503,7 @@
                      sala: "@i.Sala.Numero",
                     nPessoas:'@i.NumPessoas',
                     totalPreco:'@i.TotalPreco',
+                    cancelada: '@i.Cancelada',
                 @{
                     var anfStr = "";
                     @foreach (var a in i.ListaAnfitrioes) {
@@ -447,15 +536,24 @@
                          var salaColor= info.event.extendedProps.salaColor;
                          var reservaId= info.event.extendedProps.idReserva;
                          var anfs = info.event.extendedProps.nomesAnf;
-                         console.log(anfs)
                          var totalPreco = info.event.extendedProps.totalPreco;
                          var tema = info.event.extendedProps.temaNome;
                          var nPessoas = info.event.extendedProps.nPessoas;
                           var difStr = info.event.extendedProps.diffStr;
                          var sala = info.event.extendedProps.sala;
                          console.log(info.event.extendedProps);
+                         var cancelada =  info.event.extendedProps.cancelada;
                         var anfsArr = anfs.split(',');
+                                                 console.log(cancelada)
+
                         var nomeUser = '@TempData["userLoggedNome"]';
+                        
+                        var stringCanc="";
+                        if(cancelada == "True"){
+                            stringCanc = `<i class="bi bi-x text-danger fa-5x"></i><span class='text-danger h3'>Cancelada!</span></br>`
+
+                        }
+
 
                         var str="";
                         $.each(anfsArr,function(i,v){
@@ -474,11 +572,14 @@
                          $("#rModal").html([
                       `<div class="modal text-center" id="ex" tabindex="-1">`,
       `<div class="modal-dialog text-center">`,
-        `<div class="modal-content border-${difStr} border-2">`,
+        `<div class="modal-content border-danger border-2">`,
+
           `<div class="modal-header text-center">`,
+          
             `<h5 class="modal-title text-center">Reserva ${reservaId} - ${nome}</h5>`,
             `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`,
          `</div>`,
+                    stringCanc,
           `<div class="modal-body">`,
               `<div class="container-fluid text-center justify-content-center">`,
             `<div class="row">`,
@@ -557,6 +658,7 @@
               var tema = info.extendedProps.temaNome;
               var nPessoas = info.extendedProps.nPessoas;
                var difStr = info.extendedProps.diffStr;
+               var cancel = info.extendedProps.cancelada;
               var sala = info.extendedProps.sala;
               console.log(info.extendedProps);
              var anfsArr = anfs.split(',');
@@ -573,7 +675,7 @@
 
                         });
            
-             showModal(difStr,reservaId,nome,dataI,dataF,nPessoas,salaColor,sala,tema,totalPreco,str);
+             showModal(difStr,reservaId,nome,dataI,dataF,nPessoas,salaColor,sala,tema,totalPreco,str,cancel);
 
 
          });
@@ -603,70 +705,6 @@
 
                
 
-
-                function showModal(difStr,reservaId,nome,dataI,dataF,nPessoas,salaColor,sala,tema,totalPreco,str){
-
-
-                         $("#rModal").html([
-                      `<div class="modal text-center" id="ex" tabindex="-1">`,
-      `<div class="modal-dialog text-center">`,
-        `<div class="modal-content border-${difStr} border-2">`,
-          `<div class="modal-header text-center">`,
-            `<h5 class="modal-title text-center">Reserva ${reservaId} - ${nome}</h5>`,
-            `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`,
-         `</div>`,
-          `<div class="modal-body">`,
-              `<div class="container-fluid text-center justify-content-center">`,
-            `<div class="row">`,
-           ` <div class="col ">`,
-                    `<div >`,
-                       `Ínicio :<span class="text-success ms-1">${dataI}</span>`,
-
-                  `</div>`,
-                  `<div >`,
-                       `Fim : <span class="text-danger ms-1">${dataF}</span>`,
-
-                  `</div>`,
-                `</div> `,
-               ` <div class="col">`,
-                    `<div class="text-info">`,
-                      ` Número de pessoas: ${nPessoas}`,
-                  `</div>`,
-                  `<div >`,
-                       `Sala: <span style="color:${salaColor}">${sala}</span>`,
-                  `</div>`,
-                `</div> `,
-             `</div>` ,
-             `<div class="mt-2 text-center  ">`,
-             `Tema: <span class="text-${difStr}">${tema}</span>`,
-                ` </div>`,
-                 `<div class="mt-2 text-center  ">`,
-            ` Preço Total: <span class="">${totalPreco}€</span>`,
-                ` </div>`,
-            ` <div class="mt-5 text-center  ">`,
-             `<span class="">Anfitriões</span></br>`,
-
-             `<ul class="list-group text-break list-group-horizontal mt-2 mb-2">`,
-             `${str}`,
-             `</div>`,
-             ` </div>`,
-         ` </div>`,
-
-          `<div class="modal-footer">`,
-
-            `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`,
-          `</div>`,
-        `</div>`,
-      `</div>`,
-    `</div>`  ].join(""));
-
-    $("#ex").modal("show");
-    
-
-
-
-
-     }
 </script>
 @section Scripts {
     @{

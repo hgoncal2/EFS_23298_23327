@@ -56,7 +56,11 @@ html {
     color: #4BF38A !important;
 }
 
-
+.strike-class {
+    text-decoration: line-through !important;
+    text-decoration-color:red !important;
+    text-decoration-thickness:4px !important;
+}
 
 .iconesConf:hover {
     color: #563D7C !important;
@@ -68,10 +72,13 @@ html {
 fc-event-title{
     color:white !important; 
 }
-
+.modal.fade {
+    z-index: 10000000 !important;
+}
 .fc-event-inner {
     border: 20px !important solid red;
 }
+
 
 footer {
     margin-top: auto;

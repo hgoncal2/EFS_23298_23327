@@ -4,6 +4,7 @@ using EFS_23298_23327.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFS_23298_23327.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240708173819_cancelada")]
+    partial class cancelada
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,9 +106,6 @@ namespace EFS_23298_23327.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservaId"));
 
-                    b.Property<bool>("Cancelada")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ClienteID")
                         .HasColumnType("nvarchar(450)");
 
@@ -114,9 +114,6 @@ namespace EFS_23298_23327.Migrations
 
                     b.Property<string>("CriadoPorUsername")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCancel")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
@@ -144,6 +141,9 @@ namespace EFS_23298_23327.Migrations
 
                     b.Property<decimal>("TotalPreco")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("cancelada")
+                        .HasColumnType("bit");
 
                     b.HasKey("ReservaId");
 

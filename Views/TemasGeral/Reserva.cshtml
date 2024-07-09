@@ -1,4 +1,6 @@
 ﻿@model EFS_23298_23327.ViewModel.ReservaViewModel
+@using Humanizer
+@using System.Globalization
 @using EFS_23298_23327.Data
 @{
     ViewData["Title"] = "Privacy Policy";
@@ -13,10 +15,29 @@
     String d = DifficultiesValue.GetDifficultyVal((int)t.Dificuldade).ToString();
     String c = DifficultiesValue.GetDifficultyColor((int)t.Dificuldade);
 
+
+     @functions {
+
+       
+
+        public string GetHumanReadableCount(string s, int c) {
+            return s.ToQuantity(c);
+
+
+
+        }
+       
+
+
+
+    }
+
+    var nResSemana = Model.Sala.ListaReservas.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now)).Count();
+
 }
 
-
-
+            
+<form asp-action="Cancela" id="confirmDialog" method="post"> </form>
 
 <div id="erroUser"></div>
 
@@ -27,6 +48,8 @@
        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 }
+
+
    <div id="mod1">
 </div>
 
@@ -41,7 +64,15 @@
 
     <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
 
-        @TempData["ReservaSucesso"]
+      @TempData["ReservaSucesso"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (@TempData["ReservaCancel"] != null) {
+
+    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+
+         @Html.Raw(@TempData["ReservaCancel"])
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
@@ -103,13 +134,22 @@
     </div>
 </div>
 </div>
+<div id="rModal"></div> 
+
 
 
 
 
 @********************************************************@
+<div class="text-center float-end me-4 text-@c">
+   <i class="bi bi-fire float-end me-2 fa-fa2x"></i> <span  class="float-end me-2 " id="countText">@GetHumanReadableCount("reserva", nResSemana) esta semana</span>
 
-<div id='calendar' class=" text-white "></div>
+</div>
+
+<div id='calendar' class=" text-white ">
+
+
+</div>
 
 <script>
 
@@ -206,13 +246,30 @@
     @foreach (var i in Model.Sala.ListaReservas) {
         @if (i.Equals(Model.Sala.ListaReservas.Last())) {
             <text>{
-                    title: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                    title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
                     start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                     end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                      @if(i.ReservaEndDate<DateTime.Now){
                     @:display:'background',
                 }
-                    description: '@i.NumPessoas  Pessoas',
+                   description:'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+                    extendedProps: {
+                        nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                        dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                        idReserva: '@i.ReservaId',
+                        dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                        temaNome: '@i.TemaNome',
+                        salaId: '@i.SalaId',
+                        reservaId:'@i.ReservaId',
+                        diffStr: '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
+                        sala: "@i.Sala.Numero",
+                         strHoras: 'Em @TimeSpan.FromHours((@i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+                        nPessoas: '@i.NumPessoas',
+                        totalPreco: '@i.TotalPreco',
+                        cancelada: '@i.Cancelada',
+               
+
+                              },
 
 
                 @if (i.Cliente.UserName.Equals(User.Identity.Name)) {
@@ -228,7 +285,24 @@
                     @:display:'background',
                 }
                     end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                    description: '@i.ReservaDate.ToString("HH:mm") - @i.ReservaEndDate.ToString("HH:mm")',
+                    description:'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+                    extendedProps: {
+                     nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                      salaId: '@i.SalaId',
+                        reservaId:'@i.ReservaId',
+                    dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                    idReserva:'@i.ReservaId',
+                    dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                    temaNome: '@i.TemaNome',
+                    diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
+                     sala: "@i.Sala.Numero",
+                    strHoras: 'Em @TimeSpan.FromHours((@i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+                    nPessoas:'@i.NumPessoas',
+                    totalPreco:'@i.TotalPreco',
+                    cancelada: '@i.Cancelada'
+              
+                    
+                  },
 
 
 
@@ -307,6 +381,139 @@
 
 
                 },
+    eventClick: function(info) {
+        console.log(info.event.extendedProps);
+        var nome = info.event.extendedProps.nome;
+        var dataI = info.event.extendedProps.dataI;
+        var dataF = info.event.extendedProps.dataF;
+        //var salaColor = info.event.extendedProps.salaColor;
+        var reservaId = info.event.extendedProps.idReserva;
+        var anfs = info.event.extendedProps.nomesAnf;
+
+        var totalPreco = info.event.extendedProps.totalPreco;
+        var tema = info.event.extendedProps.temaNome;
+         var salaId = info.event.extendedProps.salaId;
+        var reservaId = info.event.extendedProps.reservaId;
+        var nPessoas = info.event.extendedProps.nPessoas;
+        var difStr = info.event.extendedProps.diffStr;
+        var sala = info.event.extendedProps.sala;
+        var strHoras = info.event.extendedProps.strHoras;
+        console.log(info.event.extendedProps);
+        var cancelada = info.event.extendedProps.cancelada;
+        var nomeUser = '@TempData["userLoggedNome"]';
+
+        var stringCanc = "";
+        if (cancelada == "True") {
+            stringCanc = `<i class="bi bi-x text-danger fa-5x"></i><span class='text-danger h3'>Cancelada!</span></br>`
+
+        }
+       var momentDate =moment(dataI, 'DD-MM-YYYY HH:mm:ss');
+        var resDate = momentDate.toDate();
+        console.log(resDate)
+        var dataAtual = new Date();
+        dataAtual.setDate(dataAtual.getDate() + 2);
+       console.log(dataAtual)
+        var strCancela = "";
+       if(dataAtual<=resDate){
+          var strCancela = `<button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalApagar"><i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button>`
+
+       }else{
+                    var strCancela = `<form asp-action="Cancela" method="post" enctype="multipart/form-data"><button disabled class="btn btn-danger btn-sm pe-auto" data-bs-toggle="tooltip"  data-bs-placement="top" data-bs-html='true' title="As reservas apenas podem ser canceladas até <strong>48h antes da data marcada</strong>"  type="submit" ><i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button></form>`
+
+       }
+
+             
+       $("#confirmDialog").html([
+            
+           `<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">`,
+    `<div class="modal-dialog modal-dialog-centered ">`,
+        `<div class="modal-content">`,
+            `<div class="modal-header modal-header-danger">`,
+               ` <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-circle fa-2x me-5 "></i> Deseja cancelar a sua reserva?</h5>`,
+                `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`,
+           `</div>`,
+            `<div class="modal-footer ">`,
+                `<button type="button" class="btn btn-success mr-auto" data-bs-dismiss="modal">Fechar</button>`,
+               
+                `<input  hidden name="resId" value="${reservaId}"/>`,
+                `@Html.AntiForgeryToken()`,
+                    `<button type="submit" class="btn btn-danger">Cancelar Reserva</button>`,
+                
+            `</div>`,
+        `</div>`,
+    `</div>`,
+`</div>`,
+
+       ].join(""));
+
+
+       
+        $("#rModal").html([
+            `<div class="modal text-center" id="ex" tabindex="-1">`,
+            `<div class="modal-dialog text-center">`,
+            `<div class="modal-content border-danger border-2">`,
+
+            `<div class="modal-header text-center">`,
+
+            `<h5 class="modal-title text-center">Reserva ${reservaId} - ${nome}</h5>`,
+            `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`,
+            `</div>`,
+            stringCanc,
+            `<div class="modal-body">`,
+            `<div class="container-fluid text-center justify-content-center">`,
+            `<div class="row">`,
+            ` <div class="col ">`,
+            `<div >`,
+            `Ínicio :<span class="text-success ms-1">${dataI}</span>`,
+
+            `</div>`,
+            `<div >`,
+            `Fim : <span class="text-danger ms-1">${dataF}</span>`,
+
+            `</div>`,
+            `</div> `,
+            ` <div class="col">`,
+            `<div class="text-info">`,
+            ` Número de pessoas: ${nPessoas}`,
+            `</div>`,
+            `<div >`,
+            `Sala: <span style="">${sala}</span>`,
+            `</div>`,
+            `</div> `,
+            `</div>`,
+            `<div class="mt-2 text-center  ">`,
+            `Tema: <span class="text-${difStr}">${tema}</span>`,
+            ` </div>`,
+            `<div class="mt-2 text-center  ">`,
+            ` Preço Total: <span class="">${totalPreco}€</span>`,
+            ` </div>`,
+            ` <div class="mt-5 text-center  ">`,
+           strHoras,
+            `</div>`,
+            ` </div>`,
+            ` </div>`,
+
+            `<div class="modal-footer">`,
+            strCancela,
+            `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>`,
+            `</div>`,
+            `</div>`,
+            `</div>`,
+            `</div>`].join(""));
+
+        $("#ex").modal("show");
+         var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    },
+    eventTimeFormat: { // like '14:30:00'
+        hour: '2-digit',
+            minute: '2-digit',
+
+                meridiem: false,
+                    hour12: false
+    },
+
+
             });
 
 
@@ -323,3 +530,4 @@
 
 </script>
 
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>

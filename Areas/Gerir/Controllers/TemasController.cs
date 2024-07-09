@@ -224,7 +224,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     TempData["MensagemErro"] = "Não foi possível anunciar tema porque <strong class=''>nenhuma sala foi associada</strong>";
                 } else {
                     if (temas.SalaID != null && temas.AnunciarTema) {
-                        await _progressHubContext.Clients.All.SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor((int)temas.Dificuldade) + ","+ "Novo tema disponível!");
+                        await _progressHubContext.Clients.Group("Clientes").SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor((int)temas.Dificuldade) + ","+ "Novo tema disponível!");
 
                     }
                 }
@@ -402,7 +402,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     ViewBag.MensagemErro = "Não foi possível anunciar tema porque <strong class=''>nenhuma sala foi associada</strong>";
                 } else {
                     if (temas.SalaID != null && temas.AnunciarTema) {
-                        await _progressHubContext.Clients.All.SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor((int)temas.Dificuldade) + "," + "Tema Atualizado!");
+                        await _progressHubContext.Clients.Group("Clientes").SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor((int)temas.Dificuldade) + "," + "Tema Atualizado!");
 
                     }
                 }
