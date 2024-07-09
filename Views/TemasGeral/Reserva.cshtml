@@ -169,25 +169,24 @@
             var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         themeSystem: 'bootstrap5',
-
+        timeZone: 'Europe/Lisbon',
+        now: '@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")',
         initialView: 'timeGridWeek',
         locale: 'pt',
         slotEventOverlap: false,
 
         initialDate: new Date(),
         stickyHeaderDates:true,
-        
-        slotMinTime: "05:00:00",
+
+        slotMinTime: "07:00:00",
         slotMaxTime: "24:00:00",
-    
-        /*@{
+    @{
 
         var tempo = (int)t.TempoEstimado + 30;
         var strTempo = TimeSpan.FromMinutes(tempo).ToString(@"hh\:mm\:ss");
 
         <text>slotDuration: '@strTempo', </text>
     }
-    */
         hiddenDays: [0],
         eventOverlap: false,
         timeZone: 'UTC',
