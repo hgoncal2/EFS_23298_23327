@@ -8,8 +8,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Security.Claims;
+using System.Xml.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -72,6 +75,52 @@ namespace EFS_23298_23327.Controllers
             vm.Roles = roles;
             return PartialView("_PartialViewPref", vm);
 
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(UtilizadoresViewModel userVM)
+        {
+            if (userVM == null)
+            {
+                return NotFound();
+            }
+            var user = await _context.Utilizadores.Where(m => m.Deleted == false).FirstOrDefaultAsync(m => m.Id == userVM.Id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var user2 = await _context.Utilizadores.Where(u => u.Deleted == false).Where(u => u.UserName.Trim() == userVM.Username.Trim() && u.Id != userVM.Id).FirstOrDefaultAsync();
+
+                if (userVM.Email != null && userVM.Email.Trim() != "")
+                {
+                    user2 = await _context.Utilizadores.Where(u => u.Deleted == false).Where(u => u.Email.Trim() == userVM.Email.Trim() && u.Id != userVM.Id).FirstOrDefaultAsync();
+                    if (user2 != null)
+                    {
+                        ViewBag.UserExiste = "Utilizador com email \"<strong>" + user2.Email + "</strong>\" já existe!";
+                        return RedirectToAction("Index");
+                    }
+                }                  
+
+                //Se for cliente
+                user.Email = userVM.Email;
+                user.PrimeiroNome = userVM.PrimeiroNome;
+                user.UltimoNome = userVM.UltimoNome;
+
+                _context.Update(user);
+                _context.Entry(user).Property(t => t.DataCriacao).IsModified = false;
+                _context.Entry(user).Property(t => t.CriadoPorOid).IsModified = false;
+                _context.Entry(user).Property(t => t.CriadoPorUsername).IsModified = false;
+                await _context.SaveChangesAsync();                  
+                ViewBag.ShowAlert = true;
+                TempData["UtilizadorAlterado"] = "Alterações guardadas com sucesso!";
+                return RedirectToAction("Index");
+
+            }
+            return RedirectToAction("Index");
         }
     }
 

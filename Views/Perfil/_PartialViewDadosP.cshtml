@@ -21,11 +21,72 @@
     }
 }
 
-<div class="card rounded-4 border-@c.First() m-4">
-    <div class="m-2 ">
-        <h3>@Model.Username</h3>
-        <br />
+@if (@TempData["UtilizadorAlterado"] != null)
+{
+    <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
+        Alterações guardadas com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
-        <p class="text-success">@Model.Email</p>
+<div class="card rounded-4 border-@c.First() m-4">
+    <div class="row m-2 ">
+        <div class="col">
+            <h3>@Model.Username</h3>
+            <p class="text-success">@Model.Email</p>
+        </div>
+        <div class="col text-lg-end align-bottom"><p>Data de criação: @Model.DataCriacao.ToString("dddd"), @Model.DataCriacao.ToString("D")</p></div>
+        
     </div>
 </div>
+
+
+
+
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="container-fluid justify-content-center">
+        @Html.Hidden("Id", Model.Id)
+        @Html.Hidden("Roles",Model.Roles.First())
+
+        <div class="row m-3">
+
+                <div class="form-group">
+                    <label asp-for="Username" class="control-label"></label>
+
+                        <input type="hidden" asp-for="Username" />
+                        <input disabled="true" asp-for="Username" class="form-control w-25" />                 
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="w-25">
+                    <div class="form-group mt-3 w-100">
+                        <label asp-for="PrimeiroNome" class="control-label "></label>
+                        <input asp-for="PrimeiroNome" class="form-control" />
+                        <span asp-validation-for="PrimeiroNome" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="w-25">
+                    <div class="form-group mt-3 w-100">
+                        <label asp-for="UltimoNome" class="control-label "></label>
+                        <input asp-for="UltimoNome" class="form-control" />
+                        <span asp-validation-for="UltimoNome" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group mt-3" style="width:55% !important">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>         
+        </div>
+        
+    </div>
+
+    <br />
+    <div class="form-group text-center d-grid gap-2 col-6 mx-auto mb-4">
+
+        <input type="submit" value="Guardar" class="btn btn-outline-secondary btn-lg" />
+    </div>
+</form>
