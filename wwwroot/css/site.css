@@ -20,6 +20,20 @@ html {
 
     width:100vw;
 }
+#clr-picker{
+    z-index:9999999 !important;
+}
+.clr-picker{
+z-index: 9999999 !important;
+}
+.clr-picker {
+    z-index: 9999999 !important;
+}
+
+
+.textWhite {
+    color: white !important;
+}
 #carouselIndex .carousel-item img {
     object-fit: fill;
     object-position: center;

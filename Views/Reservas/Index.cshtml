@@ -151,7 +151,6 @@
 
 }
 
-<div id="save"></div>
     <div class="modal  fade " id="modalPrefs" style="z-index:5000 !important" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog text-center">
     <div class="modal-content text-center border-secondary border-2">
@@ -327,6 +326,7 @@
 </div>
     
  
+<div id="save"></div>
 
 <div id="teste" class="text-end">@Html.Raw(salasLegenda)<button type="button" class="btn btn-primary btn-info" data-bs-toggle='tooltip' data-html='true' data-bs-placement='top' title='Preferências de visual' id="showModalBtn">
 <i class="bi bi-gear me-3 text-end float-end  fa-1x" ></i></button></div><span class="h6"><span class="text-success">@GetHumanReadableCount("reservas concluídas",resConcluidasSemana)</span>  <span class="text-danger">@GetHumanReadableCount("reservas canceladas",resCancelSemana)</span> <span class="text-warning">@GetHumanReadableCount("reservas",resFaltaSemana) em falta</span></span>
@@ -346,7 +346,7 @@
             dict[$(this).attr('id')] = $(this).val();
        })
 
-       $.post('/Home/SaveCor/', { dic: dict,showCancel:$("#showCancel").is(":checked") },function(result){
+       $.post('/Reservas/SaveCor/', { dic: dict,showCancel:$("#showCancel").is(":checked") },function(result){
 
            if(result.failed){
                

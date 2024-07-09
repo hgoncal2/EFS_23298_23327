@@ -1,4 +1,5 @@
 ﻿using EFS_23298_23327.Data;
+using EFS_23298_23327.Migrations;
 using EFS_23298_23327.Models;
 using EFS_23298_23327.ViewModel;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using NuGet.Common;
 using System.Diagnostics;
 using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -58,18 +60,10 @@ namespace EFS_23298_23327.Controllers
             return View(TmVm);
             
         }
-        [CustomAuthorize(Roles ="Anfitriao")]
+        
         public async Task<IActionResult> Privacy() {
 
-            var ud = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-            var u = await  _context.Anfitrioes.Where(u=>u.Id == ud).FirstOrDefaultAsync();
-            TempData["userLoggedNome"] = u.PrimeiroNome + " " + u.UltimoNome;
-            var r = await _context.Reservas.Include(c=>c.Cliente).Include(a=>a.Sala).Include(a=>a.ListaAnfitrioes).Where(a=>a.ListaAnfitrioes.Contains(u)).ToListAsync();
-          
-            
-
-            return View(r.OrderBy(r=>r.ReservaDate));
+            return NotFound();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -79,10 +73,12 @@ namespace EFS_23298_23327.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-
-
        
-    
+
+
+
+
+
 
 
 

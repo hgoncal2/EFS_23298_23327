@@ -1,5 +1,6 @@
 ﻿using EFS_23298_23327.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EFS_23298_23327.Models
 {
@@ -7,6 +8,10 @@ namespace EFS_23298_23327.Models
     {
         public ICollection<Salas>? ListaSalas { get; set; }
         public ICollection<Reservas>? ListaReservas { get; set; }
+        [ForeignKey(nameof(UserPrefsAnf))]
+     
+        public int? userPrefsAnfId { get; set; }
+        public UserPrefsAnf? userPrefsAn { get; set; }
         public Anfitrioes()
         {
             this.ListaSalas = new HashSet<Salas>();
@@ -29,6 +34,7 @@ namespace EFS_23298_23327.Models
 
             this.Email = r.Email;
         }
+
 
 
     }
