@@ -82,8 +82,11 @@ namespace EFS_23298_23327.Controllers
                             
                         }
                         TempData["NomeUtilizadorLogado"] = u.UserName;
-                        if (User.IsInRole("Admin") || User.IsInRole("Anfitriao")){
+                        if (User.IsInRole("Admin") && !User.IsInRole("Anfitriao")) {
                             return RedirectToAction("Index", "Temas", new { area = "Gerir" });
+                        }
+                        if (User.IsInRole("Anfitriao")) {
+                            return RedirectToAction("Index", "Reservas");
                         }
                        
                         

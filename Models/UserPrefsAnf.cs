@@ -14,6 +14,7 @@ namespace EFS_23298_23327.Models
         public bool mostrarCanceladas { get; set; }
 
 
+       
         public UserPrefsAnf() {
             this.Cores = new HashSet<UserPrefAnfCores>();
         }
