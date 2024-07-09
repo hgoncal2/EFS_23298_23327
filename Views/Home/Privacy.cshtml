@@ -1,13 +1,14 @@
 ﻿@using Humanizer
 @using System.Globalization
-@model IEnumerable<EFS_23298_23327.Models.Reservas>
+@model EFS_23298_23327.ViewModel.ReservasDashboardViewModel
 
 
 @{
 
-    IEnumerable<Reservas> reservasProx = Model.Where(r => r.ReservaDate >= DateTime.Now && !r.Cancelada).OrderBy(r => r.ReservaDate).ToList();
-        IEnumerable<Reservas> reservasAnt = Model.Where(r => r.ReservaEndDate < DateTime.Now && !r.Cancelada).OrderByDescending(r => r.ReservaEndDate).ToList();
-                IEnumerable<Reservas> reservasCanc = Model.Where(r => r.Cancelada).OrderBy(r => r.ReservaEndDate).ToList();
+
+    IEnumerable<Reservas> reservasProx = Model.Reservas.Where(r => r.ReservaDate >= DateTime.Now && !r.Cancelada).OrderBy(r => r.ReservaDate).ToList();
+        IEnumerable<Reservas> reservasAnt = Model.Reservas.Where(r => r.ReservaEndDate < DateTime.Now && !r.Cancelada).OrderByDescending(r => r.ReservaEndDate).ToList();
+                IEnumerable<Reservas> reservasCanc = Model.Reservas.Where(r => r.Cancelada).OrderBy(r => r.ReservaEndDate).ToList();
 
 
 
@@ -15,25 +16,42 @@
 
     var r = reservasProx.First();
 
-    Dictionary<int?, string> randColorsSala = new Dictionary<int?, string>();
     Dictionary<int, int?> idSalasnome = new Dictionary<int, int?>();
-    HashSet<int> numSalas = Model.Select(s => s.Sala.Numero).ToHashSet();
+    HashSet<int> numSalas = Model.Reservas.Select(s => s.Sala.Numero).ToHashSet();
 
+    Dictionary<int?,string> userPrefSalas = new Dictionary<int?, string>();
 
+    if(Model.UserPrefs!=null){
+  foreach(var c in Model.UserPrefs.Cores){
 
-    foreach (var c in Model) {
-        var random = new Random();
-        if (!randColorsSala.ContainsKey(c.SalaId)) {
-            randColorsSala.Add(c.SalaId, String.Format("#{0:X6}", random.Next(0x1000000))); // = "#A197B9")
-
-        }
-        if (!idSalasnome.ContainsKey(c.Sala.Numero)) {
-            idSalasnome.Add(c.Sala.Numero, c.SalaId); // = "#A197B9")
-
-        }
+         userPrefSalas.TryAdd(c.Key,c.Value);
+     }
+     
 
     }
-    ViewBag.RandColors = randColorsSala;
+
+    var listaReservasCal=Model.Reservas;
+    if(!Model.UserPrefs.mostrarCanceladas){
+        listaReservasCal = Model.Reservas.Where(r=>!r.Cancelada).ToList();
+    }
+   
+
+
+
+    foreach (var c in Model.Reservas) {
+        var random = new Random();
+        if (!userPrefSalas.ContainsKey(c.SalaId)) {
+            userPrefSalas.Add(c.SalaId, String.Format("#{0:X6}", random.Next(0x1000000))); // = "#A197B9")
+
+        }
+        
+            idSalasnome.TryAdd(c.Sala.Numero, c.SalaId); // = "#A197B9")
+
+        
+
+    }
+
+    ViewBag.RandColors = userPrefSalas;
     ViewBag.SalaNome = idSalasnome;
     ((Dictionary<int?, string>)ViewBag.RandColors).GetValueOrDefault(1);
     var resHojeLst = reservasProx.Where(r => DateTime.Now.Day == r.ReservaDate.Day);
@@ -44,9 +62,9 @@
     var resAnoLst = reservasProx.Where(r => DateTime.Now.Year == r.ReservaDate.Year);
         var resTodasLst = reservasProx.ToList();
 
-        var resConcluidasSemana = Model.Where(r => r.ReservaEndDate <= DateTime.Now && ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) && !r.Cancelada).ToList().Count();
-        var resCancelSemana = Model.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) && r.Cancelada).ToList().Count();
-         var resFaltaSemana = Model.Where(r => r.ReservaDate > DateTime.Now && ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) && !r.Cancelada).ToList().Count();
+        var resConcluidasSemana = Model.Reservas.Where(r => r.ReservaEndDate <= DateTime.Now && ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) && !r.Cancelada).ToList().Count();
+        var resCancelSemana = Model.Reservas.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) && r.Cancelada).ToList().Count();
+         var resFaltaSemana = Model.Reservas.Where(r => r.ReservaDate > DateTime.Now && ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now) && !r.Cancelada).ToList().Count();
 
 
 
@@ -110,23 +128,79 @@
     }
 
 
-
+    
 
 
 
     var salasLegenda = "";
 
-
+    
+    
     foreach (var s in numSalas) {
 
-        salasLegenda += "<span class='me-2'>Sala" + s + "<i class='ms-2 bi bi-circle-fill' style='color:" + randColorsSala.GetValueOrDefault(idSalasnome.GetValueOrDefault(s)) + "'></i></span>";
+        salasLegenda += "<span class='me-2'>Sala " + s + "<i class='ms-2 bi bi-circle-fill' style='color:" + userPrefSalas.GetValueOrDefault(idSalasnome.GetValueOrDefault(s)) + "'></i></span>";
         salasLegenda += "\t\t";
     }
+    
 
 
 
 
 }
+
+<div id="save"></div>
+    <div class="modal  fade " id="modalPrefs" style="z-index:5000 !important" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog text-center">
+    <div class="modal-content text-center border-secondary border-2">
+      <div class="modal-header text-center">
+        <h1 class="modal-title text-center fs-5" id="exampleModalLabel">Preferências</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+    <div class="container-fluid">
+
+        
+    @foreach(var i in userPrefSalas){
+                <div> 
+                    <div class="col text-center ">
+
+                        <span> Sala @idSalasnome.FirstOrDefault(x => x.Value == i.Key).Key </span>
+                         <div class="col text-center">
+
+            <input type="text" style="width:150px;z-index:9999999 !important" id="@i.Key" class="ms-5 salasCor"  value="@i.Value" data-coloris>
+                  </div>
+                         
+                  </div>
+                  
+                  
+  </div>
+
+                 
+    }
+
+     </div>
+
+
+       <div class="text-end mt-5 ">
+           <label class="form-check-label" for="showCancel">Mostrar Canceladas  </label>
+
+           <input class="form-check-input" type="checkbox" checked="@Model.UserPrefs.mostrarCanceladas" id="showCancel">
+  
+
+        </div>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+        <button type="button" class="btn btn-success" onclick="saveCor()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+
 
 
 
@@ -216,19 +290,19 @@
         <div class="card border-primary  mb-5" style="flex-shrink:2">
             <div class="card-header text-center h3 border-bottom border-secondary border-3">Próximas reservas</div>
             <div class="card-body ">
-                <btn class="card-title h4 w-100 btn btn-outline-secondary border-4" style="border-color:@randColorsSala.GetValueOrDefault(@r.SalaId) !important" onclick='showModal(
+                <btn class="card-title h4 w-100 btn btn-outline-secondary border-4" style="border-color:@userPrefSalas.GetValueOrDefault(@r.SalaId) !important" onclick='showModal(
 "@DifficultiesValue.GetDifficultyColor((int)@r.TemaDif)","@r.ReservaId","@r.Cliente.PrimeiroNome @r.Cliente.UltimoNome","@r.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")","@r.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")"
-      ,"@r.NumPessoas","@randColorsSala.GetValueOrDefault(r.SalaId)",
-      "@r.Sala.Numero","@r.TemaNome","@r.TotalPreco","@GeraAnfsStringHtmlSingle(r)","@r.Cancelada")'>Reserva nº @r.ReservaId - Em @TimeSpan.FromHours((r.ReservaDate - DateTime.Now).TotalHours).Humanize(2) - Sala @Model.First().Sala.Numero</btn>
+      ,"@r.NumPessoas","@userPrefSalas.GetValueOrDefault(r.SalaId)",
+      "@r.Sala.Numero","@r.TemaNome","@r.TotalPreco","@GeraAnfsStringHtmlSingle(r)","@r.Cancelada")'>Reserva nº @r.ReservaId - Em @TimeSpan.FromHours((r.ReservaDate - DateTime.Now).TotalHours).Humanize(2) - Sala @Model.Reservas.First().Sala.Numero</btn>
 
                 <div class="justify-content-center">
                     <div class="row">
 
                         @foreach (var s in reservasProx.Skip(1).Take(3)) {
                             <div class="col">
-                                <btn class="card-title h2 w-80 btn btn-outline-info border-2" style="border-color:@randColorsSala.GetValueOrDefault(@r.SalaId) !important" onclick='showModal(
+                                <btn class="card-title h2 w-80 btn btn-outline-info border-2" style="border-color:@userPrefSalas.GetValueOrDefault(@r.SalaId) !important" onclick='showModal(
 "@DifficultiesValue.GetDifficultyColor((int)@s.TemaDif)","@s.ReservaId","@s.Cliente.PrimeiroNome @s.Cliente.UltimoNome","@s.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")","@s.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")"
-      ,"@s.NumPessoas","@randColorsSala.GetValueOrDefault(s.SalaId)",
+      ,"@s.NumPessoas","@userPrefSalas.GetValueOrDefault(s.SalaId)",
       "@s.Sala.Numero","@s.TemaNome","@s.TotalPreco","@GeraAnfsStringHtmlSingle(s)","@s.Cancelada")'>Reserva nº @s.ReservaId - Em @TimeSpan.FromHours((s.ReservaDate - DateTime.Now).TotalHours).Humanize(2) - Sala @s.Sala.Numero</btn>
                             </div>
 
@@ -242,8 +316,11 @@
     </div>
 
 </div>
+    
+ 
 
-<div id="teste" class="text-end">@Html.Raw(salasLegenda)</div><span class="h6"><span class="text-success">@GetHumanReadableCount("reservas concluídas",resConcluidasSemana)</span>  <span class="text-danger">@GetHumanReadableCount("reservas canceladas",resCancelSemana)</span> <span class="text-warning">@GetHumanReadableCount("reservas",resFaltaSemana) em falta</span></span>
+<div id="teste" class="text-end">@Html.Raw(salasLegenda)<button type="button" class="btn btn-primary btn-info" data-bs-toggle='tooltip' data-html='true' data-bs-placement='top' title='Preferências de visual' id="showModalBtn">
+<i class="bi bi-gear me-3 text-end float-end  fa-1x" ></i></button></div><span class="h6"><span class="text-success">@GetHumanReadableCount("reservas concluídas",resConcluidasSemana)</span>  <span class="text-danger">@GetHumanReadableCount("reservas canceladas",resCancelSemana)</span> <span class="text-warning">@GetHumanReadableCount("reservas",resFaltaSemana) em falta</span></span>
 <div id="rModal"></div>
 <div id='calendar' class=" text-white "></div>
 
@@ -251,6 +328,35 @@
 
 
 <script>
+
+    function saveCor(){
+        console.log("dwadwa")
+      var  dict = new Object();
+    
+       $(".salasCor").each(function(index,item){
+            dict[$(this).attr('id')] = $(this).val();
+       })
+
+       $.post('/Home/SaveCor/', { dic: dict,showCancel:$("#showCancel").is(":checked") },function(result){
+
+           if(result.failed){
+               
+           }else{
+               $("#save").html(result);
+                              $("#modalPrefs").modal("hide")
+
+               setTimeout(function(){
+   window.location.reload();
+}, 1000);
+           }
+
+
+       });
+                
+    };
+      
+
+    
 
     function testeBtn(){
         console.log("dwadwa")
@@ -263,7 +369,9 @@
         document.addEventListener('DOMContentLoaded', function () {
     @* $("#ex").modal("show");*@
 
-
+    $("#showModalBtn").on("click",function(){
+        $("#modalPrefs").modal("show")
+    })
     
     
     $("#placeholderAccordeon").html("@Html.Raw(@getHtmlStrForAccordeon(resHojeLst))");
@@ -400,15 +508,17 @@
                     console.log(arg.event.extendedProps.cancelada)
   if (arg.event.extendedProps.cancelada == "True") {
     return [ 'strike-class' ]
-  } 
+  } else{
+      return ['textWhite']
+  }
 },
 
             events: [
 
 
 
-    @foreach (var i in Model) {
-        @if (i.Equals(Model.Last())) {
+    @foreach (var i in @listaReservasCal) {
+        @if (i.Equals(@listaReservasCal.Last())) {
             <text>{
                 @if (i.ReservaDate < DateTime.Now) {
                     @: title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero -  @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize() atrás',
@@ -434,13 +544,13 @@
                 }
 
                                 //groupId:'@i.SalaId',
-                                color:'@randColorsSala.GetValueOrDefault(i.SalaId)',
+                                color:'@userPrefSalas.GetValueOrDefault(i.SalaId)',
                                 extendedProps: {
                     nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
                     idReserva:'@i.ReservaId',
                     dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
                     dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
-                            salaColor: '@randColorsSala.GetValueOrDefault(i.SalaId)',
+                            salaColor: '@userPrefSalas.GetValueOrDefault(i.SalaId)',
 
                     temaNome: '@i.TemaNome',
                     diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
@@ -490,7 +600,7 @@
                     @: description: 'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
 
                 }
-                                color:'@randColorsSala.GetValueOrDefault(i.SalaId)',
+                                color:'@userPrefSalas.GetValueOrDefault(i.SalaId)',
                                 //groupId:'@i.SalaId',
                                 extendedProps: {
                      nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
@@ -498,7 +608,7 @@
                     idReserva:'@i.ReservaId',
                     dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
                     temaNome: '@i.TemaNome',
-                    salaColor: '@randColorsSala.GetValueOrDefault(i.SalaId)',
+                    salaColor: '@userPrefSalas.GetValueOrDefault(i.SalaId)',
                     diffStr : '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
                      sala: "@i.Sala.Numero",
                     nPessoas:'@i.NumPessoas',
@@ -711,3 +821,6 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+                  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
+<script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>

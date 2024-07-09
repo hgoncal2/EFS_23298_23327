@@ -28,6 +28,11 @@ namespace EFS_23298_23327.Data
               .HasOne(e => e.Cliente).
               WithMany(c => c.ListaReservas)
               .HasForeignKey(e => e.ClienteID);
+            modelBuilder.Entity<UserPrefsAnf>()
+              .HasMany(p => p.Cores)
+              .WithOne(c => c.UserPrefsAnf)
+              .HasForeignKey(c => c.UserPrefId);
+
 
 
 

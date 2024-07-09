@@ -17,7 +17,8 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
    
     [Display(Name = "Último Nome")]
     public String? UltimoNome { get; set; }
-   
+    
+
     [Display(Name = "Data de Criação")]
    
     public DateTime DataCriacao { get; set; }
