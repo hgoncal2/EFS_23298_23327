@@ -1,0 +1,31 @@
+﻿@model EFS_23298_23327.ViewModel.UtilizadoresViewModel
+
+@{
+    ViewData["Title"] = "Utilizadores";
+    List<String> c = new List<String>();
+    if (Model.Roles.Contains("Cliente"))
+    {
+        c.Add("success");
+    }
+    if (Model.Roles.Contains("Anfitriao"))
+    {
+        c.Add("warning");
+    }
+    if (Model.Roles.Contains("Admin"))
+    {
+        c.Add("danger");
+    }
+    if (c.Count() == 1)
+    {
+        c.Add("white");
+    }
+}
+
+<div class="card rounded-4 border-@c.First() m-4">
+    <div class="m-2 ">
+        <h3>@Model.Username</h3>
+        <br />
+
+        <p class="text-success">@Model.Email</p>
+    </div>
+</div>

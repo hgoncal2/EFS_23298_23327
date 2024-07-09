@@ -1,0 +1,94 @@
+﻿@model EFS_23298_23327.ViewModel.UtilizadoresViewModel
+
+@{
+    ViewData["Title"] = "Utilizadores";
+    List<String> c = new List<String>();    
+    if (Model.Roles.Contains("Cliente"))
+    {
+        c.Add("success");
+    }
+    if (Model.Roles.Contains("Anfitriao"))
+    {
+        c.Add("warning");
+    }
+    if (Model.Roles.Contains("Admin"))
+    {
+        c.Add("danger");
+    }
+    if(c.Count() == 1)
+    {
+        c.Add("white");
+    }
+}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+
+        $("#btnP").on("click", function () {
+            $.post('/Perfil/Pref', function (result) {
+
+                if (result.failed) {
+                    console.log("wdwad");
+                    return false;
+                } else {
+                    $('#mod1').html(result);
+                    $("#btnP").removeClass("btn-dark").addClass("btn-primary");
+                    $("#btnR").removeClass("btn-primary").addClass("btn-dark");
+                    $("#btnDP").removeClass("btn-primary").addClass("btn-dark");
+                    $('#exampleModal').modal("show");
+                }
+
+            });
+        });
+
+
+        $("#btnR").on("click", function () {
+            $.post('/Perfil/Reservas', function (result) {
+
+                if (result.failed) {
+                    console.log("wdwad");
+                    return false;
+                } else {
+                    $('#mod1').html(result);
+                    $("#btnR").removeClass("btn-dark").addClass("btn-primary");
+                    $("#btnP").removeClass("btn-primary").addClass("btn-dark");
+                    $("#btnDP").removeClass("btn-primary").addClass("btn-dark");                   
+                    $('#exampleModal').modal("show");
+                }
+
+            });
+        });
+
+        //
+        $("#btnDP").on("click", function () {
+            $.post('/Perfil/DadosPessoais', function (result) {
+
+                if (result.failed) {
+                    console.log("wdwad");
+                    return false;
+                } else {
+                    $('#mod1').html(result);
+                    $("#btnDP").removeClass("btn-dark").addClass("btn-primary");
+                    $("#btnR").removeClass("btn-primary").addClass("btn-dark");
+                    $("#btnP").removeClass("btn-primary").addClass("btn-dark");
+                    $('#exampleModal').modal("show");
+                }
+
+            });
+        });
+    });
+</script>
+
+<div class="container w-100 d-flex">
+    <div class="card border-warning mb-3 btn-group-vertical m-3 align-items-center rounded-3" style="height:100% !important; width:11% !important;">
+        <span class="badge rounded-pill bg-@c.First() btn-outline-@c.Last() text-@c.Last() m-1"> @Model.Username </span>
+        <button id="btnDP" type="button" class="btn btn-primary">Dados Pessoais</button>
+        <button id="btnR" type="button" class="btn btn-dark ">Reservas</button>
+        <button id="btnP" type="button" class="btn btn-dark mb-1">Preferências</button>
+
+    </div>
+    <div id="divL" class="card border-success m-3 rounded-3" style="width:89% !important; min-height:100vh">
+        <div id="mod1"><partial name="_PartialViewDadosP" /></div>
+
+    </div>
+</div>
