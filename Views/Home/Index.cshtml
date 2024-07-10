@@ -4,41 +4,40 @@
     ViewData["Title"] = "Home Page";
 }
 
-
-<div id="carouselHero" class="carousel slide " data-bs-ride="carousel">
-    <div class="carousel-inner">
-            
-            @foreach (var item in Model){
-            
-
-                
-                       
-                            @if (item.Foto == Model.First().Foto) {
-                                <div class="carousel-item active" data-bs-interval="2000">
-                                    <img src="/Imagens/@item.Foto" class="d-block w-100 ">
+<div class="text-center text-warning-emphasis m-3">
+    <h1 class="text-center text-warning-emphasis>ESCAPE FROM SELLIUM</h1>
+</div>
+<div id="carouselHero" class="carousel slide m-4" style="min-height:550px" data-bs-ride="carousel">
+    <div class="carousel-inner">           
+        @foreach (var item in Model){
+  
+            @if (item.Foto == Model.First().Foto) {
+                <div class="carousel-item active" data-bs-interval="2000">
+                    <img src="/Imagens/@item.Foto" class="d-block w-100 ">
                     <div class="carousel-caption d-none d-md-block">
-                        <h5>@item.Tema</h5>
-                       
-                    </div>
-                                </div>
-                            } else {
-                                <div class="carousel-item" data-bs-interval="2000">
-                                    <img src="/Imagens/@item.Foto" class="d-block w-100" alt="...">
-                    <div class="carousel-caption d-none d-md-block">
-                        <h5>@item.Tema</h5>
-
-                    </div>
-                                </div>
-                            
-                             }
-
-        }
+                        <h5>@item.Tema</h5>                      
                     </div>
                 </div>
-           
-            
-           
+            } else {
+                 <div class="carousel-item" data-bs-interval="2000">
+                    <img src="/Imagens/@item.Foto" class="d-block w-100" alt="...">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>@item.Tema</h5>
+                    </div>
+                 </div>                           
+            }
+        }
     </div>
-
+</div>
+           
+<div class="m-4 mw-50">
+    <div class="card border-3 border-info m-4 rounded-4">
+        <h3 class="text-center text-success m-2">Conceito "Escape Room"</h3>
+        <p class="text-info text-center m-2">Para os mais desatentos, uma "escape room" é uma atividade de entretenimento onde um grupo de pessoas é 
+            trancado em uma sala temática e deve resolver uma série de enigmas e desafios 
+            dentro de um tempo determinado para escapar da sala. As salas são projetadas 
+            com cenários imersivos, variando de temas como mistérios, aventuras, ficção científica, 
+            horror e históricos.</p>
+    </div>
 </div>
 
