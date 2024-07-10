@@ -1,0 +1,233 @@
+﻿@model IEnumerable<EFS_23298_23327.Models.Reservas>
+
+@{
+    ViewData["Title"] = "Reservas";
+
+    var dicCores= new Dictionary<int, string>();
+    if(TempData["SalasCor"]!=null){
+         dicCores = (Dictionary<int, string>)@TempData["SalasCor"];
+
+    }
+    HashSet<int> numSalas = Model.Select(s => s.Sala.Numero).ToHashSet();
+   
+
+   
+    var salasLegenda = "";
+    foreach (var s in numSalas) {
+
+        salasLegenda += "<span class='me-2'>Sala " + s + "<i class='ms-2 bi bi-circle-fill' style='color:" + dicCores.GetValueOrDefault(s) + "'></i></span>";
+        salasLegenda += "\t\t";
+    }
+}
+
+<script>
+    function teste(id, nome) {
+        $('#nomeReserva').text(nome);
+        $('#apagarReserva').attr('action', '/Gerir/Reservaes/Delete/' + id);
+    }
+
+
+</script>
+
+<style>
+
+    /*https://stackoverflow.com/a/19670807*/
+    table {
+        border-collapse: collapse;
+    }
+
+    td {
+        position: relative;
+        padding: 5px 10px;
+    }
+
+    tr.strikeout td:before {
+        content: " ";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        z-index:9999 !important;
+        border-bottom: 5px solid red;
+        width: 100%;
+    }
+</style>
+<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header modal-header-danger">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar Reserva '<span id="nomeReserva">a</span>' ?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-footer ">
+
+                <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
+                <form id="apagarReserva"  method="post">
+                    <button type="submit" class="btn btn-danger">Apagar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h1>Reservas</h1>
+@if (@TempData["ReservaApagado"] != null) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Reserva <strong>@TempData["ReservaApagado"]</strong> apagado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (@TempData["NomeReservaCriado2"] != null) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Reserva <strong>@TempData["NomeReservaCriado2"]</strong> criado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (@TempData["ErroAdmin"] != null) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Html.Raw(@TempData["ErroAdmin"])
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@*
+<p>
+    <a asp-action="Create">
+        <button class="btn btn-info"> <i class="fa fa-add me-2"></i>Criar Reserva</button>
+    </a>
+
+</p>
+*@
+@if(TempData["SalasCor"] != null){
+<div id="cores" class="text-end"> @Html.Raw(@salasLegenda)</div>
+
+}
+<table class="table text-center table-bordered table-hover table-striped table-secondary">
+    <thead>
+        <tr class=" text-center">
+            <th class="">
+                @Html.DisplayNameFor(model => model.ReservaId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sala.Numero)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cliente.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservaDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservaEndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NumPessoas)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ListaAnfitrioes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cancelada)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DataCriacao)
+            </th>
+            <th>
+               Ações
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    
+
+        var salaCor="";
+        if(dicCores.Any()){
+            salaCor=dicCores.GetValueOrDefault((int)item.Sala.Numero);
+        }
+        var cancel="";
+        if(item.Cancelada){
+            cancel="strikeout";
+        }
+    
+
+            <tr class="table-primary  @cancel">
+                <td class="text-center align-items-center align-content-center">
+                    @Html.DisplayFor(modelItem => item.ReservaId)
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    <ul class="list-group list-group-horizontal">
+
+
+                        <li class="list-group-item text-white  flex-fill ms-2" style="background-color:@salaCor">@Html.DisplayFor(modelItem => item.Sala.Numero)</li>
+                    </ul>
+
+                
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                   
+                        @Html.DisplayFor(modelItem => item.Cliente.UserName)
+                   
+            </td>
+                <td class="text-center align-items-center align-content-center">
+               
+                        @Html.DisplayFor(modelItem => item.ReservaDate)
+               
+                
+            </td>
+                <td class="text-center align-items-center align-content-center">
+                    
+                        @Html.DisplayFor(modelItem => item.ReservaEndDate)
+                   
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                   
+                        @Html.DisplayFor(modelItem => item.NumPessoas)
+                   
+                </td>
+                <td class="text-center align-items-center align-content-center">
+
+                    @if (@item.ListaAnfitrioes.Any()) {
+                        <ul class="list-group list-group-horizontal">
+
+                            @foreach (var anf in @item.ListaAnfitrioes) {
+
+                                if (anf.UserName.Equals(@TempData["UserLogado"])) {
+                                    <li class="list-group-item text-white  border-success border-3 bg-secondary  flex-fill ms-2">@anf.PrimeiroNome @anf.UltimoNome</li>
+
+                                }else{
+                                    <li class="list-group-item text-white    bg-warning flex-fill ms-2">@anf.PrimeiroNome @anf.UltimoNome</li>
+
+                                }
+
+                             
+
+
+                            }
+                        </ul>
+
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @if(item.Cancelada){
+                        <span class="text-danger fw-bold">Sim</span>
+                    }else{
+                        <span class="text-success fw-bold">Não</span>
+                    }
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                @Html.DisplayFor(modelItem => item.DataCriacao)
+            </td>
+                <td class="align-content-center text-nowrap">
+                    <a asp-action="Edit" title="Editar" asp-route-id="@item.ReservaId"><i class="fa fa-pencil link-success icons-index"></i></a>
+                    <a asp-action="Details" title="Ver" asp-route-id="@item.ReservaId"><i class="fa-solid fa-circle-info icons-index"></i></a>
+                    <a data-bs-toggle="modal" title="Apagar" style="cursor:pointer" data-bs-target="#modalApagar" onclick="teste('@item.ReservaId','@item.ReservaId')"><i class="fa fa-trash icons-index link-danger delete"></i></a>
+                </td>
+        </tr>
+}
+    </tbody>
+</table>

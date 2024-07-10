@@ -1,0 +1,151 @@
+﻿@using Humanizer
+@model EFS_23298_23327.Models.Reservas
+
+@{
+    ViewData["Title"] = "Ver Reserva";
+    var strCorBorder = "border-secondary";
+if(Model.Cancelada){
+    strCorBorder = "border-danger border-5";
+}
+    
+}
+
+
+
+<div class="mt-4">
+    <a class="bi bi-arrow-left-circle-fill h2 me-5 text-info iconesConf" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
+</div>
+<h2 class="ms-2  mt-4">Ver Reserva <span style="color:mediumpurple"><strong>@Model.ReservaId</strong></span>  </h2>
+<div class="card text-center  @strCorBorder mb-3">
+    @if(Model.Cancelada){
+        <i class="bi bi-x text-danger float-end fa-2x">Cancelada!</i>
+    }
+    
+
+    <div class="card-header bg-primary">
+        
+        @if(Model.ReservaDate<=DateTime.Now){
+            <h3 class="float-end text-danger">Há @TimeSpan.FromHours((Model.ReservaDate - DateTime.Now).TotalHours).Humanize(2)</h3>
+
+        }else{
+            <h3 class="float-end text-success">Em @TimeSpan.FromHours((Model.ReservaDate - DateTime.Now).TotalHours).Humanize(2)</h3>
+
+        }
+
+    </div>
+    <div class="card-body  ">
+        <h5 class="card-title ">
+            <div class="row h2">
+                <div class="col text-info">
+                    @Html.LabelFor(m => m.Cliente)
+                </div>
+                <div class="col text-info">
+                    @Html.LabelFor(m => m.ReservaDate)
+                </div>
+                <div class="col text-info">
+                    @Html.LabelFor(m => m.ReservaEndDate)
+                </div>
+            </div>
+            <div class="row mt-5 h5">
+                <div class="col">
+                    @Model.Cliente.getUserNameString()
+                </div>
+                <div class="col">
+                    <span class="text-success">@Model.ReservaDate</span>
+                </div>
+                <div class="col">
+                    <span class="text-danger">@Model.ReservaEndDate</span>
+                </div>
+            </div>
+        </h5>
+        
+        <p class="card-text">
+        
+    </div>
+
+    <div class="card-footer mt-5 ">
+        <hr class="border-white" > </hr>
+        <div class="row h6 mt-5">
+            <div class="col">
+                @Html.LabelFor(m => m.NumPessoas):  @Model.NumPessoas
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.TemaNome): <span class="text-@DifficultiesValue.GetDifficultyColor((int)@Model.TemaDif)" > @Model.TemaNome</span>
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.DataCriacao): @Model.DataCriacao
+            </div>
+        </div>
+
+        <div class="row h6 mt-5">
+            <div class="col">
+                @Html.LabelFor(m => m.TotalPreco):  @Model.TotalPreco€
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.Sala):<span class="ms-1   " style="color:green;">@Html.DisplayFor(modelItem => modelItem.Sala.Numero)</span>
+                    
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.Cancelada):  @if (Model.Cancelada) {
+                    <span class="text-danger fw-bold">Sim</span>
+                } else {
+                    <span class="text-success fw-bold">Não</span>
+                }
+            </div>
+        </div>
+        <div class="mt-5">
+        <span class="align-content-center mt-5 text-center">@Html.LabelFor(m => m.ListaAnfitrioes)</span>
+        <ul class="list-group text-break list-group-horizontal mt-2 mb-2">
+
+
+
+            @foreach (var anf in Model.ListaAnfitrioes) {
+
+                if (anf.UserName.Equals(@TempData["UserLogado"])) {
+                    <li class='list-group-item text-white border-success border-3 bg-secondary flex-fill ms-2' data-bs-toggle='tooltip' data-html='true' data-bs-placement='top' title='EU'>@anf.getUserNameString()</li>
+
+                } else {
+                    <li class='list-group-item text-white bg-warning flex-fill ms-2'>@anf.getUserNameString()</li>
+                }
+
+
+            }
+        </ul>
+    </div>
+        <a asp-route-id="@Model?.ReservaId" asp-action="Edit">
+            <button class="btn btn-success float-start mt-lg-5"> <i class="fa fa-pencil me-2"></i>Editar Reserva</button>
+        </a>
+        @if((bool)TempData["Cancelavel"]){
+            <a asp-route-id="@Model?.ReservaId" asp-action="Edit">
+                <button class="btn btn-danger float-end mt-lg-5"> <i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button>
+            </a>
+        }else{
+            <button class="btn btn-danger float-end mt-lg-5 pe-auto" disabled data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html='true' title="As reservas apenas podem ser canceladas até <strong>48h antes da data marcada</strong>"> <i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button>
+
+        }
+        
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+  
+    
+<script>
+   
+</script>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

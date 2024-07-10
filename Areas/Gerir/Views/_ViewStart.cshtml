@@ -5,6 +5,9 @@
     <li class="nav-item">
         <a id="salas" class="nav-link text-white" asp-area="Gerir" asp-controller="Salas" asp-action="Index">Salas</a>
     </li>
+    <li class="nav-item">
+        <a id="reservas" class="nav-link text-white" asp-area="Gerir" asp-controller="ReservasGerir" asp-action="Index">Reservas</a>
+    </li>
 
     @if (User.IsInRole("Admin")) {
         <li class="nav-item">

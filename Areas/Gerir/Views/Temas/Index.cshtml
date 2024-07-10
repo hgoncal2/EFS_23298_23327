@@ -110,13 +110,13 @@
         @foreach (var item in Model) {
 
             <tr class="text-center table-primary align-text-top">
-                <td scope="row">
+                <td scope="row" class="text-center align-items-center align-content-center">
                     @Html.DisplayFor(modelItem => item.TemaId)
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
                     @Html.DisplayFor(modelItem => item.Nome)
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
                     @if (item.MinPessoas != null) {
                         <div style="width:15vw ;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" title="@item.Descricao">
                             @Html.DisplayFor(modelItem => item.Descricao)
@@ -128,10 +128,10 @@
                         <span>N.A.</span>
                     }
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
                     @Html.DisplayFor(modelItem => item.TempoEstimado) Minutos
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
 
                     @if (item.MinPessoas != null) {
 
@@ -142,7 +142,7 @@
                         <span>N.A.</span>
                     }
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
                     @if (item.MinPessoas != null) {
 
                         @Html.DisplayFor(modelItem => item.MaxPessoas)
@@ -152,12 +152,12 @@
                         <span>N.A.</span>
                     }
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
                     <span class="text-@DifficultiesValue.GetDifficultyColor((int) item.Dificuldade)">
                         @Html.DisplayFor(modelItem => item.Dificuldade)
                     </span>
                 </td>
-                <td class="align-content-center">
+                <td class="text-center align-items-center align-content-center">
 
 
 
@@ -193,7 +193,7 @@
                     }
 
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
                     @if (item.Sala != null) {
                         <ul class="list-group list-group-horizontal">
 
@@ -205,7 +205,7 @@
                         <span>N.A.</span>
                     }
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
                     @if (item.Preco != null) {
 
 
@@ -219,7 +219,7 @@
                         <span>N.A.</span>
                     }
                 </td>
-                <td class="text-center">
+                <td class="text-center align-items-center align-content-center">
                     @if (item.Icone != null) {
 
 
@@ -234,10 +234,10 @@
                         <span>N.A.</span>
                     }
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
                     @Html.DisplayFor(modelItem => item.DataCriacao)
                 </td>
-                <td>
+                <td class="text-center align-items-center align-content-center">
                     @Html.DisplayFor(modelItem => item.CriadoPorUsername)
                 </td>
                 <td class="align-content-center text-nowrap">

@@ -54,5 +54,9 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
         this.Email = r.Email;
     }
 
+    public String getUserNameString() {
+        return this.PrimeiroNome + " " + this.UltimoNome;
+    }
+
 }
 
