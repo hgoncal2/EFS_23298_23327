@@ -556,6 +556,7 @@ else
                                 id:'@i.ReservaId',
                                 start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                                 end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                className:'@i.ReservaId',
                                 @if (i.ReservaDate < DateTime.Now) {
                     @: description: 'Reserva @i.ReservaId - Sala @i.Sala.Numero -  @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize() atrás',
 
@@ -606,7 +607,7 @@ else
                                  @: title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
 
                              }
-
+                             className:'@i.ReservaId',
                              
                 @if(i.ReservaEndDate<DateTime.Now){
                     @:display:'background',
@@ -818,17 +819,23 @@ else
               var difStr = info.extendedProps.diffStr;
                   var salaColor= info.extendedProps.salaColor;
               calendar.gotoDate(info.start);
-              info.setProp( "borderColor","yellow");
+              var el = "."+info.extendedProps.idReserva
+              
+              
+
+             
                //info.setProp( "backgroundColor","yellow");
                    $('html, body').animate({
-        scrollTop: $('#calendar').offset().top}, 'slow');
-        
-});
+        scrollTop: $(el).offset().top}, 'slow');
+         info.setProp( "backgroundColor","black");
+         info.setProp( "borderColor","yellow");
+
+
+   });
 
 
 
             calendar.render();
-
             
 
 
@@ -845,4 +852,5 @@ else
 
                   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
 <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
 }

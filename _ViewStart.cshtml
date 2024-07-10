@@ -1,5 +1,19 @@
-﻿@{
+﻿
+@{
     Layout = "_Layout";
+    @functions {
+
+
+        public string GetHumanReadableCount(string s, int c) {
+            return s.ToQuantity(c);
+
+
+
+        }
+
+
+
+    }
 }
 
 

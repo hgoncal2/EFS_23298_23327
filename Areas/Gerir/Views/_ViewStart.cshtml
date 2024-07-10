@@ -1,4 +1,15 @@
-﻿<ul class="nav nav-pills">
+﻿@functions {
+
+
+    public string GetHumanReadableCount(string s, int c) {
+        return s.ToQuantity(c);
+
+
+
+    }
+ }
+
+<ul class="nav nav-pills">
     <li class="nav-item">
         <a id="temas" class="nav-link text-white " asp-area="Gerir" asp-controller="Temas" asp-action="Index">Temas</a>
     </li>

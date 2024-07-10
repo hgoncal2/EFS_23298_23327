@@ -14,6 +14,7 @@ using EFS_23298_23327.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Antiforgery;
 using Humanizer;
+using System.Globalization;
 
 namespace EFS_23298_23327.Controllers
 {
@@ -72,12 +73,15 @@ namespace EFS_23298_23327.Controllers
                 return NotFound();
             }
 
-            var tema = await _context.Temas.Include(f => f.ListaFotos.Where(f => f.Deleted == false)).Include(s => s.Sala).ThenInclude(s => s.ListaReservas.Where(r=>!r.Cancelada)).ThenInclude(s => s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaID == id).FirstOrDefaultAsync();
+            var tema = await _context.Temas.Include(f => f.ListaFotos.Where(f => f.Deleted == false)).Include(s => s.Sala).ThenInclude(s => s.ListaReservas.Where(r=>!r.Cancelada || !r.Deleted)).ThenInclude(s => s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaID == id).FirstOrDefaultAsync();
             if (tema == null) {
                 return NotFound();
             }
 
+
+           
             ReservaViewModel rvm = new ReservaViewModel(tema.Sala, tema);
+            rvm.Sala.ListaReservas = rvm.Sala.ListaReservas.Where(r => !r.Cancelada).ToList();
             if (TempData["viewStart"] != null && TempData["viewEnd"] != null) {
                 rvm.viewStart = (DateTime)TempData["viewStart"];
                 rvm.viewEnd = (DateTime)TempData["viewEnd"];

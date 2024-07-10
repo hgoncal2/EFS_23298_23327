@@ -33,7 +33,7 @@
     }
 
 
-    var nResSemana = Model.Sala.ListaReservas.Where(r => ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now)).Count();
+    var nResSemana = Model.Sala.ListaReservas.Where(r => !r.Cancelada && ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now)).Count();
 
 }
 
@@ -167,6 +167,7 @@
         $('html, body').animate({
     @if (Model.viewStart != DateTime.MinValue && ViewBag.erroUserAuth == null) {
         @:scrollTop: $('#calendar').offset().top}, 'slow');
+        //scrollToTime
     } else {
         @:scrollTop: $('#tema').offset().top}, 'slow');
     }
@@ -201,9 +202,13 @@
         selectOverlap: false,
         nowIndicator: true,
         selectable: true,
-        validRange: {
-            start: '@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")'
-        },
+       slotLaneClassNames:function(arg) {
+          
+       if(arg.date>new Date()) {
+           console.log("entrei")
+           return ['custom_pointer'];
+       }
+    },
         eventColor: '#2a602a',
         selectAllow: function (info) {
             console.log(info.start >= new Date())

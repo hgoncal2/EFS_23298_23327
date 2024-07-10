@@ -1,3 +1,4 @@
+
 html {
   font-size: 14px;
 }
@@ -20,12 +21,22 @@ html {
 
     width:100vw;
 }
-#clr-picker{
-    z-index:9999999 !important;
+.teste {
+    background-color:yellow !important;
+}
+fc-v-event{
+    border: 3px solid red !important;
+}
+#clr-picker {
+    z-index: 9999999 !important;
 }
 .clr-picker{
 z-index: 9999999 !important;
 }
+.custom_pointer {
+    cursor: pointer !important;
+}
+
 
 .clr-picker {
     z-index: 9999999 !important;

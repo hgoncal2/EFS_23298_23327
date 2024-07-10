@@ -20,9 +20,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="App_Code\" />
     <Folder Include="Areas\Gerir\Data\" />
     <Folder Include="Areas\Gerir\Models\" />
     <Folder Include="Areas\Gerir\Views\Shared\" />
