@@ -60,10 +60,10 @@ namespace EFS_23298_23327.Controllers
         public async Task<IActionResult> Reservas()
         {
             var user = await _context.Utilizadores.FindAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            HashSet<string> roles = _userManager.GetRolesAsync(user).Result.ToHashSet();
-            var vm = new UtilizadoresViewModel(user);
-            vm.Roles = roles;
-            return PartialView("_PartialViewReservas", vm);
+            var c = await _context.Clientes.Where(c => c.UserName.Equals(user.UserName)).FirstAsync();
+            var r = await _context.Reservas.Where(r => r.Cliente.UserName.Equals(user.UserName)).ToListAsync();
+            var vm = new Reservas(c);
+            return PartialView("_PartialViewReservas", r);
 
         }
 
