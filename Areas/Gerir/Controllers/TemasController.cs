@@ -12,6 +12,7 @@ using System.Security.Claims;
 using EFS_23298_23327.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using System.Globalization;
+using System.Linq.Dynamic.Core;
 
 namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
@@ -263,6 +264,139 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
             return View(temas);
         }
+        [HttpGet]
+        public async Task<IActionResult> Filter(Dictionary<string, string> dictVals, String last) {
+
+            //Se tem filtro de Anfitriões
+            var hasAnfs = false;
+            var Temas = new List<Temas>();
+            //Inicializa query varia Anfitriões
+            var queryAnf = "";
+            var ListaAnfs = new List<string>();
+            
+            //O dicionário contém "dic" se não houver valores filtrados(excepto anfitriões,não arranjei forma de passar o array no dicionário).Se não houver filtros de texto e não houver filtro de Anfitriões,devolve lista normal
+
+            if (dictVals.ContainsKey("dic") || (dictVals.Count() == 1 && dictVals.ContainsKey("last"))) {
+                Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s=>s.Sala).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+                //Se só houver filtro de anfitriões
+            }
+            
+             else {
+                //Inicializa variáveis a string vazia.Vão ser necessárias para saber que tipo de filtro precisamos(importante para os OrderBys)
+                var query = "";
+                var orderby = "";
+                var orderType = "";
+                //Por cada valor no dicionário(Campo,Valor a filtrar)
+                foreach (var val in dictVals) {
+                    //Se o campo for data/anfs,vamos ignorar por agora
+                    if (!val.Key.ToLower().Contains("dat")) {
+                        if (val.Key.ToLower().Contains("dificuldade")){
+                            query += @val.Key.Replace("_", ".") + "==" + val.Value;
+                            TempData["lastVal"] = val.Value;
+                        } else {
+                            //Se for um campo boolean,a expressão vai ser diferente,temos que ter isso em conta
+
+                            //Se for campo de texto normal(mesmo que seja int,estou a converter para string para fazer o includes)
+                            query += @val.Key.Replace("_", ".") + ".toString().Contains(\"" + val.Value + "\")";
+                        }
+                       
+                        
+                        //Se não for o ultimo valor do dicionário,dá append do "And" para continuar a preencher os campos da query
+                        if (!val.Equals(dictVals.Last())) {
+                            query += " && ";
+                        }
+                    } else {
+                        //Se for data,vamos guardar que tipo de data é(Data inicial reserva,final,ou data criada)
+                        orderby = val.Key;
+                        //Tal como o tipo(desc,asc)
+                        orderType = val.Value;
+                    }
+
+                }
+                //Se a string da query acabar com os caracteres "&&",vamos removê-los
+                if (query.Trim().EndsWith("&&")) {
+                    query = query.Substring(0, query.LastIndexOf("&") - 1);
+
+                }
+                if (query == "") {
+                    //Se query estiver vazia,quer dizer que so foi feito um filtro de datas
+                    if (hasAnfs) {
+                        //Ter em conta se foi efetuaod filtro nos anfitriões
+                        Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).Where(queryAnf, ListaAnfs).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                    } else {
+                        //Se não houver filtro de anfitriões
+                        Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).OrderBy(orderby + " " + orderType).ToListAsync();
+                    }
+
+
+                } else {
+                    if (orderby == "") {
+                        //Se orderBy tiver vazio,e a query não estiver vazia,filtra pelos campos e usa a order por defeito
+                        if (hasAnfs) {
+                            Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).Where(query).Where(queryAnf, ListaAnfs).ToListAsync();
+
+                        } else {
+                            Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).Where(query).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+                        }
+
+                    } else {
+                        if (hasAnfs) {
+                            Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f=>!f.Deleted)).Include(s => s.Sala).Where(query).Where(queryAnf, ListaAnfs).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                        } else {
+                            Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).Where(query).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                        }
+
+
+                    }
+
+
+                }
+
+
+            }
+
+           
+
+            //Ussado para fazer a border do anfitrião
+            TempData["UserLogado"] = User.FindFirstValue(ClaimTypes.Name);
+
+            //Volta a enviar os valores do dicionário de filtros de modo a manter o estado em que estava
+            TempData["dicVals"] = dictVals;
+           
+            //Usado para fazer a legenda
+           
+            //Usado para manter o foco no último campo em que estava a ser escrito
+            TempData["Last"] = last;
+
+
+            //E finalmente,dá return com o novo modelo "filtrado"
+
+            return PartialView("_partialTemasTabela", Temas);
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // POST: /Gerir/Temas/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.

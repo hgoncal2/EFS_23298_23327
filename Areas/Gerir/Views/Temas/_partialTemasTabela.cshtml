@@ -1,148 +1,105 @@
-﻿@model IEnumerable<EFS_23298_23327.Models.Temas>
-@using EFS_23298_23327.Data
-@using EFS_23298_23327.Data.Enum
+﻿@model IEnumerable<Temas>
+@using EFS_23298_23327.Data.Enum    
+
 @{
-    ViewData["Title"] = "Index";
-}
 
 
-<script>
-    function teste(id, nome) {
-        $('#nomeTema').text(nome);
-        $('#apagarTema').attr('action', 'Gerir/Temas/Delete/' + id);
+
+    var dicVals = new Dictionary<string, string>();
+    if (TempData["dicVals"] != null)
+    {
+        dicVals = (Dictionary<string, string>)@TempData["dicVals"];
+
     }
+  
 
-
-</script>
-<style>
+   // HashSet<String?> anfs = Model.SelectMany(a => a.ListaAnfitrioes).Select(a => a).ToHashSet();
     
-</style>
-<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
-        <div class="modal-content">
-            <div class="modal-header modal-header-danger">
-                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar tema '<span id="nomeTema">a</span>' ?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-footer ">
 
-                <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
-                <form id="apagarTema" method="post">
-                    <button type="submit" class="btn btn-danger">Apagar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
-<h1>Temas</h1>
-@if (TempData["MensagemErro"] != null) {
-    <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
-        @Html.Raw(TempData["MensagemErro"])
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
 
 }
-@if (TempData["TemaApagado"] != null) {
-    <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
-        Tema <strong>@TempData["TemaApagado"]</strong> apagado com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (@TempData["NomeTemaCriado"] != null) {
-    <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
-        Tema <strong>@TempData["NomeTemaCriado"]</strong> criado com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-<p>
-    <a asp-action="Create">
-        <button class="btn btn-info"> <i class="fa fa-add me-2"></i>Criar tema</button>
-    </a>
 
-</p>
-
-<div id="tabela">
 <span class="text-center text-white mb-2">@AppUtils.GetHumanReadableCount("resultado", Model.Count())</span>
 
-    <table id="temas" class="table table-bordered table-sm table-hover table-striped " style="border-collapse: collapse;">
+<table id="temas" class="table table-bordered table-sm table-hover table-striped ">
     <thead class="text-center  table-info">
         <tr>
-               
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.Nome)<br />
+            <th>
+                @Html.DisplayNameFor(model => model.TemaId)
+                <input class="w-100 filter" id="TemaId" onkeyup="filter(this)"></input>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
                 <input class="w-100 filter" id="Nome" onkeyup="filter(this)"></input>
 
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.Descricao)<br />
+            <th>
+                @Html.DisplayNameFor(model => model.Descricao)
                 <input class="w-100 filter" id="Descricao" onkeyup="filter(this)"></input>
 
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.TempoEstimado)<br />
+            <th>
+                @Html.DisplayNameFor(model => model.TempoEstimado)
                 <input class="w-100 filter" id="TempoEstimado" onkeyup="filter(this)"></input>
 
 
             </th>
-            <th class="w-100 text-nowrap">
-                @Html.DisplayNameFor(model => model.MinPessoas)<br />
+            <th>
+                @Html.DisplayNameFor(model => model.MinPessoas)
                 <input class="w-100 filter" id="MinPessoas" onkeyup="filter(this)"></input>
 
 
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.MaxPessoas)<br />
+            <th>
+                @Html.DisplayNameFor(model => model.MaxPessoas)
                 <input class="w-100 filter" id="MaxPessoas" onkeyup="filter(this)"></input>
 
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.Dificuldade)<br />
-                    <select class="form-select w-100 text-white bg-primary w-100  filter" id="Dificuldade" >
-                        <option class="text-white" value="Dificuldade">Todas</option>
-                        @foreach (var dif in Html.GetEnumSelectList<Dificuldade>()) {
-                            <option class="text-@DifficultiesValue.GetDifficultyColorStr(dif.Value)" value="@dif.Value">@dif.Text</option>
-                        }
-                    </select>
+            <th>
+                @Html.DisplayNameFor(model => model.Dificuldade)
+                <select class="form-select text-white bg-primary filter" id="Dificuldade">
+                    <option class="text-white" value="Dificuldade">Todas</option>
+                    @foreach (var dif in Html.GetEnumSelectList<Dificuldade>()) {
+                        <option class="text-@DifficultiesValue.GetDifficultyColorStr(dif.Value)" value="@dif.Value">@dif.Text</option>
+                    }
+                </select>
             </th>
-                <th class="w-100 text-nowrap">
-                    <br />
+            <th class="th-lg">
                 @Html.DisplayNameFor(model => model.ListaFotos)
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.Sala)<br />
+            <th>
+                @Html.DisplayNameFor(model => model.Sala)
                 <input class="w-100 filter" id="Sala_Numero" onkeyup="filter(this)"></input>
 
             </th>
-            <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.Preco)<br />
+            <th>
+                @Html.DisplayNameFor(model => model.Preco)
                 <input class="w-100 filter" id="Preco" onkeyup="filter(this)"></input>
 
             </th>
-                <th class="w-100 text-nowrap">
+            <th>
                 @Html.DisplayNameFor(model => model.Icone)
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.DataCriacao)<br />
-                    <div>
-                        <i class="bi bi-arrow-down-short" style="cursor:pointer" id="DataCriacao_desc" onclick="filter(this)"></i> <i class="bi bi-arrow-up-short" id="DataCriacao_asc" onclick="filter(this)" style="cursor:pointer"></i>
-
-                    </div>
+            <th>
+                @Html.DisplayNameFor(model => model.DataCriacao)
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.CriadoPorUsername)<br />
+            <th>
+                @Html.DisplayNameFor(model => model.CriadoPorUsername)
                 <input class="w-100 filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
 
             </th>
             <th>Ações</th>
         </tr>
     </thead>
-        <tbody style="font-size: 15px">
+    <tbody>
 
         @foreach (var item in Model) {
 
             <tr class="text-center table-primary align-text-top">
-                
+                <td scope="row" class="text-center align-items-center align-content-center">
+                    @Html.DisplayFor(modelItem => item.TemaId)
+                </td>
                 <td class="text-center align-items-center align-content-center">
                     @Html.DisplayFor(modelItem => item.Nome)
                 </td>
@@ -280,47 +237,73 @@
     </tbody>
 
 </table>
-</div>
 
-<script>
-  
-</script>
+                    <script>
 
-@Html.AntiForgeryToken()
-<script>
-                   
-    $("#Dificuldade").on("change",function(){
+    $("#Dificuldade").on("change", function () {
         console.log($(this).val())
-        filter($(this))
+        var el = $("#Dificuldade");
+        if(el.val()!="Dificuldade"){
+            el.removeClass("text-white")
+        }
+        console.log(el.val() == "0")
+        if(el.val()=="0"){
+            el.addClass("text-@DifficultiesValue.GetDifficultyColor(0)")
+            console.log(el.val() == "0")
+        }
+        if(el.val()=="1"){
+            el.addClass("text-@DifficultiesValue.GetDifficultyColor(1)")
+        }
+        if (el.val() == "2") {
+            el.addClass("text-@DifficultiesValue.GetDifficultyColor(2)")
+        }
+        if (el.val() == "3") {
+            el.addClass("text-@DifficultiesValue.GetDifficultyColor(3)")
+
+        }
+        if ('@TempData["lastVal"]' != el.val()) {
+            filter(el);
+        }
     })
-    
-    function filter(el) {
-        var dictCores = new Object();
+    $(".table").ready(function () {
+        var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
         var dictVals = new Object();
-        var dictSalasNum = new Object();
-
-        var lastId = "#" + $(el).attr('id')
-        console.log(lastId)
-        $('.filter').each(function (i, obj) {
-
-            if (obj.value != null && obj.value != "") {
-                dictVals[$(obj).attr('id')] = obj.value
-            }
-
-        });
-        if ($(el).attr('id').toLowerCase().indexOf("dat") >= 0) {
-            var arr = $(el).attr('id').split("_");
-            dictVals[arr[0]] = arr[1];
-        }
-
        
-        $.get("/Gerir/Temas/Filter", { dictVals: dictVals,last: lastId,}, function (data, status) {
-            $("#tabela").html(data)
+
+
+    @foreach (var i in dicVals)
+    {
+        @:$("#@i.Key").val("@i.Value").change();
+        @:console.log("#@i.Key");
+    }
+        })
 
 
 
 
-        });
-        }
 
-</script>
+
+
+
+
+
+
+
+
+
+    
+              var lastId = "@TempData["Last"]";
+ 
+
+   
+
+    if ( lastId.toLowerCase().indexOf("dificuldade") >= 0 || lastId.toLowerCase().indexOf("dat") >= 0) {
+
+    } else {
+        var fldLength = $(lastId).val().length;
+        $(lastId).focus();
+        $(lastId)[0].setSelectionRange(fldLength, fldLength);
+    }
+                    </script>

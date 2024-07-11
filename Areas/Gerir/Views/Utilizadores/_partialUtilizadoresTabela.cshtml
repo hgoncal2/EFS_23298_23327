@@ -64,10 +64,7 @@
 
 
 
-                        <option class=" text-white bg-warning flex-fill" value="@i">@i</option>
-
-
-
+                        <option class=" text-white bg-@RolesColourValue.GetRoleColour(i) flex-fill" value="@i">@i</option>
 
                     }
                 </select>
@@ -144,21 +141,11 @@
                         <ul class="list-group list-group-horizontal">
                             @foreach (var role in dictRoles.GetValueOrDefault(item.Id))
                             {
-                                @if (role.Equals("Admin"))
-                                {
-                                    <li class="list-group-item text-white  bg-danger flex-fill ms-2">@role</li>
+                               
+                                
+                                    <li class="list-group-item text-white  bg-@RolesColourValue.GetRoleColour(role) flex-fill ms-2">@role</li>
 
-                                }
-                                @if (role.Equals("Anfitriao"))
-                                {
-                                    <li class="list-group-item text-white  bg-warning flex-fill ms-2">@role</li>
-
-                                }
-                                @if (role.Equals("Cliente"))
-                                {
-                                    <li class="list-group-item text-white  bg-success flex-fill ms-2">@role</li>
-
-                                }
+                                
 
 
 
