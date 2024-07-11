@@ -30,12 +30,12 @@
         <tr>
             <th class="w-100 text-nowrap">
 
-                <span>@Html.DisplayNameFor(model => model.Numero)</span><br/>
-                <input class="w-75 filter" id="Numero" onkeyup="filter(this)"></input>
+                <span>@Html.DisplayNameFor(model => model.Numero)</span><br />
+                <input class="w-100 filter" id="Numero" onkeyup="filter(this)"></input>
             </th>
             <th class="w-100 text-nowrap">
                 @Html.DisplayNameFor(model => model.Area)<br />
-                <input class="w-75 filter" id="Area" onkeyup="filter(this)"></input>
+                <input class="w-100 filter" id="Area" onkeyup="filter(this)"></input>
             </th>
 
             <th class="w-100 text-nowrap">
@@ -43,17 +43,13 @@
                     @Html.DisplayNameFor(model => model.ListaAnfitrioes)<br />
                     <select multiple="multiple" id="ListaAnfitrioes" class="form-control  multiple-checkboxes">
 
-                        @foreach (var i in @anfs)
-                        {
+                        @foreach (var i in @anfs) {
 
 
-                            if (i.UserName.Equals(@TempData["UserLogado"]))
-                            {
+                            if (i.UserName.Equals(@TempData["UserLogado"])) {
                                 <option class=" text-white  border-success border-3 bg-secondary flex-fill" value="@i.Id">@i.PrimeiroNome @i.UltimoNome</option>
 
-                            }
-                            else
-                            {
+                            } else {
                                 <option class=" text-white bg-warning flex-fill" value="@i.Id">@i.PrimeiroNome @i.UltimoNome</option>
 
                             }
@@ -63,10 +59,11 @@
                     </select>
                 </div>
 
+
             </th>
             <th class="w-100 text-nowrap">
                 Nº Reservas<i class=" ms-2 bi bi-patch-question" data-bs-toggle="tooltip" data-html="true" data-bs-placement="top" data-bs-html='true' title="Nº de reservas restantes <strong>da semana atual</strong> "></i><br />
-                <input class="w-75 filter" id="NumReservas" onkeyup="filter(this)"></input>
+                <input class="w-100 filter" id="NumReservas" onkeyup="filter(this)"></input>
             </th>
             <th class="w-100 text-nowrap">
                 @Html.DisplayNameFor(model => model.DataCriacao)<br />
@@ -75,9 +72,9 @@
 
                 </div>
             </th>
-            <th>
+            <th class="w-100 text-nowrap">
                 @Html.DisplayNameFor(model => model.CriadoPorUsername)<br />
-                <input class="w-75 filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
+                <input class="w-100 filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
             </th>
 
             <th>Ações</th>

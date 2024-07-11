@@ -199,7 +199,13 @@
 
 </form>
 
+
+<form id="apagarTema" method="post" asp-action="EliminaFotos" asp-route-id="@Model.TemaId">
+    <button class="btn btn-danger align-self-end" title="Eliminar Todas"> <i class="fa fa-trash me-2"></i>Eliminar todas</button>
+</form>
+<br />
 <div class="row">
+    
 
     @foreach (var foto in @Model.ListaFotos)
     {

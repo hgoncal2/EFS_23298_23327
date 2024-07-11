@@ -16,8 +16,6 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css" />
     
-    <link href="~/lib/fancybox/css/fancybox.css" rel="stylesheet" />
-    <script src="~/lib/fancybox/js/fancybox.umd.js"></script>
 
     
    
@@ -27,8 +25,10 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" asp-append-version="true" />
     <script src="~/js/site.js" asp-append-version="true"></script>
-    
-    
+
+    <link href="~/lib/fancybox/css/fancybox.css" rel="stylesheet" />
+    <script src="~/lib/fancybox/js/fancybox.umd.js"></script>
+
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js"></script>
 
     <link rel="stylesheet" href="~/css/vapor.min.css" asp-append-version="true" />
@@ -180,6 +180,9 @@
     <script src="~/lib/multiselect/bootstrap-multiselect.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script>
+        Fancybox.bind("[data-fancybox]", {
+            // Your custom options
+        });
     </script>
 
 

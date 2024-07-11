@@ -27,39 +27,40 @@
 <table class="table text-center table-bordered table-hover table-striped table-secondary">
     <thead>
         <tr class="table-info text-center">
-            <th class="">
-                @Html.DisplayNameFor(model => model.Id)
-                <input class="w-75 filter" id="Id" onkeyup="filter(this)"></input>
+            <th class="w-100">
+                <span class="w-100">@Html.DisplayNameFor(model => model.Id)</span><br />
+                <input class="w-100 filter" style="width:100%" id="Id" onkeyup="filter(this)"></input>
             </th>
-            <th>
+            <th class="w-100">
                 @Html.DisplayNameFor(model => model.UserName)
-                <input class="w-75 filter" id="UserName" onkeyup="filter(this)"></input>
+                <input class="w-100 filter" id="UserName" onkeyup="filter(this)"></input>
             </th>
-            <th>
+            <th class="w-100 text-nowrap">
                 @Html.DisplayNameFor(model => model.PrimeiroNome)
-                <input class="w-75 filter" id="PrimeiroNome" onkeyup="filter(this)"></input>
+                <br />
+                <input class="w-100 filter" id="PrimeiroNome" onkeyup="filter(this)"></input>
 
 
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UltimoNome)
-                <input class="w-75 filter" id="UltimoNome" onkeyup="filter(this)"></input>
+            <th class="w-100 text-nowrap">
+                @Html.DisplayNameFor(model => model.UltimoNome) <br />
+                <input class="w-100  filter" id="UltimoNome" onkeyup="filter(this)"></input>
 
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-                <input class="w-75 filter" id="Email" onkeyup="filter(this)"></input>
+            <th class="w-100 text-nowrap">
+                @Html.DisplayNameFor(model => model.Email) <br />
+                <input class="w-100  filter" id="Email" onkeyup="filter(this)"></input>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CriadoPorUsername)
-                <input class="w-75 filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
+            <th class="w-100 text-nowrap">
+                @Html.DisplayNameFor(model => model.CriadoPorUsername) <br />
+                <input class="w-100  filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
             </th>
-            <th>
+            <th class="w-100 text-nowrap">
                 @* @Html.DisplayNameFor(model => model.Roles)*@Roles
+                <br />
                 <select multiple="multiple" id="ListaRoles" class="form-control  multiple-checkboxes">
 
-                    @foreach (var i in @roles)
-                    {
+                    @foreach (var i in @roles) {
 
 
 
@@ -75,12 +76,13 @@
 
 
             </th>
-            <th>
+            <th class="w-100 text-nowrap">
                 @Html.DisplayNameFor(model => model.DataCriacao)
+                <br />
                 <i class="bi bi-arrow-down-short" style="cursor:pointer" id="DataCriacao_desc" onclick="filter(this)"></i> <i class="bi bi-arrow-up-short" id="DataCriacao_asc" onclick="filter(this)" style="cursor:pointer"></i>
 
             </th>
-            <th></th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>

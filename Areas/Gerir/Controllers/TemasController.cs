@@ -500,6 +500,32 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return NotFound();
         }
 
+        [HttpPost, ActionName("EliminaFotos")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminaFotos(int id) {
+
+
+            var tema = await _context.Temas.Include(t => t.ListaFotos).Where(t => t.TemaId == id).FirstOrDefaultAsync();
+           
+            if (tema != null && tema.ListaFotos.Any()) {
+
+                foreach(var f in tema.ListaFotos) {
+                    f.Deleted = true;
+                }
+
+                _context.UpdateRange(tema.ListaFotos);
+                await _context.SaveChangesAsync();
+
+                TempData["FotoEliminada"] = true;
+                return RedirectToAction(nameof(Edit), new { id = tema.TemaId });
+
+            } else {
+                return NotFound();
+            }
+
+            return NotFound();
+        }
+
 
 
         private bool TemasExists(int id) {
