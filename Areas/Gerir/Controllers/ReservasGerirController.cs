@@ -31,7 +31,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         public async Task<IActionResult> Index() {
             //todos os utilizadores não apagados
             
-            var reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a=>a.ListaAnfitrioes).Include(c=>c.Cliente).Include(s=>s.Sala).OrderBy(u => u.ReservaDate).ToListAsync();
+            var reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a=>a.ListaAnfitrioes).Include(c=>c.Cliente).Include(s=>s.Sala).OrderByDescending(u => u.DataCriacao).ToListAsync();
             var ud = User.FindFirstValue(ClaimTypes.NameIdentifier);
             TempData["UserLogado"] = User.FindFirstValue(ClaimTypes.Name);
 
@@ -143,7 +143,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             //O dicionário contém "dic" se não houver valores filtrados(excepto anfitriões,não arranjei forma de passar o array no dicionário).Se não houver filtros de texto e não houver filtro de Anfitriões,devolve lista normal
 
             if (dictVals.ContainsKey("dic") && !dictVals.ContainsKey("anfs")) {
-                reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Include(c => c.Cliente).Include(s => s.Sala).OrderBy(u => u.ReservaDate).ToListAsync();
+                reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Include(c => c.Cliente).Include(s => s.Sala).OrderByDescending(u => u.DataCriacao).ToListAsync();
 
                 //Se só houver filtro de anfitriões
             }if (dictVals.ContainsKey("dic") && dictVals.ContainsKey("anfs")) {
@@ -154,7 +154,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
                 } else {
                     //Devolve lista normal,pois não caiu no primeiro "if"
-                    reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Include(c => c.Cliente).Include(s => s.Sala).OrderBy(u => u.ReservaDate).ToListAsync();
+                    reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Include(c => c.Cliente).Include(s => s.Sala).OrderByDescending(u => u.DataCriacao).ToListAsync();
 
 
                 }
@@ -215,7 +215,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                             reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Include(c => c.Cliente).Include(s => s.Sala).Where(query).Where(queryAnf, ListaAnfs).ToListAsync();
 
                         } else {
-                            reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Include(c => c.Cliente).Include(s => s.Sala).Where(query).ToListAsync();
+                            reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Include(c => c.Cliente).Include(s => s.Sala).Where(query).OrderByDescending(u=>u.DataCriacao).ToListAsync();
 
                         }
 
