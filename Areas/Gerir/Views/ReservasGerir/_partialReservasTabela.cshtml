@@ -14,7 +14,11 @@
 
     }
     
-   
+    HashSet<Anfitrioes?> anfs = Model.SelectMany(a => a.ListaAnfitrioes).Select(a => a).ToHashSet();
+    if(!anfs.Any()){
+        anfs = (HashSet<Anfitrioes?>) TempData["Anfs"];
+    }
+
 
 }
 
@@ -55,14 +59,32 @@
                 <input class="w-75 filter" id="NumPessoas" onkeyup="filter(this)"></input>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ListaAnfitrioes)
+                <div class="">
+                    @Html.DisplayNameFor(model => model.ListaAnfitrioes)
+                    <select multiple="multiple" id="ListaAnfitrioes" class="form-control  multiple-checkboxes">
+
+                        @foreach (var i in @anfs) {
+
+
+                            if (i.UserName.Equals(@TempData["UserLogado"])) {
+                                <option class=" text-white  border-success border-3 bg-secondary flex-fill" value="@i.Id">@i.PrimeiroNome @i.UltimoNome</option>
+
+                            } else {
+                                <option class=" text-white bg-warning flex-fill" value="@i.Id">@i.PrimeiroNome @i.UltimoNome</option>
+
+                            }
+
+
+                        }
+                    </select>
+                </div>
             </th>
             <th class="w-25">
                 @Html.DisplayNameFor(model => model.Cancelada)
                 <select class="form-select filter text-dark bg-white w-100" id="Cancelada" aria-label="Default select example">
                     <option selected></option>
                     <option class="text-success" onselect="filter(this)" value="true">Sim</option>
-                    <option class="text-danger" onselect="filter(this)" value=" false">Não</option>
+                    <option class="text-danger" onselect="filter(this)" value="false">Não</option>
 
                 </select>
             </th>
@@ -175,44 +197,92 @@
 </table>
 
 <script>
-
+    $('.multiple-checkboxes').multiselect('refresh');
 
     $("#Cancelada").on("change", function () {
-        var el = $("#Cancelada")
-
-        if ("@TempData["lastVal"]" != el.val()){
+        var el = $("#Cancelada");
+        if (el.val() == "true" || el.val() == "false") {
+            el.removeClass("text-dark")
+            if (el.val() == "true") {
+                el.addClass("text-danger")
+            } else {
+                el.addClass("text-success")
+            }}
+        if ('@TempData["lastVal"]' != el.val()) {
             filter(el);
         }
-       
-    })
-
-
-
-
+    });
 
     $(".table").ready(function () {
+
+       
         var dictVals = new Object();
+        $("#ListaAnfitrioes").multiselect('destroy');
+        $("#ListaAnfitrioes").multiselect({
+            templates: {
+                button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+            },
+            buttonWidth: '100%',
+            nonSelectedText: 'Selecionar anfitriões',
+            buttonWidth: '400px',
+
+            onChange: function (option, checked, select) {
+                console.log($("#ListaAnfitrioes"));
+                filter($("#ListaAnfitrioes"));
+            },
+            filterBehavior: "text",
+            enableCaseInsensitiveFiltering: true,
+            onSelectAll: function (options) {
+                console.log($("#ListaAnfitrioes"));
+                filter($("#ListaAnfitrioes"));
+            },
+            onDeselectAll: function (options) {
+                console.log($("#ListaAnfitrioes"));
+                filter($("#ListaAnfitrioes"));
+            },
+            enableFiltering: true,
+            dropUp: false,
+            popupContainer: '<div class="multiselect-container dropdown-menu" style="width: 279px"></div>',
+            maxHeight: 400,
+            includeSelectAllOption: true,
+            selectAllText: 'Selecionar todos',
+            numberDisplayed: 0,
+            allSelectedText: false
+
+        });
+    
+
+
 
     @foreach (var i in dicVals) {
-
         @:$("#@i.Key").val("@i.Value").change();
         @:console.log("#@i.Key");
-
     }
-        })
-        
-        var lastId="@TempData["Last"]"
-        if(lastId.toLowerCase().indexOf("cancelada") < 0){
-           var fldLength = $(lastId).val().length;
-            $(lastId).focus();
-            $(lastId)[0].setSelectionRange(fldLength, fldLength);
+    })
+
+                var lastId = "@TempData["Last"]";
+        console.log(lastId.toLowerCase().indexOf("ListaAnfitrioes"));
+
+        if ("@TempData["ListaAnfs"]" != null) {
+            var arr = [];
+    @foreach (var i in (List<String>)@TempData["ListaAnfs"]) {
+        @:arr.push("@i");
+    }
+
+                console.log(arr);
+        console.log(lastId.toLowerCase())
+        console.log(lastId.toLowerCase().indexOf("cancelada"))
+        console.log(lastId.toLowerCase().indexOf("listaanfi"))
+            $("#ListaAnfitrioes").multiselect('select', arr);
         }
- 
 
-    /*
-          
-    */
-
-
-
+    if (lastId.toLowerCase().indexOf("cancelada") >= 0 || lastId.toLowerCase().indexOf("listaanfi") >= 0 || lastId.toLowerCase().indexOf("dat") >= 0) {
+           
+        }else{
+        var fldLength = $(lastId).val().length;
+        $(lastId).focus();
+        $(lastId)[0].setSelectionRange(fldLength, fldLength);
+        }
+    
 </script>
+

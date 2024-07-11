@@ -21,8 +21,12 @@ html {
 
     width:100vw;
 }
+.multiselect-container.dropdown-menu.show{
+    z-index:999999999999999;
+}
+
 .teste {
-    background-color:yellow !important;
+    background-color: yellow !important;
 }
 fc-v-event{
     border: 3px solid red !important;

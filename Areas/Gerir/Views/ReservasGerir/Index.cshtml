@@ -12,7 +12,9 @@
     }
     HashSet<int> numSalas = Model.Select(s => s.Sala.Numero).ToHashSet();
    
+    HashSet<Anfitrioes?> anfs = Model.SelectMany(a=>a.ListaAnfitrioes).Select(a=>a).ToHashSet();
 
+   
    
     var salasLegenda = "";
     foreach (var s in numSalas) {
@@ -149,15 +151,35 @@
                 @Html.DisplayNameFor(model => model.NumPessoas)
                     <input class="w-75 filter" id="NumPessoas" onkeyup="filter(this)"></input>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ListaAnfitrioes)
+                <th >
+                    <div class="">
+                        @Html.DisplayNameFor(model => model.ListaAnfitrioes)
+                    <select multiple="multiple" id="ListaAnfitrioes" class="form-control  multiple-checkboxes">
+
+                        @foreach (var i in @anfs) {
+
+
+                                if (i.UserName.Equals(@TempData["UserLogado"])){
+                                    <option class=" text-white  border-success border-3 bg-secondary flex-fill" value="@i.Id">@i.PrimeiroNome @i.UltimoNome</option>
+                                   
+                                            }else{
+                                    <option class=" text-white bg-warning flex-fill" value="@i.Id">@i.PrimeiroNome @i.UltimoNome</option>
+
+                                            }
+
+
+                        }
+                    </select>
+                    </div>
+                
+                    
             </th>
                 <th class="w-25">
                 @Html.DisplayNameFor(model => model.Cancelada)
                     <select class="form-select filter text-dark bg-white w-100" id="Cancelada" aria-label="Default select example">
                         <option selected></option>
-                        <option class="text-success"  onselect="filter(this)" value="true">Sim</option>
-                        <option class="text-danger"  onselect="filter(this)" value=" false">Não</option>
+                        <option class="text-danger"  onselect="filter(this)" value="true">Sim</option>
+                        <option class="text-success"  onselect="filter(this)" value="false">Não</option>
                        
                     </select>
             </th>
@@ -271,11 +293,52 @@
 </div>
 
                     <script>
+    $(document).ready(function () {
+        $("#ListaAnfitrioes").multiselect({
+            templates: {
+                button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+            },
+            buttonWidth: '100%',
+            nonSelectedText: 'Selecionar anfitriões',
 
+            buttonWidth: '400px',
+            onChange: function (option, checked, select) {
+                console.log($("#ListaAnfitrioes"));
+                 filter($("#ListaAnfitrioes"));
+            },
+            filterBehavior:"text",
+            enableCaseInsensitiveFiltering:true,
+            onSelectAll: function(options) {
+                console.log($("#ListaAnfitrioes"));
+                filter($("#ListaAnfitrioes"));
+    },
+            onDeselectAll: function (options) {
+                console.log($("#ListaAnfitrioes"));
+                filter($("#ListaAnfitrioes"));
+            },
+            enableFiltering: true,
+            dropUp: false,
+              popupContainer: '<div class="multiselect-container dropdown-menu" style="width: 279px"></div>',
+            maxHeight: 400,
+            includeSelectAllOption: true,
+            selectAllText: 'Selecionar todos',
+            numberDisplayed: 0,
+            allSelectedText: false
+
+        });
+    });
 
         $("#Cancelada").on("click",function(){
            var el = $("#Cancelada")
+        console.log(el.val().toString() == "false")
+        console.log(el.val())
            if(el.val() == "true" || el.val() == "false"){
+             el.removeClass("text-dark")
+             if(el.val()=="true"){
+                 el.addClass("text-danger")
+             }else{
+                el.addClass("text-success")
+             }
             filter(el);
            }
          
@@ -300,18 +363,21 @@
             var arr = $(el).attr('id').split("_");
             dictVals[arr[0]] = arr[1];
         }
+       
         console.log(dictVals)
 
-
+        var listaAnfStr = ($("#ListaAnfitrioes").val()).join(",");
+        console.log(listaAnfStr);
 
        @foreach(var i in dicCores){
         @:dictCores['@i.Key'] ='@i.Value';
        }
-           
-       
 
-        $.get("/Gerir/ReservasGerir/Filter", { dictVals:dictVals, dic: dictCores,last:lastId }, function (data, status) {
+
+
+            $.get("/Gerir/ReservasGerir/Filter", { dictVals: dictVals, dic: dictCores, last: lastId, anfs: ($("#ListaAnfitrioes").val()).join(",") }, function (data, status) {
             $("#tabela").html(data)
+                
 
            
               
