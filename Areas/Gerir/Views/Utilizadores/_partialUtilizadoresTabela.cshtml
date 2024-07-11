@@ -1,115 +1,71 @@
 ﻿@model IEnumerable<Utilizadores>
 
-@{
-    ViewData["Title"] = "Utilizadores";
 
+@{
+
+
+
+    var dicVals = new Dictionary<string, string>();
+    if (TempData["dicVals"] != null)
+    {
+        dicVals = (Dictionary<string, string>)@TempData["dicVals"];
+
+    }
+    HashSet<String> roles = (HashSet<String>)TempData["AllRoles"];
     var dictRoles = (Dictionary<String, HashSet<String>>)TempData["DictRolesUser"];
 
-    HashSet<String> roles = (HashSet<String>)TempData["AllRoles"];
+   // HashSet<String?> anfs = Model.SelectMany(a => a.ListaAnfitrioes).Select(a => a).ToHashSet();
+    
+
+
+
 }
 
-<script>
-    function teste(id, nome) {
-        $('#nomeUser').text(nome);
-        $('#apagarUser').attr('action', '/Gerir/Utilizadores/Delete/' + id);
-    }
-
-
-</script>
-<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
-        <div class="modal-content">
-            <div class="modal-header modal-header-danger">
-                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar utilizador '<span id="nomeUser">a</span>' ?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-footer ">
-
-                <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
-                <form id="apagarUser" method="post">
-                    <button type="submit" class="btn btn-danger">Apagar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<h1>Utilizadores</h1>
-@if (@TempData["UtilizadorApagado"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Utilizador <strong>@TempData["UtilizadorApagado"]</strong> apagado com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (@TempData["NomeUtilizadorCriado2"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Utilizador <strong>@TempData["NomeUtilizadorCriado2"]</strong> criado com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (@TempData["ErroAdmin"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @Html.Raw(@TempData["ErroAdmin"])
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-<p>
-    <a asp-action="Create">
-        <button class="btn btn-info"> <i class="fa fa-add me-2"></i>Criar utilizador</button>
-    </a>
-
-</p>
-
-<div id="tabela">
 <span class="text-center text-white mb-2">@AppUtils.GetHumanReadableCount("resultado", Model.Count())</span>
+
 
 <table class="table text-center table-bordered table-hover table-striped table-secondary">
     <thead>
         <tr class="table-info text-center">
-                <th class="w-100">
-                    <span class="w-100">@Html.DisplayNameFor(model => model.Id)</span><br />
-                    <input class="w-100 filter" style="width:100%" id="Id" onkeyup="filter(this)"></input>
+            <th class="">
+                @Html.DisplayNameFor(model => model.Id)
+                <input class="w-75 filter" id="Id" onkeyup="filter(this)"></input>
             </th>
-                <th class="w-100">
+            <th>
                 @Html.DisplayNameFor(model => model.UserName)
-                    <input class="w-100 filter" id="UserName" onkeyup="filter(this)"></input>
+                <input class="w-75 filter" id="UserName" onkeyup="filter(this)"></input>
             </th>
-                <th class="w-100 text-nowrap">
+            <th>
                 @Html.DisplayNameFor(model => model.PrimeiroNome)
-                <br/>
-                <input class="w-100 filter" id="PrimeiroNome" onkeyup="filter(this)"></input>
+                <input class="w-75 filter" id="PrimeiroNome" onkeyup="filter(this)"></input>
 
 
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.UltimoNome) <br />
-                    <input class="w-100  filter" id="UltimoNome" onkeyup="filter(this)"></input>
+            <th>
+                @Html.DisplayNameFor(model => model.UltimoNome)
+                <input class="w-75 filter" id="UltimoNome" onkeyup="filter(this)"></input>
 
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.Email) <br />
-                    <input class="w-100  filter" id="Email" onkeyup="filter(this)"></input>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+                <input class="w-75 filter" id="Email" onkeyup="filter(this)"></input>
             </th>
-                <th class="w-100 text-nowrap">
-                    @Html.DisplayNameFor(model => model.CriadoPorUsername) <br />
-                    <input class="w-100  filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
+            <th>
+                @Html.DisplayNameFor(model => model.CriadoPorUsername)
+                <input class="w-75 filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
             </th>
-                <th class="w-100 text-nowrap">
+            <th>
                 @* @Html.DisplayNameFor(model => model.Roles)*@Roles
-                    <br />
                 <select multiple="multiple" id="ListaRoles" class="form-control  multiple-checkboxes">
 
                     @foreach (var i in @roles)
                     {
 
 
-                      
-                            <option class=" text-white bg-warning flex-fill" value="@i">@i</option>
 
-                       
+                        <option class=" text-white bg-warning flex-fill" value="@i">@i</option>
+
+
 
 
                     }
@@ -121,7 +77,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.DataCriacao)
-                    <br />
                 <i class="bi bi-arrow-down-short" style="cursor:pointer" id="DataCriacao_desc" onclick="filter(this)"></i> <i class="bi bi-arrow-up-short" id="DataCriacao_asc" onclick="filter(this)" style="cursor:pointer"></i>
 
             </th>
@@ -129,6 +84,7 @@
         </tr>
     </thead>
     <tbody>
+        
         @foreach (var item in Model)
         {
             <tr class="table-primary">
@@ -227,17 +183,54 @@
         }
     </tbody>
 </table>
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     <script>
-    $(document).ready(function () {
+
+
+    $(".table").ready(function () {
+        var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+        var dictVals = new Object();
+        $("#ListaRoles").multiselect('destroy');
         $("#ListaRoles").multiselect({
             templates: {
                 button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
             },
             buttonWidth: '100%',
             nonSelectedText: 'Selecionar anfitriões',
-
             buttonWidth: '400px',
+
             onChange: function (option, checked, select) {
                 console.log($("#ListaRoles"));
                 filter($("#ListaRoles"));
@@ -262,51 +255,49 @@
             allSelectedText: false
 
         });
-    });
 
-    function filter(el) {
-        var dictRoles = new Object();
-        var dictVals = new Object();
 
-        var lastId = "#" + $(el).attr('id')
-        console.log(lastId)
-        $('.filter').each(function (i, obj) {
-
-            if (obj.value != null && obj.value != "") {
-                dictVals[$(obj).attr('id')] = obj.value
-            }
-
-        });
-        if ($(el).attr('id').toLowerCase().indexOf("dat") >= 0) {
-            var arr = $(el).attr('id').split("_");
-            dictVals[arr[0]] = arr[1];
-        }
-
-        console.log(dictVals)
-
-        var listaAnfStr = ($("#ListaRoles").val()).join(",");
-        console.log(listaAnfStr);
-
-    @foreach (var i in dictRoles)
+    @foreach (var i in dicVals)
     {
-        @:dictRoles['@i.Key'] ='@i.Value';
+        @:$("#@i.Key").val("@i.Value").change();
+        @:console.log("#@i.Key");
     }
-    @if (!dictRoles.Any())
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+              var lastId = "@TempData["Last"]";
+    console.log(lastId.toLowerCase().indexOf("ListaAnfitrioes"));
+
+    if ("@TempData["Listaroles"]" != null) {
+        var arr = [];
+    @foreach (var i in (List<String>)@TempData["Listaroles"])
     {
-        @:dictRoles['']="";
+        @:arr.push("@i");
     }
 
-            console.log(dictRoles)
-
-        $.get("/Gerir/Utilizadores/Filter", { dictVals: dictVals, dic: dictRoles, last: lastId, roles: ($("#ListaRoles").val()).join(",") }, function (data, status) {
-            $("#tabela").html(data)
-
-
-
-
-        });
-
+       
+        
+        $("#ListaRoles").multiselect('select', arr);
     }
 
+    if ( lastId.toLowerCase().indexOf("listarol") >= 0 || lastId.toLowerCase().indexOf("dat") >= 0) {
 
+    } else {
+        var fldLength = $(lastId).val().length;
+        $(lastId).focus();
+        $(lastId)[0].setSelectionRange(fldLength, fldLength);
+    }
                     </script>

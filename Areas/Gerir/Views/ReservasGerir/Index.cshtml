@@ -119,20 +119,20 @@
 <table class="table text-center table-bordered table-hover table-striped table-secondary">
     <thead>
         <tr class=" text-center">
-            <th class="">
-                @Html.DisplayNameFor(model => model.ReservaId)
-                    <input class="w-75 filter" id="ReservaId" onkeyup="filter(this)"></input>
+                <th class="w-100 text-nowrap">
+                    @Html.DisplayNameFor(model => model.ReservaId)<br />
+                    <input class="w-100 filter" id="ReservaId" onkeyup="filter(this)"></input>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sala.Numero)
-                    <input class="w-75 filter" id="Sala_Numero" onkeyup="filter(this)"></input>
+                <th class="w-100 text-nowrap">
+                    @Html.DisplayNameFor(model => model.Sala.Numero)<br />
+                    <input class="w-100 filter" id="Sala_Numero" onkeyup="filter(this)"></input>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cliente.UserName)
-                    <input class="w-75 filter" id="Cliente_UserName" onkeyup="filter(this)"></input>
+                <th class="w-100 text-nowrap">
+                    @Html.DisplayNameFor(model => model.Cliente.UserName)<br />
+                    <input class="w-100 filter" id="Cliente_UserName" onkeyup="filter(this)"></input>
             </th>
-            <th>
-                    @Html.DisplayNameFor(model => model.ReservaDate)
+                <th class="w-100 text-nowrap">
+                    @Html.DisplayNameFor(model => model.ReservaDate)<br />
                     <div>
                         <i class="bi bi-arrow-down-short" id="ReservaDate_desc" style="cursor:pointer" onclick="filter(this)"></i> <i class="bi bi-arrow-up-short" id="ReservaDate_asc" onclick="filter(this)" style="cursor:pointer"></i>
 
@@ -140,20 +140,22 @@
 
                    
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReservaEndDate)
+                <th class="w-100 text-nowrap">
+                    @Html.DisplayNameFor(model => model.ReservaEndDate)<br />
                     <div>
                         <i class="bi bi-arrow-down-short" style="cursor:pointer" id="ReservaEndDate_desc" onclick="filter(this)"></i> <i class="bi bi-arrow-up-short" id="ReservaEndDate_asc" onclick="filter(this)" style="cursor:pointer"></i>
 
                     </div>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NumPessoas)
-                    <input class="w-75 filter" id="NumPessoas" onkeyup="filter(this)"></input>
+                <th class="w-100 text-nowrap">
+                    <br />
+                    @Html.DisplayNameFor(model => model.NumPessoas)<br />
+                    <input class="w-100 filter" id="NumPessoas" onkeyup="filter(this)"></input>
             </th>
-                <th >
+                <th class="w-100 text-nowrap">
+                    <br />
                     <div class="">
-                        @Html.DisplayNameFor(model => model.ListaAnfitrioes)
+                        @Html.DisplayNameFor(model => model.ListaAnfitrioes)<br />
                     <select multiple="multiple" id="ListaAnfitrioes" class="form-control  multiple-checkboxes">
 
                         @foreach (var i in @anfs) {
@@ -174,8 +176,8 @@
                 
                     
             </th>
-                <th class="w-25">
-                @Html.DisplayNameFor(model => model.Cancelada)
+                <th class="w-100 text-nowrap">
+                    @Html.DisplayNameFor(model => model.Cancelada)<br />
                     <select class="form-select filter text-dark bg-white w-100" id="Cancelada" aria-label="Default select example">
                         <option selected></option>
                         <option class="text-danger"  onselect="filter(this)" value="true">Sim</option>
@@ -184,8 +186,8 @@
                     </select>
             </th>
 
-                <th class="w-75">
-                @Html.DisplayNameFor(model => model.DataCriacao)
+                <th class="w-100 text-nowrap">
+                    @Html.DisplayNameFor(model => model.DataCriacao)<br />
                     <div>
                         <i class="bi bi-arrow-down-short" style="cursor:pointer" id="DataCriacao_desc" onclick="filter(this)"></i> <i class="bi bi-arrow-up-short" id="DataCriacao_asc" onclick="filter(this)" style="cursor:pointer"></i>
 

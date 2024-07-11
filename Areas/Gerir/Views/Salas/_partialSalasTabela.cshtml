@@ -28,19 +28,19 @@
 <table id="Salas" class="table table-bordered table-hover table-striped">
     <thead class="table-info text-center">
         <tr>
-            <th>
+            <th class="w-100 text-nowrap">
 
-                <span>@Html.DisplayNameFor(model => model.Numero)</span>
+                <span>@Html.DisplayNameFor(model => model.Numero)</span><br/>
                 <input class="w-75 filter" id="Numero" onkeyup="filter(this)"></input>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Area)
+            <th class="w-100 text-nowrap">
+                @Html.DisplayNameFor(model => model.Area)<br />
                 <input class="w-75 filter" id="Area" onkeyup="filter(this)"></input>
             </th>
 
-            <th>
+            <th class="w-100 text-nowrap">
                 <div class="">
-                    @Html.DisplayNameFor(model => model.ListaAnfitrioes)
+                    @Html.DisplayNameFor(model => model.ListaAnfitrioes)<br />
                     <select multiple="multiple" id="ListaAnfitrioes" class="form-control  multiple-checkboxes">
 
                         @foreach (var i in @anfs)
@@ -64,19 +64,19 @@
                 </div>
 
             </th>
-            <th>
-                Nº Reservas<i class=" ms-2 bi bi-patch-question" data-bs-toggle="tooltip" data-html="true" data-bs-placement="top" data-bs-html='true' title="Nº de reservas restantes <strong>da semana atual</strong> "></i>
+            <th class="w-100 text-nowrap">
+                Nº Reservas<i class=" ms-2 bi bi-patch-question" data-bs-toggle="tooltip" data-html="true" data-bs-placement="top" data-bs-html='true' title="Nº de reservas restantes <strong>da semana atual</strong> "></i><br />
                 <input class="w-75 filter" id="NumReservas" onkeyup="filter(this)"></input>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataCriacao)
+            <th class="w-100 text-nowrap">
+                @Html.DisplayNameFor(model => model.DataCriacao)<br />
                 <div>
                     <i class="bi bi-arrow-down-short" style="cursor:pointer" id="DataCriacao_desc" onclick="filter(this)"></i> <i class="bi bi-arrow-up-short" id="DataCriacao_asc" onclick="filter(this)" style="cursor:pointer"></i>
 
                 </div>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CriadoPorUsername)
+                @Html.DisplayNameFor(model => model.CriadoPorUsername)<br />
                 <input class="w-75 filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
             </th>
 

@@ -12,6 +12,7 @@ using EFS_23298_23327.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Runtime.Intrinsics.Arm;
+using System.Linq.Dynamic.Core;
 
 namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
@@ -43,6 +44,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         {
             //todos os utilizadores não apagados
             var users = await _context.Utilizadores.Where(u=> u.Deleted != true).OrderByDescending(u=> u.DataCriacao).ToListAsync();
+            Dictionary<String,HashSet<String>> DictRolesUser = new Dictionary<String,HashSet<String>>();
             ICollection<UtilizadoresViewModel> listaU = new List<UtilizadoresViewModel>();
           
             if (users != null || users.Any())
@@ -52,13 +54,17 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 { 
                    
                    
-                   HashSet<String> roles =  _userManager.GetRolesAsync(u).Result.ToHashSet();
-                    var uVM = new UtilizadoresViewModel(u);
-                    uVM.Roles = roles;
-                    listaU.Add(uVM);
+                DictRolesUser.Add(u.Id,_userManager.GetRolesAsync(u).Result.ToHashSet());
+               //     var uVM = new UtilizadoresViewModel(u);
+                 //   uVM.Roles = roles;
+                  //  listaU.Add(uVM);
                 }
             }
-            return View(listaU);
+
+            TempData["DictRolesUser"] = DictRolesUser;
+            HashSet<String> allRoles = _roleManager.Roles.Select(r => r.Name).ToHashSet();
+            TempData["AllRoles"] = allRoles;
+            return View(users);
         }
 
         // GET: UtilizadoresViewModels/Details/5
@@ -91,6 +97,230 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             ViewBag.SelectionIdList = allRoles;
             return View(new RegisterViewModel());
         }
+        [HttpGet]
+        public async Task<IActionResult> Filter(Dictionary<string, string> dictVals, Dictionary<string, HashSet<String>> dicRoles, String last, String roles)
+        {
+
+            //Se tem filtro de Anfitriões
+            var hasRoles = false;
+            Dictionary<String, HashSet<String>> DictRolesUser = new Dictionary<String, HashSet<String>>();
+
+            var Utilizadores = new List<Utilizadores>();
+            //Inicializa query varia Anfitriões
+            var queryRoles = "";
+            var ListaRoles = new List<string>();
+            var usersInRoles = new HashSet<string>();
+            if (roles != "" && roles != null)
+            {
+
+                hasRoles = true;
+                ListaRoles = roles.Split(",").ToList();
+                //Interseção da lista de anfitriões da reserva com a lista de Ids do filtro.Se o tamanho da interseção das duas listas for igual ao tamanho da lista do filtro,devolve true(todos os elementos do filtro pertencem à lista de anfitriões)
+               
+                foreach(var role in ListaRoles)
+                {
+                    if (!usersInRoles.Any())
+                    {
+                        usersInRoles = usersInRoles.Concat(_userManager.GetUsersInRoleAsync(role).Result.Select(u => u.Id).ToHashSet<string>()).ToHashSet<string>();
+
+                    }
+                    else
+                    {
+                        usersInRoles = usersInRoles.Intersect(_userManager.GetUsersInRoleAsync(role).Result.Select(u => u.Id).ToHashSet<string>()).ToHashSet<string>();
+
+                    }
+                }
+                queryRoles = "@0.Contains(Id)";
+                // Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Include(c => c.Cliente).Include(s => s.Sala).Where("ListaAnfitrioes.Any(a => @0.Contains(a.Id))", Listaroles).ToListAsync();
+
+
+
+
+
+            }
+            //O dicionário contém "dic" se não houver valores filtrados(excepto anfitriões,não arranjei forma de passar o array no dicionário).Se não houver filtros de texto e não houver filtro de Anfitriões,devolve lista normal
+
+            if (dictVals.ContainsKey("dic") && !dictVals.ContainsKey("roles"))
+            {
+                Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+                //Se só houver filtro de anfitriões
+            }
+            if (dictVals.ContainsKey("dic") && dictVals.ContainsKey("roles"))
+            {
+                //Pode acontecer ter a key "roles" mas o Value estar vazio.Vamos certificar-nos que apanhamos esses casos
+                if (hasRoles)
+                {
+                    //Devolve lista com filtro Anfitriões
+                    Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).Where(queryRoles , usersInRoles).ToListAsync();
+
+                }
+                else
+                {
+                    //Devolve lista normal,pois não caiu no primeiro "if"
+                    Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+
+                }
+                //Se houver "mais" filtros na tabela(qualquer um excepto anfitrião
+            }
+            else
+            {
+                //Inicializa variáveis a string vazia.Vão ser necessárias para saber que tipo de filtro precisamos(importante para os OrderBys)
+                var query = "";
+                
+                var orderby = "";
+                var orderType = "";
+                //Por cada valor no dicionário(Campo,Valor a filtrar)
+                foreach (var val in dictVals)
+                {
+                    //Se o campo for data/roles,vamos ignorar por agora
+                    if (!val.Key.ToLower().Contains("dat") && !val.Key.ToLower().Contains("roles"))
+                    {
+                        //Se for um campo boolean,a expressão vai ser diferente,temos que ter isso em conta
+                        if (val.Value.ToLower().Contains("true") || val.Value.ToLower().Contains("false"))
+                        {
+                            query += @val.Key.Replace("_", ".") + "==" + val.Value;
+                            //Guarda id do campo que foi submetido em ultimo.Esta linha de código é extremamente importante devido ao listener que está na dropdown(on change)que ative cada vez que se dá render da partial view
+                            //Se este tempdata não tiver nulo,significa que já foi filtrado,e não preciisamos de chamar esta função outra vez.Esta verificação está a ser feita no lado do cliente
+                            //Sem esta linha de código,vai entra em loop infinito!
+                            TempData["lastVal"] = val.Value;
+                        }
+                        else
+                        {
+                            //Se for campo de texto normal(mesmo que seja int,estou a converter para string para fazer o includes)
+                            query += @val.Key.Replace("_", ".") + ".toString().Contains(\"" + val.Value + "\")";
+                        }
+                        //Se não for o ultimo valor do dicionário,dá append do "And" para continuar a preencher os campos da query
+                        if (!val.Equals(dictVals.Last()))
+                        {
+                            query += " && ";
+                        }
+                    }
+                    else
+                    {
+                        //Se for data,vamos guardar que tipo de data é(Data inicial reserva,final,ou data criada)
+                        orderby = val.Key;
+                        //Tal como o tipo(desc,asc)
+                        orderType = val.Value;
+                    }
+
+                }
+                //Se a string da query acabar com os caracteres "&&",vamos removê-los
+                if (query.Trim().EndsWith("&&"))
+                {
+                    query = query.Substring(0, query.LastIndexOf("&") - 1);
+
+                }
+                if (query == "")
+                {
+                    //Se query estiver vazia,quer dizer que so foi feito um filtro de datas
+                    if (hasRoles)
+                    {
+                        //Ter em conta se foi efetuaod filtro nos anfitriões
+                        Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).Where(queryRoles, usersInRoles).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                    }
+                    else
+                    {
+                        //Se não houver filtro de anfitriões
+                        Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).OrderBy(orderby + " " + orderType).ToListAsync();
+                    }
+
+
+                }
+                else
+                {
+                    if (orderby == "")
+                    {
+                        //Se orderBy tiver vazio,e a query não estiver vazia,filtra pelos campos e usa a order por defeito
+                        if (hasRoles)
+                        {
+                            Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).Where(query).Where(queryRoles, usersInRoles).ToListAsync();
+
+                        }
+                        else
+                        {
+                            Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).Where(query).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+                        }
+
+                    }
+                    else
+                    {
+                        if (hasRoles)
+                        {
+                            Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).Where(query).Where(queryRoles, usersInRoles).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                        }
+                        else
+                        {
+                            Utilizadores = await _context.Utilizadores.Where(u => u.Deleted != true).Where(query).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                        }
+
+
+                    }
+
+
+                }
+
+
+            }
+
+            //Pode acontecer o modelo dar return sem nenhum anfitrião,isto está aqui para esses casos(Idealmente,não deveria acontecer.Infelizmente não vivemos num mundo ideal)
+           
+
+            //Ussado para fazer a border do anfitrião
+            TempData["UserLogado"] = User.FindFirstValue(ClaimTypes.Name);
+
+            //Volta a enviar os valores do dicionário de filtros de modo a manter o estado em que estava
+            TempData["dicVals"] = dictVals;
+            //Mesma razão,voltar a selecionar todos os anfitriões filtrados
+            TempData["Listaroles"] = ListaRoles;
+            HashSet<String> allRoles = _roleManager.Roles.Select(r => r.Name).ToHashSet();
+            TempData["AllRoles"] = allRoles;
+            //Usado para fazer a legenda
+            if (Utilizadores != null || Utilizadores.Any())
+            {
+                //Ir buscar os roles a que um utilizador pertence,para cada utilizador
+                foreach (var u in Utilizadores)
+                {
+
+
+                    DictRolesUser.Add(u.Id, _userManager.GetRolesAsync(u).Result.ToHashSet());
+                    //     var uVM = new UtilizadoresViewModel(u);
+                    //   uVM.Roles = roles;
+                    //  listaU.Add(uVM);
+                }
+            }
+
+            TempData["DictRolesUser"] = DictRolesUser;
+            //Usado para manter o foco no último campo em que estava a ser escrito
+            TempData["Last"] = last;
+
+
+            //E finalmente,dá return com o novo modelo "filtrado"
+
+            return PartialView("_partialUtilizadoresTabela", Utilizadores);
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // POST: UtilizadoresViewModels/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
