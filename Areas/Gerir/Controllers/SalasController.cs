@@ -13,6 +13,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Identity;
 using System.Data;
 using System.Globalization;
+using System.Linq.Dynamic.Core;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
@@ -54,10 +56,250 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
                // var s3 =await _context.Reservas.Where(r => !r.Deleted).Where(r => r.SalaId == item.SalaId).Where(r => r.ReservaEndDate > DateTime.Now).Where(r=>ISOWeek.GetWeekOfYear(r.ReservaDate)==ISOWeek.GetWeekOfYear(new DateTime()) ).CountAsync();
             }
+            var ud = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            TempData["UserLogado"] = User.FindFirstValue(ClaimTypes.Name);
+
+            var u = await _context.Anfitrioes.Where(u => u.Id == ud).Include(u => u.userPrefsAn).ThenInclude(u => u.Cores).FirstOrDefaultAsync();
+            if (u != null)
+            {
+                if (u.userPrefsAn != null)
+                {
+                    Dictionary<int, string> coresSalas = new Dictionary<int, string>();
+
+                    foreach (var i in u.userPrefsAn.Cores)
+                    {
+                        var sNum = s.Where(s => s.SalaId == i.Key).Select(a=>a.Numero).First();
+
+
+                        coresSalas.Add(sNum, i.Value);
+                    }
+                    TempData["SalasCor"] = coresSalas;
+
+
+                }
+            }
 
             ViewBag.SalasCount = mapSalaRes;
             return View(s);
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Filter(Dictionary<string, string> dictVals, Dictionary<int, string> dic, string last, string anfs,Dictionary<int, int> dicSalasCount)
+        {
+
+            //Se tem filtro de Anfitriões
+            var hasAnfs = false;
+            var salas = new List<Salas>();
+            //Inicializa query varia Anfitriões
+            var queryAnf = "";
+            var isNumReservas = dictVals.ContainsKey("NumReservas");
+            List<int> num = null;
+            if (isNumReservas)
+            {
+                
+                num = await _context.Salas.Include(s=>s.ListaReservas).Where(s => (s.ListaReservas.Where(r => r.ReservaEndDate > DateTime.Now)).Count() == int.Parse(dictVals.GetValueOrDefault("NumReservas"))).Select(r => r.SalaId).ToListAsync();
+                
+            }
+            var ListaAnfs = new List<string>();
+            if (anfs != "" && anfs != null)
+            {
+
+                hasAnfs = true;
+                ListaAnfs = anfs.Split(",").ToList();
+                //Interseção da lista de anfitriões da reserva com a lista de Ids do filtro.Se o tamanho da interseção das duas listas for igual ao tamanho da lista do filtro,devolve true(todos os elementos do filtro pertencem à lista de anfitriões)
+                queryAnf = "ListaAnfitrioes.Select(a => a.Id).Intersect(@0).Count() == @0.Count()";
+
+
+
+
+
+            }
+            //O dicionário contém "dic" se não houver valores filtrados(excepto anfitriões,não arranjei forma de passar o array no dicionário).Se não houver filtros de texto e não houver filtro de Anfitriões,devolve lista normal
+
+            if (dictVals.ContainsKey("dic") && !dictVals.ContainsKey("anfs"))
+            {
+                salas = await _context.Salas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+                //Se só houver filtro de anfitriões
+            }
+            if (dictVals.ContainsKey("dic") && dictVals.ContainsKey("anfs"))
+            {
+                //Pode acontecer ter a key "anfs" mas o Value estar vazio.Vamos certificar-nos que apanhamos esses casos
+                if (hasAnfs)
+                {
+                    //Devolve lista com filtro Anfitriões
+                    salas = await _context.Salas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Where(queryAnf, ListaAnfs).ToListAsync();
+
+                }
+                else
+                {
+                    //Devolve lista normal,pois não caiu no primeiro "if"
+                    salas = await _context.Salas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+
+                }
+                //Se houver "mais" filtros na tabela(qualquer um excepto anfitrião
+            }
+            else
+            {
+                //Inicializa variáveis a string vazia.Vão ser necessárias para saber que tipo de filtro precisamos(importante para os OrderBys)
+                var query = "";
+                var orderby = "";
+                var orderType = "";
+                //Por cada valor no dicionário(Campo,Valor a filtrar)
+                foreach (var val in dictVals)
+                {
+                    //Se o campo for data/anfs,vamos ignorar por agora
+                    if (!val.Key.ToLower().Contains("dat") && !val.Key.ToLower().Contains("anfs"))
+                    {
+                        //Se for um campo boolean,a expressão vai ser diferente,temos que ter isso em conta
+                        if (val.Value.ToLower().Contains("true") || val.Value.ToLower().Contains("false"))
+                        {
+                            query += @val.Key.Replace("_", ".") + "==" + val.Value;
+                            //Guarda id do campo que foi submetido em ultimo.Esta linha de código é extremamente importante devido ao listener que está na dropdown(on change)que ative cada vez que se dá render da partial view
+                            //Se este tempdata não tiver nulo,significa que já foi filtrado,e não preciisamos de chamar esta função outra vez.Esta verificação está a ser feita no lado do cliente
+                            //Sem esta linha de código,vai entra em loop infinito!
+                            TempData["lastVal"] = val.Value;
+                        }
+                        if (val.Key.ToLower().Contains("reserva"))
+                        {
+                            query +="(\""+ string.Join(",", num) + "\").Contains(SalaId.toString())";
+                        }
+                        else
+                        {
+                            //Se for campo de texto normal(mesmo que seja int,estou a converter para string para fazer o includes)
+                            query += @val.Key.Replace("_", ".") + ".toString().Contains(\"" + val.Value + "\")";
+                        }
+                        //Se não for o ultimo valor do dicionário,dá append do "And" para continuar a preencher os campos da query
+                        if (!val.Equals(dictVals.Last()))
+                        {
+                            query += " && ";
+                        }
+                    }
+                    else
+                    {
+                      
+                            //Se for data,vamos guardar que tipo de data é(Data inicial reserva,final,ou data criada)
+                        orderby = val.Key;
+                        //Tal como o tipo(desc,asc)
+                        orderType = val.Value;
+                        
+                       
+                    }
+
+                }
+             
+                //Se a string da query acabar com os caracteres "&&",vamos removê-los
+                if (query.Trim().EndsWith("&&"))
+                {
+                    query = query.Substring(0, query.LastIndexOf("&") - 1);
+
+                }
+                if (query == "")
+                {
+                    //Se query estiver vazia,quer dizer que so foi feito um filtro de datas
+                    if (hasAnfs)
+                    {
+                      
+                            salas = await _context.Salas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Where(queryAnf, ListaAnfs).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                        
+
+                    }
+                    else
+                    {
+                       
+                        salas = await _context.Salas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).OrderBy(orderby + " " + orderType).ToListAsync();
+                            
+                      }
+                      
+
+
+                }
+                else
+                {
+                    if (orderby == "")
+                    {
+                        //Se orderBy tiver vazio,e a query não estiver vazia,filtra pelos campos e usa a order por defeito
+                        if (hasAnfs)
+                        {
+                           
+                            
+                            salas = await _context.Salas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Where(query).Where(queryAnf, ListaAnfs).ToListAsync();
+
+                            
+
+
+                        }
+                        else
+                        {
+                          
+
+                                salas = await _context.Salas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Where(query).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+                            
+
+                        }
+
+                    }
+                    else
+                    {
+                        if (hasAnfs)
+                        {
+                           
+                                salas = await _context.Salas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Where(query).Where(queryAnf, ListaAnfs).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                            
+
+                        }
+                        else
+                        {
+                                                           salas = await _context.Salas.Where(u => u.Deleted != true).Include(a => a.ListaAnfitrioes).Where(query).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                            
+
+                        }
+
+
+                    }
+
+
+                }
+
+
+            }
+
+            //Pode acontecer o modelo dar return sem nenhum anfitrião,isto está aqui para esses casos(Idealmente,não deveria acontecer.Infelizmente não vivemos num mundo ideal)
+            if (!salas.Select(a => a.ListaAnfitrioes).Any())
+            {
+                TempData["Anfs"] = await _context.Anfitrioes.Where(u => !u.Deleted).Include(a => a.ListaReservas).Where(a => a.ListaReservas.Any()).ToListAsync();
+            }
+
+            //Ussado para fazer a border do anfitrião
+            TempData["UserLogado"] = User.FindFirstValue(ClaimTypes.Name);
+
+            //Volta a enviar os valores do dicionário de filtros de modo a manter o estado em que estava
+            TempData["dicVals"] = dictVals;
+            //Mesma razão,voltar a selecionar todos os anfitriões filtrados
+            TempData["ListaAnfs"] = ListaAnfs;
+            //Usado para fazer a legenda
+            TempData["SalasCor"] = dic;
+            //Usado para manter o foco no último campo em que estava a ser escrito
+            TempData["Last"] = last;
+
+            ViewBag.SalasCount = dicSalasCount;
+            //E finalmente,dá return com o novo modelo "filtrado"
+
+            return PartialView("_partialSalasTabela", salas);
+
+        }
+
+
+
+
+
+
 
         // GET: Salas/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -151,7 +393,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 return NotFound();
             }
 
-            List<String>anfs = salas.ListaAnfitrioes.Select(a => a.Id).ToList();
+            List<string>anfs = salas.ListaAnfitrioes.Select(a => a.Id).ToList();
             var ViewModel = new AnfitriaoSalaViewModel(salas, anfs);
 
             var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");

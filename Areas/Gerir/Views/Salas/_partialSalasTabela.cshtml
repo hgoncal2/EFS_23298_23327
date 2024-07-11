@@ -1,102 +1,43 @@
-﻿@model IEnumerable<EFS_23298_23327.Models.Salas>
+﻿@model IEnumerable<Salas>
+
 
 @{
-    ViewData["Title"] = "Index";
+
     var dicCores = new Dictionary<int, string>();
     if (TempData["SalasCor"] != null)
     {
         dicCores = (Dictionary<int, string>)@TempData["SalasCor"];
 
     }
-    HashSet<int> numSalas = Model.Select(s => s.Numero).ToHashSet();
-    var salasLegenda = "";
-    foreach (var s in numSalas)
+
+    var dicVals = new Dictionary<string, string>();
+    if (TempData["dicVals"] != null)
     {
+        dicVals = (Dictionary<string, string>)@TempData["dicVals"];
 
-        salasLegenda += "<span class='me-2'>Sala " + s + "<i class='ms-2 bi bi-circle-fill' style='color:" + dicCores.GetValueOrDefault(s) + "'></i></span>";
-        salasLegenda += "\t\t";
     }
+
     HashSet<Anfitrioes?> anfs = Model.SelectMany(a => a.ListaAnfitrioes).Select(a => a).ToHashSet();
-
-    var dicSalasNum = ((Dictionary<int, int>)ViewBag.SalasCount);
-}
+    
 
 
-<script>
-    function teste(id, nome) {
-        $('#nomeSala').text(nome);
-        $('#apagarSala').attr('action', 'Salas/Delete/' + id);
-    }
-   
-
-
-</script>
-
-<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
-        <div class="modal-content">
-            <div class="modal-header modal-header-danger">
-                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar Sala '<span id="nomeSala">a</span>' ?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-footer ">
-
-                <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
-                <form id="apagarSala" method="post">
-                    <button type="submit" class="btn btn-danger">Apagar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<h1>Salas</h1>
-@if (TempData["SalaApagada"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Sala <strong>@TempData["SalaApagada"]</strong> apagado com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (TempData["ErroEliminar"] != null) {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        Erro! Não pode apagar esta sala pois está a ser usada no tema <strong>@TempData["ErroEliminar"]</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (@TempData["NumeroSalaCriada"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Sala <strong>@TempData["NumeroSalaCriada"]</strong> criada com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-<p>
-    <a asp-action="Create">
-        <button class="btn btn-info"> <i class="fa fa-add me-2 "></i>Criar Sala</button>
-    </a>
-
-</p>
-@if (TempData["SalasCor"] != null)
-{
-    <div id="cores" class="text-end"> @Html.Raw(@salasLegenda)</div>
 
 }
-<div id="tabela">
+
 <span class="text-center text-white mb-2">@AppUtils.GetHumanReadableCount("resultado", Model.Count())</span>
-<table  class="table table-bordered table-hover table-striped">
+<table id="Salas" class="table table-bordered table-hover table-striped">
     <thead class="table-info text-center">
         <tr>
             <th>
-                
+
                 <span>@Html.DisplayNameFor(model => model.Numero)</span>
                 <input class="w-75 filter" id="Numero" onkeyup="filter(this)"></input>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Area)
-                    <input class="w-75 filter" id="Area" onkeyup="filter(this)"></input>
+                <input class="w-75 filter" id="Area" onkeyup="filter(this)"></input>
             </th>
-            
+
             <th>
                 <div class="">
                     @Html.DisplayNameFor(model => model.ListaAnfitrioes)
@@ -122,24 +63,23 @@
                     </select>
                 </div>
 
-
             </th>
             <th>
                 Nº Reservas<i class=" ms-2 bi bi-patch-question" data-bs-toggle="tooltip" data-html="true" data-bs-placement="top" data-bs-html='true' title="Nº de reservas restantes <strong>da semana atual</strong> "></i>
-                    <input class="w-75 filter" id="NumReservas" onkeyup="filter(this)"></input>
+                <input class="w-75 filter" id="NumReservas" onkeyup="filter(this)"></input>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.DataCriacao)
-                    <div>
-                        <i class="bi bi-arrow-down-short" style="cursor:pointer" id="DataCriacao_desc" onclick="filter(this)"></i> <i class="bi bi-arrow-up-short" id="DataCriacao_asc" onclick="filter(this)" style="cursor:pointer"></i>
+                <div>
+                    <i class="bi bi-arrow-down-short" style="cursor:pointer" id="DataCriacao_desc" onclick="filter(this)"></i> <i class="bi bi-arrow-up-short" id="DataCriacao_asc" onclick="filter(this)" style="cursor:pointer"></i>
 
-                    </div>
+                </div>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.CriadoPorUsername)
-                    <input class="w-75 filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
+                <input class="w-75 filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
             </th>
-            
+
             <th>Ações</th>
         </tr>
     </thead>
@@ -212,13 +152,13 @@
                 </td>
                 <td>
                     @{
-                        var s = dicSalasNum.GetValueOrDefault(item.SalaId);
+                        var s = ((Dictionary<int, int>)ViewBag.SalasCount).GetValueOrDefault(item.SalaId);
                     }
-                    
-                       <span>@s</span>
+
+                    <span>@s</span>
 
                 </td>
-              
+
                 <td>
                     @Html.DisplayFor(modelItem => item.DataCriacao)
                 </td>
@@ -235,25 +175,24 @@
     </tbody>
 
 </table>
-</div>
 
-@Html.AntiForgeryToken()
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+                    <script>
 
-     <script>
-    $(document).ready(function () {
+
+    $(".table").ready(function () {
+        var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+        var dictVals = new Object();
+        $("#ListaAnfitrioes").multiselect('destroy');
         $("#ListaAnfitrioes").multiselect({
             templates: {
                 button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
             },
             buttonWidth: '100%',
             nonSelectedText: 'Selecionar anfitriões',
-
             buttonWidth: '400px',
+
             onChange: function (option, checked, select) {
                 console.log($("#ListaAnfitrioes"));
                 filter($("#ListaAnfitrioes"));
@@ -278,62 +217,51 @@
             allSelectedText: false
 
         });
-    });
 
 
-    function filter(el) {
-        var dictCores = new Object();
-        var dictVals = new Object();
-        var dictSalasNum = new Object();
-
-        var lastId = "#" + $(el).attr('id')
-        console.log(lastId)
-        $('.filter').each(function (i, obj) {
-
-            if (obj.value != null && obj.value != "") {
-                dictVals[$(obj).attr('id')] = obj.value
-            }
-
-        });
-        if ($(el).attr('id').toLowerCase().indexOf("dat") >= 0) {
-            var arr = $(el).attr('id').split("_");
-            dictVals[arr[0]] = arr[1];
-        }
-
-        console.log(dictVals)
-
-        var listaAnfStr = ($("#ListaAnfitrioes").val()).join(",");
-        console.log(listaAnfStr);
-
-    @foreach (var i in dicCores)
+    @foreach (var i in dicVals)
     {
-        @:dictCores['@i.Key'] ='@i.Value';
+        @:$("#@i.Key").val("@i.Value").change();
+        @:console.log("#@i.Key");
+    }
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+              var lastId = "@TempData["Last"]";
+    console.log(lastId.toLowerCase().indexOf("ListaAnfitrioes"));
+
+    if ("@TempData["ListaAnfs"]" != null) {
+        var arr = [];
+    @foreach (var i in (List<String>)@TempData["ListaAnfs"])
+    {
+        @:arr.push("@i");
     }
 
-    @foreach (var i in dicSalasNum)
-    {
-            @:dictSalasNum['@i.Key'] = '@i.Value';
+            console.log(arr);
+        console.log(lastId.toLowerCase())
+        console.log(lastId.toLowerCase().indexOf("cancelada"))
+        console.log(lastId.toLowerCase().indexOf("listaanfi"))
+        $("#ListaAnfitrioes").multiselect('select', arr);
     }
 
+    if ( lastId.toLowerCase().indexOf("listaanfi") >= 0 || lastId.toLowerCase().indexOf("dat") >= 0) {
 
-    @if (!dicCores.Any())
-    {
-        @:dictCores['0']="";
-    }
-    @if (!dicSalasNum.Any())
-    {
-        @:dictSalasNum['0']="0";
-    }
-
-            console.log(dictCores)
-
-        $.get("/Gerir/Salas/Filter", { dictVals: dictVals, dic: dictCores, last: lastId, anfs: ($("#ListaAnfitrioes").val()).join(","),dicSalasCount:dictSalasNum }, function (data, status) {
-            $("#tabela").html(data)
-
-
-
-
-        });
-
+    } else {
+        var fldLength = $(lastId).val().length;
+        $(lastId).focus();
+        $(lastId)[0].setSelectionRange(fldLength, fldLength);
     }
                     </script>

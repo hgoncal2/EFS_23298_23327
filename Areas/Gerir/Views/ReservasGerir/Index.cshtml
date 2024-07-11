@@ -183,6 +183,7 @@
                        
                     </select>
             </th>
+
                 <th class="w-75">
                 @Html.DisplayNameFor(model => model.DataCriacao)
                     <div>
@@ -372,8 +373,12 @@
        @foreach(var i in dicCores){
         @:dictCores['@i.Key'] ='@i.Value';
        }
+    @if (!dicCores.Any())
+    {
+            @:dictCores['0']="";
+    }
 
-
+       console.log(dictCores)
 
             $.get("/Gerir/ReservasGerir/Filter", { dictVals: dictVals, dic: dictCores, last: lastId, anfs: ($("#ListaAnfitrioes").val()).join(",") }, function (data, status) {
             $("#tabela").html(data)

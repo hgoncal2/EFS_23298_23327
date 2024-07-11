@@ -1,5 +1,5 @@
 ﻿using EFS_23298_23327.Data;
-using EFS_23298_23327.Migrations;
+
 using EFS_23298_23327.Models;
 using EFS_23298_23327.ViewModel;
 using Microsoft.AspNetCore.Hosting;

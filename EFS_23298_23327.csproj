@@ -28,7 +28,6 @@
     <Folder Include="Areas\Gerir\Data\" />
     <Folder Include="Areas\Gerir\Models\" />
     <Folder Include="Areas\Gerir\Views\Shared\" />
-    <Folder Include="wwwroot\Imagens\Thumbs\" />
   </ItemGroup>
 
 </Project>

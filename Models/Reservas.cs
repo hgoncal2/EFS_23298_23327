@@ -25,8 +25,8 @@ namespace EFS_23298_23327.Models
         public String? ClienteID { get; set; }
         public  Clientes? Cliente { get; set; }
         [ForeignKey(nameof(Salas))]
-        public int? SalaId { get; set; }
-        public  Salas? Sala { get; set; }
+        public int SalaId { get; set; }
+        public  Salas Sala { get; set; }
         public bool Cancelada { get; set; }
         public String? TemaNome { get; set; }
         [EnumDataType(typeof(Dificuldade))]
