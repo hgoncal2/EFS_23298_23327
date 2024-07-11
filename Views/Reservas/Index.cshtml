@@ -41,11 +41,12 @@ else
      
 
     }
-
+    var mostrarCanceladas=true;
     var listaReservasCal=Model.Reservas;
     if(Model.UserPrefs != null){
             if(!Model.UserPrefs.mostrarCanceladas){
-        listaReservasCal = Model.Reservas.Where(r=>!r.Cancelada).ToList();
+       @* listaReservasCal = Model.Reservas.Where(r=>!r.Cancelada).ToList();*@
+       mostrarCanceladas=false;
         }
    
     }
@@ -548,6 +549,9 @@ else
                     @: title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
 
                 }
+                @if(!mostrarCanceladas && @i.Cancelada){
+                    @:display:"none",
+                }
 
 
                 @if(i.ReservaEndDate<DateTime.Now){
@@ -612,6 +616,10 @@ else
                 @if(i.ReservaEndDate<DateTime.Now){
                     @:display:'background',
                 }
+                @if(!mostrarCanceladas && @i.Cancelada){
+                    @:display:"none",
+                }
+
                                 start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
                                 id:'@i.ReservaId',
                                 end: '@i.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")',
