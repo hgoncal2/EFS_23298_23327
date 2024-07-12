@@ -19,7 +19,8 @@
 @foreach(var i in reservasProx)
 {
     String c = "success";
-    @if(i.ReservaDate<DateTime.Now.AddDays(3)){
+    @if (i.ReservaDate < DateTime.Now.AddDays(3))
+    {
         c = "danger";
     }
     

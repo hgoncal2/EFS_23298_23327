@@ -71,8 +71,7 @@ namespace EFS_23298_23327.Controllers
         {
             var user = await _context.Utilizadores.FindAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
             HashSet<string> roles = _userManager.GetRolesAsync(user).Result.ToHashSet();
-            var vm = new UtilizadoresViewModel(user);
-            vm.Roles = roles;
+            var vm = new UserPrefs(user);
             return PartialView("_PartialViewPref", vm);
 
         }
@@ -124,6 +123,9 @@ namespace EFS_23298_23327.Controllers
         }
     }
 
-   
+
+    
+
+
 
 }
