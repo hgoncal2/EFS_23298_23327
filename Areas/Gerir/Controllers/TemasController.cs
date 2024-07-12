@@ -12,6 +12,8 @@ using System.Security.Claims;
 using EFS_23298_23327.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using System.Globalization;
+using System.Linq.Dynamic.Core;
+using System.Diagnostics;
 
 namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
@@ -258,27 +260,180 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             List<Salas> s = await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
             ViewBag.s = s.Except(a).ToList();
             ViewBag.TemaAntigo = temas.Nome;
+            ViewBag.SalaAntiga = temas.SalaID;
 
             temas.PrecoStr = temas.Preco.ToString();
 
             return View(temas);
         }
+        [HttpGet]
+        public async Task<IActionResult> Filter(Dictionary<string, string> dictVals, String last) {
 
-        // POST: /Gerir/Temas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+            //Se tem filtro de Anfitriões
+            var hasAnfs = false;
+            var Temas = new List<Temas>();
+            //Inicializa query varia Anfitriões
+            var queryAnf = "";
+            var ListaAnfs = new List<string>();
+            
+            //O dicionário contém "dic" se não houver valores filtrados(excepto anfitriões,não arranjei forma de passar o array no dicionário).Se não houver filtros de texto e não houver filtro de Anfitriões,devolve lista normal
+
+            if (dictVals.ContainsKey("dic") || (dictVals.Count() == 1 && dictVals.ContainsKey("last"))) {
+                Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s=>s.Sala).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+                //Se só houver filtro de anfitriões
+            }
+            
+             else {
+                //Inicializa variáveis a string vazia.Vão ser necessárias para saber que tipo de filtro precisamos(importante para os OrderBys)
+                var query = "";
+                var orderby = "";
+                var orderType = "";
+                //Por cada valor no dicionário(Campo,Valor a filtrar)
+                foreach (var val in dictVals) {
+                    //Se o campo for data/anfs,vamos ignorar por agora
+                    if (!val.Key.ToLower().Contains("dat")) {
+                        if (val.Key.ToLower().Contains("dificuldade")){
+                            query += @val.Key.Replace("_", ".") + "==" + val.Value;
+                            TempData["lastVal"] = val.Value;
+                        } else {
+                            //Se for um campo boolean,a expressão vai ser diferente,temos que ter isso em conta
+
+                            //Se for campo de texto normal(mesmo que seja int,estou a converter para string para fazer o includes)
+                            query += @val.Key.Replace("_", ".") + ".toString().Contains(\"" + val.Value + "\")";
+                        }
+                       
+                        
+                        //Se não for o ultimo valor do dicionário,dá append do "And" para continuar a preencher os campos da query
+                        if (!val.Equals(dictVals.Last())) {
+                            query += " && ";
+                        }
+                    } else {
+                        //Se for data,vamos guardar que tipo de data é(Data inicial reserva,final,ou data criada)
+                        orderby = val.Key;
+                        //Tal como o tipo(desc,asc)
+                        orderType = val.Value;
+                    }
+
+                }
+                //Se a string da query acabar com os caracteres "&&",vamos removê-los
+                if (query.Trim().EndsWith("&&")) {
+                    query = query.Substring(0, query.LastIndexOf("&") - 1);
+
+                }
+                if (query == "") {
+                    //Se query estiver vazia,quer dizer que so foi feito um filtro de datas
+                    if (hasAnfs) {
+                        //Ter em conta se foi efetuaod filtro nos anfitriões
+                        Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).Where(queryAnf, ListaAnfs).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                    } else {
+                        //Se não houver filtro de anfitriões
+                        Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).OrderBy(orderby + " " + orderType).ToListAsync();
+                    }
+
+
+                } else {
+                    if (orderby == "") {
+                        //Se orderBy tiver vazio,e a query não estiver vazia,filtra pelos campos e usa a order por defeito
+                        if (hasAnfs) {
+                            Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).Where(query).Where(queryAnf, ListaAnfs).ToListAsync();
+
+                        } else {
+                            Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).Where(query).OrderByDescending(u => u.DataCriacao).ToListAsync();
+
+                        }
+
+                    } else {
+                        if (hasAnfs) {
+                            Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f=>!f.Deleted)).Include(s => s.Sala).Where(query).Where(queryAnf, ListaAnfs).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                        } else {
+                            Temas = await _context.Temas.Where(u => u.Deleted != true).Include(a => a.ListaFotos.Where(f => !f.Deleted)).Include(s => s.Sala).Where(query).OrderBy(orderby + " " + orderType).ToListAsync();
+
+                        }
+
+
+                    }
+
+
+                }
+
+
+            }
+
+           
+
+            //Ussado para fazer a border do anfitrião
+            TempData["UserLogado"] = User.FindFirstValue(ClaimTypes.Name);
+
+            //Volta a enviar os valores do dicionário de filtros de modo a manter o estado em que estava
+            TempData["dicVals"] = dictVals;
+           
+            //Usado para fazer a legenda
+           
+            //Usado para manter o foco no último campo em que estava a ser escrito
+            TempData["Last"] = last;
+
+
+            //E finalmente,dá return com o novo modelo "filtrado"
+
+            return PartialView("_partialTemasTabela", Temas);
+
+        }
+
+
+
+
+        
+
+
+
+
+
+
+            // POST: /Gerir/Temas/Edit/5
+            // To protect from overposting attacks, enable the specific properties you want to bind to.
+            // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+            [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Icone,PrecoStr,AnunciarTema")] Temas temas, string nomeAntigo) {
+        public async Task<IActionResult> Edit(int id, [Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Icone,PrecoStr,AnunciarTema")] Temas temas, string nomeAntigo,int? SalaAntiga,string? confirmSala,string? guid) {
+
+            //Se o utilizador não quiser mover as reservas para a nova sala
+            if (confirmSala == "false") {
+                //Apaga fotos que tinham sido carregadas e guardadas temporariamente
+                var localizacaoImagemTemp = _webHostEnvironment.WebRootPath;
+                localizacaoImagemTemp = Path.Combine(localizacaoImagemTemp, "Imagens/Temp");
+
+                try {
+                    if (guid != null) {
+                        var files = Directory.GetFiles(localizacaoImagemTemp, "*_" + guid);
+                        foreach (var i in files) {
+                            System.IO.File.Delete(i);
+
+                        }
+                    }
+
+                } catch (Exception e) {
+
+
+                }
+                //Retorna para  a pagina de editar
+                return RedirectToAction("Edit", new { id = temas.TemaId });
+            }
 
             //É improvável que aconteça,mas o temaID pode ter sido adulterado
             if (id != temas.TemaId) {
                 return NotFound();
             }
+
+           
             //Exclui tema atual da lista de salas a usadas por temas
             List<Salas> a = await _context.Temas.Where(s => !s.Deleted && s.TemaId != temas.TemaId).Select(s => s.Sala).Where(s => !s.Deleted && s.SalaId != temas.SalaID).ToListAsync();
             List<Salas> s = await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
-            ViewBag.s = s.Except(a).ToList();
+
+                ViewBag.s = s.Except(a).ToList();
+           
             //Remove Nome antigo(do tema) do modelstate.Isto foi adicionado pois por vezes o modelstate não era válido devido ao nomeAntigo
             //Visto que não faz parte do modelo "Temas"
             if (ModelState.ContainsKey("nomeAntigo")) {
@@ -317,7 +472,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     erro = true;
 
                 }
-
+                //Se tiver imagens,é criado um map cuja key é o filename e o value é o ficheiro,irá ser usado para depois as guardar no disco
                 var hasImagem = false;
                 string nomeImagem = "";
                 Dictionary<Fotos, IFormFile> mapFotos = new Dictionary<Fotos, IFormFile>();
@@ -359,15 +514,95 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
                     return View(temas);
                 }
+                //Se for enviado o request pela primeira vez
+                if (confirmSala == null) {
+                    //Se sala atual for diferente de null(nenhuma) e se for diferente da sala antiga(ter sido escolhido outra sala)
+                    if (temas.SalaID != SalaAntiga && temas.SalaID != null) {
+                        //Se houverem reservas pendentes na sala antiga
+                        var c = _context.Salas.Where(s => s.SalaId == temas.SalaID).Include(s=>s.ListaReservas).Where(s=>s.ListaReservas.Where(s => s.ReservaDate > DateTime.Now).Count() >0);
+                        if (c != null) {
+                            TempData["ConfirmDialog"] = "Esta sala ainda tem reservas pendentes! Ao trocar de sala,estas reservas irão ser movidas para a nova sala!";
+                            //Guarda sala antiga
+                            TempData["SalaAntiga"] = SalaAntiga;
+                            //Se tiverem sido uploaded imagens,vamos guardá-las numa pasta temporária.Estas imagens irão ser apagadas(caso o utilizador cancele) ou movidas para a sua localização suposta
+                            if (hasImagem) {
+                                //Cria novo guid,irá servir para identificar este conjunto de imagens,e certificar-nos que não apagamos ou movemos imagens que não é suposto
+                                Guid g = Guid.NewGuid();
+                                TempData["Guid"] = g;
+                                string localizacaoImagem = _webHostEnvironment.WebRootPath;
+                                localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens/Temp");
+                                if (!Directory.Exists(localizacaoImagem)) {
+                                    Directory.CreateDirectory(localizacaoImagem);
+                                }
+                                foreach (KeyValuePair<Fotos, IFormFile> i in mapFotos) {
+
+                                    localizacaoImagem = Path.Combine(localizacaoImagem, i.Key.Nome+"_"+g);
+                                    using var stream = new FileStream(
+                                  localizacaoImagem, FileMode.Create
+                                  );
+                                    await i.Value.CopyToAsync(stream);
+                                    localizacaoImagem = _webHostEnvironment.WebRootPath;
+                                    localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens/Temp");
+                                }
+
+
+
+                            }
+                            temas.ListaFotos.Clear();
+                            return View(temas);
+                        }
+                    }
+
+                } else {
+                    if (confirmSala == "true" && SalaAntiga!=null) {
+                        //Se utilizador aceitar trocar de sala,vamos buscar as imagens que estão na pasta temporária e criar um objeto foto,adicioná-as à lista do tema,e movê-las para a pasta definitiva
+                        string localizacaoImagem = _webHostEnvironment.WebRootPath;
+                       var localizacaoImagemNova = Path.Combine(localizacaoImagem, "Imagens/");
+                        localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens/Temp");
+                       
+                        try {
+                            var files = Directory.GetFiles(localizacaoImagem,"*_"+guid);
+                            foreach(var i in files) {
+                                var fileName = Path.GetFileName(i).Split("_").FirstOrDefault();
+                                Fotos f = new Fotos(fileName);
+
+                                f.TemaId = temas.TemaId;
+                                f.Tema = temas;
+
+                                temas.ListaFotos.Add(f);
+
+                                Directory.Move(i,localizacaoImagemNova+fileName);
+                            }
+                        } catch (Exception e) {
+
+                        }
+                        
+
+
+                        //Por cada reserva que pertence à sala antiga e esteja pendente
+                        var res = await _context.Reservas.Where(r => r.SalaId == (int)SalaAntiga && r.ReservaDate>DateTime.Now && !r.Cancelada && !r.Deleted).ToListAsync();
+                        var c = res.Count();
+                        //vamos atribuir-lhes a nova sala
+                        foreach(var r in res) {
+                            r.SalaId= (int)temas.SalaID;
+                        }
+                        //e guardar
+                        _context.UpdateRange(res);
+                        //Mostrar mensagem ao utilizador
+                        TempData["CountReservas"] = "Movidas " + c + " reservas para a sala" + temas.SalaID + "!";
+                    }
+                }
                 try {
 
                     _context.Update(temas);
                     //Exclui estas propriedades de serem modificadas
                     //O que estava a acontecer é que a data em que o tema foi editado esta a dar overwrite à data em que foi criado
                     _context.Entry(temas).Property(t => t.DataCriacao).IsModified = false;
+                        
                     _context.Entry(temas).Property(t => t.CriadoPorOid).IsModified = false;
                     _context.Entry(temas).Property(t => t.CriadoPorUsername).IsModified = false;
 
+                    //Guarda as imagens fisicament e no disco,se houver(imagens,não o disco)
                     await _context.SaveChangesAsync();
                     if (hasImagem) {
                         string localizacaoImagem = _webHostEnvironment.WebRootPath;
@@ -396,11 +631,15 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                         throw;
                     }
                 }
+                //Sala antiga leva o valor da nova sala,que caso seja mudada será a antiga.Caso não seja,salaantiga==novaSala,logo não se faz nada.
+                TempData["SalaAntiga"] = temas.SalaID;
                 ViewBag.TemaAntigo = temas.Nome;
                 ViewBag.ShowAlert = true;
+                //Não é permitido anunciar o tema aos cliente se não tiver sala atribuida
                 if (temas.SalaID == null && temas.AnunciarTema) {
                     ViewBag.MensagemErro = "Não foi possível anunciar tema porque <strong class=''>nenhuma sala foi associada</strong>";
                 } else {
+                    //Faz anúncio por websockets ao grupo clientes
                     if (temas.SalaID != null && temas.AnunciarTema) {
                         await _progressHubContext.Clients.Group("Clientes").SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor((int)temas.Dificuldade) + "," + "Tema Atualizado!");
 

@@ -1,0 +1,309 @@
+﻿@model IEnumerable<Temas>
+@using EFS_23298_23327.Data.Enum    
+
+@{
+
+
+
+    var dicVals = new Dictionary<string, string>();
+    if (TempData["dicVals"] != null)
+    {
+        dicVals = (Dictionary<string, string>)@TempData["dicVals"];
+
+    }
+  
+
+   // HashSet<String?> anfs = Model.SelectMany(a => a.ListaAnfitrioes).Select(a => a).ToHashSet();
+    
+
+
+
+}
+
+<span class="text-center text-white mb-2">@AppUtils.GetHumanReadableCount("resultado", Model.Count())</span>
+
+<table id="temas" class="table table-bordered table-sm table-hover table-striped ">
+    <thead class="text-center  table-info">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TemaId)
+                <input class="w-100 filter" id="TemaId" onkeyup="filter(this)"></input>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
+                <input class="w-100 filter" id="Nome" onkeyup="filter(this)"></input>
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descricao)
+                <input class="w-100 filter" id="Descricao" onkeyup="filter(this)"></input>
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TempoEstimado)
+                <input class="w-100 filter" id="TempoEstimado" onkeyup="filter(this)"></input>
+
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MinPessoas)
+                <input class="w-100 filter" id="MinPessoas" onkeyup="filter(this)"></input>
+
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaxPessoas)
+                <input class="w-100 filter" id="MaxPessoas" onkeyup="filter(this)"></input>
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dificuldade)
+                <select class="form-select text-white bg-primary filter" id="Dificuldade">
+                    <option class="text-white" value="Dificuldade">Todas</option>
+                    @foreach (var dif in Html.GetEnumSelectList<Dificuldade>()) {
+                        <option class="text-@DifficultiesValue.GetDifficultyColorStr(dif.Value)" value="@dif.Value">@dif.Text</option>
+                    }
+                </select>
+            </th>
+            <th class="th-lg">
+                @Html.DisplayNameFor(model => model.ListaFotos)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sala)
+                <input class="w-100 filter" id="Sala_Numero" onkeyup="filter(this)"></input>
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Preco)
+                <input class="w-100 filter" id="Preco" onkeyup="filter(this)"></input>
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Icone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DataCriacao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CriadoPorUsername)
+                <input class="w-100 filter" id="CriadoPorUsername" onkeyup="filter(this)"></input>
+
+            </th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model) {
+
+            <tr class="text-center table-primary align-text-top">
+                <td scope="row" class="text-center align-items-center align-content-center">
+                    @Html.DisplayFor(modelItem => item.TemaId)
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @if (item.MinPessoas != null) {
+                        <div style="width:15vw ;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" title="@item.Descricao">
+                            @Html.DisplayFor(modelItem => item.Descricao)
+                        </div>
+
+
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @Html.DisplayFor(modelItem => item.TempoEstimado) Minutos
+                </td>
+                <td class="text-center align-items-center align-content-center">
+
+                    @if (item.MinPessoas != null) {
+
+                        @Html.DisplayFor(modelItem => item.MinPessoas)
+                        ;
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @if (item.MinPessoas != null) {
+
+                        @Html.DisplayFor(modelItem => item.MaxPessoas)
+                        ;
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    <span class="text-@DifficultiesValue.GetDifficultyColor((int) item.Dificuldade)">
+                        @Html.DisplayFor(modelItem => item.Dificuldade)
+                    </span>
+                </td>
+                <td class="text-center align-items-center align-content-center">
+
+
+
+
+                    @if (@item.ListaFotos != null || @item.ListaFotos.Any()) {
+                        <div id="carouselIndex" class="carousel slide card-text " data-bs-ride="carousel">
+
+                            <div class="carousel-inner" style="height=200px;width:200px;">
+                                @foreach (var i in @item.ListaFotos) {
+                                    @if (i.FotoId == @item.ListaFotos.First().FotoId) {
+                                        <div class="carousel-item active" data-bs-interval="2000">
+                                            <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                               href="~/Imagens/@i.Nome"> <img height="200px;width:200px;" src="/Imagens/@i.Nome" class="d-block w-100 "></a>
+
+                                        </div>
+                                    } else {
+                                        <div class="carousel-item" data-bs-interval="2000">
+                                            <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
+                                               href="~/Imagens/@i.Nome"><img height="200px;width:200px;" src="/Imagens/@i.Nome" class="d-block w-100"></a>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+
+
+
+
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @if (item.Sala != null) {
+                        <ul class="list-group list-group-horizontal">
+
+
+                            <li class="list-group-item text-white bg-success flex-fill ms-2">@Html.DisplayFor(modelItem => item.Sala.Numero)</li>
+                        </ul>
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @if (item.Preco != null) {
+
+
+
+                        @Html.DisplayFor(modelItem => item.Preco)
+
+                        @:€
+
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @if (item.Icone != null) {
+
+
+
+
+
+                        <i class="text-@DifficultiesValue.GetDifficultyColor((int) item.Dificuldade) @item.Icone fa-2x"></i>
+
+
+                    } else {
+
+                        <span>N.A.</span>
+                    }
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @Html.DisplayFor(modelItem => item.DataCriacao)
+                </td>
+                <td class="text-center align-items-center align-content-center">
+                    @Html.DisplayFor(modelItem => item.CriadoPorUsername)
+                </td>
+                <td class="align-content-center text-nowrap">
+                    <a asp-action="Edit" title="Editar" asp-route-id="@item.TemaId"><i class="fa fa-pencil link-success icons-index"></i></a>
+                    <a asp-action="Details" title="Ver" asp-route-id="@item.TemaId"><i class="fa-solid fa-circle-info icons-index"></i></a>
+                    <a data-bs-toggle="modal" title="Apagar" style="cursor:pointer" data-bs-target="#modalApagar" onclick="teste('@item.TemaId','@item.Nome')"><i class="fa fa-trash icons-index link-danger delete"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+                    <script>
+
+    $("#Dificuldade").on("change", function () {
+        console.log($(this).val())
+        var el = $("#Dificuldade");
+        if(el.val()!="Dificuldade"){
+            el.removeClass("text-white")
+        }
+        console.log(el.val() == "0")
+        if(el.val()=="0"){
+            el.addClass("text-@DifficultiesValue.GetDifficultyColor(0)")
+            console.log(el.val() == "0")
+        }
+        if(el.val()=="1"){
+            el.addClass("text-@DifficultiesValue.GetDifficultyColor(1)")
+        }
+        if (el.val() == "2") {
+            el.addClass("text-@DifficultiesValue.GetDifficultyColor(2)")
+        }
+        if (el.val() == "3") {
+            el.addClass("text-@DifficultiesValue.GetDifficultyColor(3)")
+
+        }
+        if ('@TempData["lastVal"]' != el.val()) {
+            filter(el);
+        }
+    })
+    $(".table").ready(function () {
+        var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+        var dictVals = new Object();
+       
+
+
+    @foreach (var i in dicVals)
+    {
+        @:$("#@i.Key").val("@i.Value").change();
+        @:console.log("#@i.Key");
+    }
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+              var lastId = "@TempData["Last"]";
+ 
+
+   
+
+    if ( lastId.toLowerCase().indexOf("dificuldade") >= 0 || lastId.toLowerCase().indexOf("dat") >= 0) {
+
+    } else {
+        var fldLength = $(lastId).val().length;
+        $(lastId).focus();
+        $(lastId)[0].setSelectionRange(fldLength, fldLength);
+    }
+                    </script>

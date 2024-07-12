@@ -82,7 +82,16 @@
             <th class="w-100 text-nowrap">
                 @Html.DisplayNameFor(model => model.Cancelada)<br />
                 <select class="form-select filter text-dark bg-white w-100" id="Cancelada" aria-label="Default select example">
-                    <option selected></option>
+                    <option selected value="@null">Escolher</option>
+                    <option class="text-success" onselect="filter(this)" value="true">Sim</option>
+                    <option class="text-danger" onselect="filter(this)" value="false">Não</option>
+
+                </select>
+            </th>
+            <th class="w-100 text-nowrap">
+               Pendentes<br />
+                <select class="form-select filter text-dark bg-white w-100" id="Pendentes" aria-label="Default select example">
+                    <option selected value="@null">Escolher</option>
                     <option class="text-success" onselect="filter(this)" value="true">Sim</option>
                     <option class="text-danger" onselect="filter(this)" value="false">Não</option>
 
@@ -183,7 +192,13 @@
                         <span class="text-success fw-bold">Não</span>
                     }
                 </td>
-
+                <td class="text-center align-items-center align-content-center">
+                    @if (item.ReservaDate > DateTime.Now) {
+                        <span class="text-success fw-bold">Sim</span>
+                    } else {
+                        <span class="text-danger fw-bold">Não</span>
+                    }
+                </td>
                 <td class="text-center align-items-center align-content-center">
                     @Html.DisplayFor(modelItem => item.DataCriacao)
                 </td>
@@ -200,22 +215,28 @@
 <script>
     $('.multiple-checkboxes').multiselect('refresh');
 
-    $("#Cancelada").on("change", function () {
-        var el = $("#Cancelada");
-        if (el.val() == "true" || el.val() == "false") {
-            el.removeClass("text-dark")
-            if (el.val() == "true") {
-                el.addClass("text-danger")
-            } else {
-                el.addClass("text-success")
-            }}
-        if ('@TempData["lastVal"]' != el.val()) {
-            filter(el);
-        }
-    });
+  
 
     $(".table").ready(function () {
 
+        $('#Pendentes').select2({
+            minimumResultsForSearch: -1
+        });
+        $('#Pendentes').on('select2:select', function (e) {
+           
+            var el = $("#Pendentes")
+           
+            filter(el);
+        });
+        $('#Cancelada').select2({
+            minimumResultsForSearch: -1,
+        });
+        $('#Cancelada').on('select2:select', function (e) {
+           
+            var el = $("#Cancelada")
+           
+            filter(el);
+        });
        
         var dictVals = new Object();
         $("#ListaAnfitrioes").multiselect('destroy');
@@ -277,7 +298,7 @@
             $("#ListaAnfitrioes").multiselect('select', arr);
         }
 
-    if (lastId.toLowerCase().indexOf("cancelada") >= 0 || lastId.toLowerCase().indexOf("listaanfi") >= 0 || lastId.toLowerCase().indexOf("dat") >= 0) {
+    if (lastId.toLowerCase().indexOf("cancelada") >= 0 || lastId.toLowerCase().indexOf("listaanfi") >= 0 || lastId.toLowerCase().indexOf("dat") >= 0 || lastId.toLowerCase().indexOf("pendentes") >= 0) {
            
         }else{
         var fldLength = $(lastId).val().length;

@@ -35,22 +35,7 @@ namespace EFS_23298_23327.Controllers
         }
 
 
-        [CustomAuthorize(Roles = "Anfitriao")]
-        public async Task<IActionResult> Privacy() {
-            var ud = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var u = await _context.Anfitrioes.Where(u => u.Id == ud).Include(u => u.userPrefsAn).ThenInclude(u => u.Cores).FirstOrDefaultAsync();
-            TempData["userLoggedNome"] = u.PrimeiroNome + " " + u.UltimoNome;
-            var r = await _context.Reservas.Include(c => c.Cliente).Include(a => a.Sala).Include(a => a.ListaAnfitrioes).Where(a => a.ListaAnfitrioes.Contains(u)).OrderBy(r => r.ReservaDate).ToListAsync();
-            var vm = new ReservasDashboardViewModel(u.userPrefsAn, r);
-            if (TempData["Save"] != null) {
-                TempData["Save"] = TempData["Save"];
-
-            }
-
-
-            return View(vm);
-        }
+       
 
         [HttpPost]
         public async Task<IActionResult> SaveCor(Dictionary<string, string> dic, string showCancel) {

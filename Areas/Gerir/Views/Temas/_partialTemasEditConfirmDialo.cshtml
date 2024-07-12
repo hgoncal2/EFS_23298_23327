@@ -1,0 +1,262 @@
+﻿@using EFS_23298_23327.Data.Enum
+@model EFS_23298_23327.Models.Temas
+@using EFS_23298_23327.Data
+@{
+    ViewData["Title"] = "Editar";
+}
+
+@{
+
+    var nenhumaSala = false;
+}
+
+
+<div class="mt-4">
+    <a class="bi bi-arrow-left-circle-fill h2 me-5 text-info iconesConf" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
+</div>
+
+<h2 class="ms-2  mt-4">Editar Tema <span style="color:mediumpurple"><strong>@Model.Nome</strong></span> </h2>
+
+<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered ">
+    <div class="modal-content">
+        <div class="modal-header modal-header-danger">
+            <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar tema '<span id="nomeTema">a</span>' ?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-footer ">
+
+            <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
+            <form id="edi" method="post">
+                <button type="submit" class="btn btn-danger">Sim</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<hr class="bg-primary " />
+@if (@ViewBag.MensagemErro != null) {
+    <div class="alert alert-warning  text-center alert-dismissible fade show" role="alert">
+        @Html.Raw(@ViewBag.MensagemErro)
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+}
+@if (ViewBag.ShowAlert == true) {
+    <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
+        Tema <strong>@Model.Nome</strong> guardado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["FotoEliminada"] != null) {
+    <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
+        Foto eliminada com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (@ViewBag.TemaExistente != null && ViewBag.TemaExistente != Model.Nome) {
+    <div class="alert alert-danger alert-dismissible text-center fade show" role="alert">
+        Erro! Tema <strong>@ViewBag.TemaExistente</strong> já existe!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+}
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
+    <input type="hidden" asp-for="TemaId" />
+    <div class="container-fluid mt-1 justify-content-center h-100 d-inline-block">
+        <div class="row">
+            <div class="col">
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Nome, new { @class = "required" })
+                    <input asp-for="Nome" class="form-control" />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
+                <div class="form-group h-50">
+                    <label asp-for="Descricao" class="control-label required"></label>
+                    <textarea asp-for="Descricao" class="form-control h-75">
+
+                    </textarea>
+                    <span asp-validation-for="Descricao" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TempoEstimado, new { @class = "required" })
+                    <input asp-for="TempoEstimado" class="form-control" />
+                    <span asp-validation-for="TempoEstimado" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div style="flex:1">
+                            @Html.LabelFor(m => m.PrecoStr, new { @class = "required" })
+                            <input asp-for="PrecoStr" class="form-control" />
+                            <span asp-validation-for="PrecoStr" class="text-danger"></span>
+                        </div>
+                        <div class="mt-4">
+                            <span>
+                                <span id="preco" class="input-group-text">€</span>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label asp-for="MinPessoas" class="control-label required"></label>
+                    <input min="1" max="10" asp-for="MinPessoas" class="form-control" />
+                    <span asp-validation-for="MinPessoas" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="MaxPessoas" class="control-label required"></label>
+                    <input min="1" max="20" asp-for="MaxPessoas" class="form-control" />
+                    <span asp-validation-for="MaxPessoas" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Dificuldade, new { @class = "required" })
+                    <select id="dif" class="form-select text-@DifficultiesValue.GetDifficultyColor((int)Model.Dificuldade)" asp-for="Dificuldade" aria-label="Escolher dificuldade">
+                        @foreach (var dif in Html.GetEnumSelectList<Dificuldade>()) {
+                            <option class="text-@DifficultiesValue.GetDifficultyColorStr(dif.Value)" value="@dif.Value">@dif.Text</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Dificuldade" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Icone)<a href="https://icons.getbootstrap.com/" target="_blank"><i data-bs-toggle="tooltip" data-html="true" data-bs-placement="right" data-bs-html='true' title="Ver todos os ícones disponíveis" class=" ms-2 bi bi-patch-question"></i></a>
+                    <div class="input-group">
+
+                        </br>
+                        <input asp-for="Icone" placeholder="bi bi-icon" class="form-control border-end-0 " id="temasIcon" />
+                        <i id="icon" class="text-@DifficultiesValue.GetDifficultyColor((int)@Model.Dificuldade) ms-2 @Model.Icone fa-2x"></i>
+
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    @Html.LabelFor(m => m.Sala)
+                    @if (@ViewBag.s != null && (ViewBag.s as List<Salas>).Any()) {
+                        <select class="form-select" asp-for="SalaID" aria-label="Escolher Sala">
+                            <option value="@null">Nenhuma </option>
+                            @foreach (var dif in @ViewBag.s as List<Salas>) {
+                                @if (dif.SalaId == Model.SalaID) {
+                                    <option selected value="@dif.SalaId">@dif.Numero</option>
+
+                                } else {
+                                    <option value="@dif.SalaId">@dif.Numero</option>
+
+                                }
+                            }
+                        </select>
+                    } else {
+                        nenhumaSala = true;
+                        <p>Nenhuma sala disponível</p>
+                    }
+
+
+                    <span asp-validation-for="SalaID" class="text-danger"></span>
+                </div>
+                <div class="form-group form-check mt-2">
+
+                    @if (nenhumaSala) {
+                        <input class="form-check-input form-control" disabled="true" asp-for="AnunciarTema" type="checkbox" id="flexCheckDefault">
+
+                    } else {
+                        <input class="form-check-input form-control" asp-for="AnunciarTema" type="checkbox" id="flexCheckDefault">
+
+                    }
+                    <label class="form-check-label ms-2" for="flexCheckDefault">
+                        @Html.LabelFor(m => m.AnunciarTema)<span data-bs-toggle="tooltip" data-html="true" data-bs-placement="right" title="Anunciaa criação do tema a todos os utilizadores via websockets.Necessita de sala associdada"><i class=" ms-2 bi bi-patch-question" id="anunciaTema"></i></span>
+
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br /><br />
+
+    <div class="w-50 container-fluid justify-content-center align-items-center text-center">
+        <div class="row justify-content-center align-items-center text-center">
+            Adicionar Imagens
+
+
+            <input asp-for="ListaFotos" type="file" name="Imagem" accept=".png,.jpg,.jpeg" class="form-control" data-show-caption="true" multiple></i></input>
+
+        </div>
+
+
+        <span class="text-danger" asp-validation-for="ListaFotos"></span>
+    </div>
+    <br />
+    <div class="form-group text-center mt-lg-4  mx-auto">
+        <a type="submit">
+
+            @if (@ViewBag.TemaAntigo != null) {
+                @Html.Hidden("NomeAntigo", (String)@ViewBag.TemaAntigo)
+            }
+            
+                @Html.Hidden("SalaAntiga", (int?)@ViewBag.SalaAntiga)
+            @Html.Hidden("ConfirmSala", (bool?)true)
+
+            <button class="btn btn-outline-secondary btn-lg"><i class="fa fa-floppy-disk me-2"></i>Guardar tema</button>
+        </a>
+    </div>
+
+    <br />
+    <br />
+
+
+
+</form>
+
+
+<form id="apagarTema" method="post" asp-action="EliminaFotos" asp-route-id="@Model.TemaId">
+    <button class="btn btn-danger align-self-end" title="Eliminar Todas"> <i class="fa fa-trash me-2"></i>Eliminar todas</button>
+</form>
+<br />
+<div class="row">
+
+
+    @foreach (var foto in @Model.ListaFotos) {
+
+        <div class="col-lg-2 d-none d-lg-block text-center  " style="width:250px">
+            <div class="card col-xs-6" style="min-height:100%">
+                <div style=" height: 100px;">
+                    <a data-fancybox="gallery" data-caption="Imagem do tema '@Model.Nome'"
+                       href="~/Imagens/@foto.Nome" style="text-decoration:none;min-height:50%" class="mt-2">
+                        <img src="~/Imagens/@foto.Nome"
+                             alt="Imagem do tema '@Model.Nome'"
+                             title="Imagem do tema '@Model.Nome'"
+                             class="rounded img-thumbnail  expandeImagem" width="100%" style="max-height:100px;min-height:100px" />
+
+                    </a>
+                </div>
+
+                <div class="card-body m-auto" style="min-height:20px">
+                    <form id="apagarTema" method="post" asp-action="EliminaFoto" asp-route-id="@foto.FotoId">
+                        <button class="btn btn-danger align-self-end" title="Eliminar imagem"> <i class="fa fa-trash me-2"></i>Eliminar</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+
+
+    }
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

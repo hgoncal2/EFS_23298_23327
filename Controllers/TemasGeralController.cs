@@ -36,7 +36,7 @@ namespace EFS_23298_23327.Controllers
             //Usado para testes ws
            // await _progressHubContext.Clients.All.SendAsync("tema", "system", "teste");
 
-            var applicationDbContext = _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Where(m => m.Deleted != true).Where(t=>t.ListaFotos.Any()).Where(t=> t.SalaID!=null).OrderByDescending(m => m.DataCriacao);
+            var applicationDbContext = _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Where(m => m.Deleted != true).Where(t=>t.ListaFotos.Where(f=>!f.Deleted).Any()).Where(t=> t.SalaID!=null).OrderByDescending(m => m.DataCriacao);
             ICollection<TemasFotoViewModel> TmVm = new List<TemasFotoViewModel>();
             var lista = await applicationDbContext.ToListAsync();
             if (lista != null)
