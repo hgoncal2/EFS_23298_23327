@@ -399,8 +399,9 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Icone,PrecoStr,AnunciarTema")] Temas temas, string nomeAntigo,int? SalaAntiga,string? confirmSala,string? guid) {
 
-
+            //Se o utilizador não quiser mover as reservas para a nova sala
             if (confirmSala == "false") {
+                //Apaga fotos que tinham sido carregadas e guardadas temporariamente
                 var localizacaoImagemTemp = _webHostEnvironment.WebRootPath;
                 localizacaoImagemTemp = Path.Combine(localizacaoImagemTemp, "Imagens/Temp");
 
@@ -417,6 +418,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
 
                 }
+                //Retorna para  a pagina de editar
                 return RedirectToAction("Edit", new { id = temas.TemaId });
             }
 
@@ -470,7 +472,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     erro = true;
 
                 }
-
+                //Se tiver imagens,é criado um map cuja key é o filename e o value é o ficheiro,irá ser usado para depois as guardar no disco
                 var hasImagem = false;
                 string nomeImagem = "";
                 Dictionary<Fotos, IFormFile> mapFotos = new Dictionary<Fotos, IFormFile>();
@@ -512,13 +514,19 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
                     return View(temas);
                 }
+                //Se for enviado o request pela primeira vez
                 if (confirmSala == null) {
+                    //Se sala atual for diferente de null(nenhuma) e se for diferente da sala antiga(ter sido escolhido outra sala)
                     if (temas.SalaID != SalaAntiga && temas.SalaID != null) {
-                        var c = _context.Salas.Where(s => s.SalaId == temas.SalaID).Include(s => s.ListaReservas.Where(s => s.ReservaDate > DateTime.Now));
+                        //Se houverem reservas pendentes na sala antiga
+                        var c = _context.Salas.Where(s => s.SalaId == temas.SalaID).Include(s=>s.ListaReservas).Where(s=>s.ListaReservas.Where(s => s.ReservaDate > DateTime.Now).Count() >0);
                         if (c != null) {
                             TempData["ConfirmDialog"] = "Esta sala ainda tem reservas pendentes! Ao trocar de sala,estas reservas irão ser movidas para a nova sala!";
+                            //Guarda sala antiga
                             TempData["SalaAntiga"] = SalaAntiga;
+                            //Se tiverem sido uploaded imagens,vamos guardá-las numa pasta temporária.Estas imagens irão ser apagadas(caso o utilizador cancele) ou movidas para a sua localização suposta
                             if (hasImagem) {
+                                //Cria novo guid,irá servir para identificar este conjunto de imagens,e certificar-nos que não apagamos ou movemos imagens que não é suposto
                                 Guid g = Guid.NewGuid();
                                 TempData["Guid"] = g;
                                 string localizacaoImagem = _webHostEnvironment.WebRootPath;
@@ -547,6 +555,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
                 } else {
                     if (confirmSala == "true" && SalaAntiga!=null) {
+                        //Se utilizador aceitar trocar de sala,vamos buscar as imagens que estão na pasta temporária e criar um objeto foto,adicioná-as à lista do tema,e movê-las para a pasta definitiva
                         string localizacaoImagem = _webHostEnvironment.WebRootPath;
                        var localizacaoImagemNova = Path.Combine(localizacaoImagem, "Imagens/");
                         localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens/Temp");
@@ -570,13 +579,16 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                         
 
 
-
+                        //Por cada reserva que pertence à sala antiga e esteja pendente
                         var res = await _context.Reservas.Where(r => r.SalaId == (int)SalaAntiga && r.ReservaDate>DateTime.Now && !r.Cancelada && !r.Deleted).ToListAsync();
                         var c = res.Count();
+                        //vamos atribuir-lhes a nova sala
                         foreach(var r in res) {
                             r.SalaId= (int)temas.SalaID;
                         }
+                        //e guardar
                         _context.UpdateRange(res);
+                        //Mostrar mensagem ao utilizador
                         TempData["CountReservas"] = "Movidas " + c + " reservas para a sala" + temas.SalaID + "!";
                     }
                 }
@@ -590,6 +602,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     _context.Entry(temas).Property(t => t.CriadoPorOid).IsModified = false;
                     _context.Entry(temas).Property(t => t.CriadoPorUsername).IsModified = false;
 
+                    //Guarda as imagens fisicament e no disco,se houver(imagens,não o disco)
                     await _context.SaveChangesAsync();
                     if (hasImagem) {
                         string localizacaoImagem = _webHostEnvironment.WebRootPath;
@@ -618,12 +631,15 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                         throw;
                     }
                 }
+                //Sala antiga leva o valor da nova sala,que caso seja mudada será a antiga.Caso não seja,salaantiga==novaSala,logo não se faz nada.
                 TempData["SalaAntiga"] = temas.SalaID;
                 ViewBag.TemaAntigo = temas.Nome;
                 ViewBag.ShowAlert = true;
+                //Não é permitido anunciar o tema aos cliente se não tiver sala atribuida
                 if (temas.SalaID == null && temas.AnunciarTema) {
                     ViewBag.MensagemErro = "Não foi possível anunciar tema porque <strong class=''>nenhuma sala foi associada</strong>";
                 } else {
+                    //Faz anúncio por websockets ao grupo clientes
                     if (temas.SalaID != null && temas.AnunciarTema) {
                         await _progressHubContext.Clients.Group("Clientes").SendAsync("tema", "system", temas.SalaID + "," + DifficultiesValue.GetDifficultyColor((int)temas.Dificuldade) + "," + "Tema Atualizado!");
 
