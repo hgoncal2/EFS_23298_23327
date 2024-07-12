@@ -170,7 +170,19 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     if (!val.Key.ToLower().Contains("dat") && !val.Key.ToLower().Contains("anfs")) {
                         //Se for um campo boolean,a expressão vai ser diferente,temos que ter isso em conta
                             if (val.Value.ToLower().Contains("true") || val.Value.ToLower().Contains("false")) {
+                            if(val.Key.ToLower().Contains("pendentes"))
+                            {
+
+                                if (val.Value.ToLower().Contains("true")) {
+                                    query += "ReservaDate > DateTime.Now";
+                                } else {
+                                    query += "ReservaDate <= DateTime.Now";
+                                }
+                                
+                            } else {
                                 query += @val.Key.Replace("_", ".") + "==" + val.Value;
+                            }
+                               
                             //Guarda id do campo que foi submetido em ultimo.Esta linha de código é extremamente importante devido ao listener que está na dropdown(on change)que ative cada vez que se dá render da partial view
                             //Se este tempdata não tiver nulo,significa que já foi filtrado,e não preciisamos de chamar esta função outra vez.Esta verificação está a ser feita no lado do cliente
                             //Sem esta linha de código,vai entra em loop infinito!

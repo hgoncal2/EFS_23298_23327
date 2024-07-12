@@ -18,7 +18,23 @@
 
 <h2 class="ms-2  mt-4">Editar Tema <span style="color:mediumpurple"><strong>@Model.Nome</strong></span> </h2>
 
+<div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered ">
+    <div class="modal-content">
+        <div class="modal-header modal-header-danger">
+            <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar tema '<span id="nomeTema">a</span>' ?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-footer ">
 
+            <button type="button" class="btn btn-secondary mr-auto" data-bs-dismiss="modal">Fechar</button>
+            <form id="edi" method="post">
+                <button type="submit" class="btn btn-danger">Sim</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
 
 <hr class="bg-primary " />
 @if (@ViewBag.MensagemErro != null) {
@@ -28,65 +44,29 @@
     </div>
 
 }
-
-
-
-
-@if (ViewBag.ShowAlert == true)
-{
+@if (ViewBag.ShowAlert == true) {
     <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
         Tema <strong>@Model.Nome</strong> guardado com sucesso!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-
     </div>
 }
-@if (TempData["FotoEliminada"] != null)
-{
+@if (TempData["FotoEliminada"] != null) {
     <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
-       Foto eliminada com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (TempData["CountReservas"] != null) {
-    <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
-        @TempData["CountReservas"]
+        Foto eliminada com sucesso!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-@if (@ViewBag.TemaExistente != null && ViewBag.TemaExistente != Model.Nome)
-{
+@if (@ViewBag.TemaExistente != null && ViewBag.TemaExistente != Model.Nome) {
     <div class="alert alert-danger alert-dismissible text-center fade show" role="alert">
         Erro! Tema <strong>@ViewBag.TemaExistente</strong> já existe!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    
+
 }
-<div id="confirm"></div>
+
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
-    @if(TempData["ConfirmDialog"] != null){
-        <div class="modal fade" id="modalConfirm" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
-    <div class="modal-content">
-    <div class="modal-header bg-warning">
-    <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Sala @TempData["SalaAntiga"] contém reservas ativas!
-    <button type = "button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-                    <div class="modal-body">
-                        @TempData["ConfirmDialog"]
-                    </div>
-    <div class="modal-footer ">
 
-                        <button type="submit" asp-route-guid="@TempData["Guid"]" asp-route-confirmSala="false" class="btn btn-danger mr-auto" data-bs-dismiss="modal">Fechar</button>
-
-                        <button asp-route-confirmSala="true" asp-route-SalaAntiga="@TempData["SalaAntiga"]" asp-route-guid="@TempData["Guid"]" type="submit" class="btn btn-success">Eu percebi</button>
-    
-    </div>
-    </div>
-    </div>
-    </div>
-    
-}  
     <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
     <input type="hidden" asp-for="TemaId" />
     <div class="container-fluid mt-1 justify-content-center h-100 d-inline-block">
@@ -123,7 +103,7 @@
                             </span>
                         </div>
                     </div>
-                   
+
                 </div>
             </div>
 
@@ -141,8 +121,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Dificuldade, new { @class = "required" })
                     <select id="dif" class="form-select text-@DifficultiesValue.GetDifficultyColor((int)Model.Dificuldade)" asp-for="Dificuldade" aria-label="Escolher dificuldade">
-                        @foreach (var dif in Html.GetEnumSelectList<Dificuldade>())
-                        {
+                        @foreach (var dif in Html.GetEnumSelectList<Dificuldade>()) {
                             <option class="text-@DifficultiesValue.GetDifficultyColorStr(dif.Value)" value="@dif.Value">@dif.Text</option>
                         }
                     </select>
@@ -153,7 +132,7 @@
                     <div class="input-group">
 
                         </br>
-                        <input asp-for="Icone"  placeholder="bi bi-icon" class="form-control border-end-0 " id="temasIcon" />
+                        <input asp-for="Icone" placeholder="bi bi-icon" class="form-control border-end-0 " id="temasIcon" />
                         <i id="icon" class="text-@DifficultiesValue.GetDifficultyColor((int)@Model.Dificuldade) ms-2 @Model.Icone fa-2x"></i>
 
                     </div>
@@ -165,17 +144,17 @@
                         <select class="form-select" asp-for="SalaID" aria-label="Escolher Sala">
                             <option value="@null">Nenhuma </option>
                             @foreach (var dif in @ViewBag.s as List<Salas>) {
-                                @if(dif.SalaId == Model.SalaID){
+                                @if (dif.SalaId == Model.SalaID) {
                                     <option selected value="@dif.SalaId">@dif.Numero</option>
 
-                                }else{
+                                } else {
                                     <option value="@dif.SalaId">@dif.Numero</option>
 
                                 }
                             }
                         </select>
                     } else {
-                        nenhumaSala=true;
+                        nenhumaSala = true;
                         <p>Nenhuma sala disponível</p>
                     }
 
@@ -200,33 +179,30 @@
         </div>
     </div>
     <br /><br />
-    
+
     <div class="w-50 container-fluid justify-content-center align-items-center text-center">
         <div class="row justify-content-center align-items-center text-center">
-       Adicionar Imagens
+            Adicionar Imagens
 
 
             <input asp-for="ListaFotos" type="file" name="Imagem" accept=".png,.jpg,.jpeg" class="form-control" data-show-caption="true" multiple></i></input>
-           
+
         </div>
-        
-        
+
+
         <span class="text-danger" asp-validation-for="ListaFotos"></span>
     </div>
     <br />
     <div class="form-group text-center mt-lg-4  mx-auto">
         <a type="submit">
-           
-            @if (@ViewBag.TemaAntigo != null)
-            {
-                @Html.Hidden("NomeAntigo",(String) @ViewBag.TemaAntigo)
-            }
+
             @if (@ViewBag.TemaAntigo != null) {
-                @Html.Hidden("SalaAntiga", (int?)@TempData["SalaAntiga"])
+                @Html.Hidden("NomeAntigo", (String)@ViewBag.TemaAntigo)
             }
-               
             
-            
+                @Html.Hidden("SalaAntiga", (int?)@ViewBag.SalaAntiga)
+            @Html.Hidden("ConfirmSala", (bool?)true)
+
             <button class="btn btn-outline-secondary btn-lg"><i class="fa fa-floppy-disk me-2"></i>Guardar tema</button>
         </a>
     </div>
@@ -234,7 +210,7 @@
     <br />
     <br />
 
-    
+
 
 </form>
 
@@ -244,22 +220,21 @@
 </form>
 <br />
 <div class="row">
-    
 
-    @foreach (var foto in @Model.ListaFotos)
-    {
+
+    @foreach (var foto in @Model.ListaFotos) {
 
         <div class="col-lg-2 d-none d-lg-block text-center  " style="width:250px">
             <div class="card col-xs-6" style="min-height:100%">
                 <div style=" height: 100px;">
-                <a data-fancybox="gallery" data-caption="Imagem do tema '@Model.Nome'"
+                    <a data-fancybox="gallery" data-caption="Imagem do tema '@Model.Nome'"
                        href="~/Imagens/@foto.Nome" style="text-decoration:none;min-height:50%" class="mt-2">
-                    <img src="~/Imagens/@foto.Nome"
-                         alt="Imagem do tema '@Model.Nome'"
-                         title="Imagem do tema '@Model.Nome'"
-                         class="rounded img-thumbnail  expandeImagem" width="100%" style="max-height:100px;min-height:100px" />
+                        <img src="~/Imagens/@foto.Nome"
+                             alt="Imagem do tema '@Model.Nome'"
+                             title="Imagem do tema '@Model.Nome'"
+                             class="rounded img-thumbnail  expandeImagem" width="100%" style="max-height:100px;min-height:100px" />
 
-                </a>
+                    </a>
                 </div>
 
                 <div class="card-body m-auto" style="min-height:20px">
@@ -267,7 +242,7 @@
                         <button class="btn btn-danger align-self-end" title="Eliminar imagem"> <i class="fa fa-trash me-2"></i>Eliminar</button>
                     </form>
                 </div>
-                
+
             </div>
         </div>
 
@@ -279,22 +254,6 @@
     }
 
 </div>
-
-
-
-
-<script>
-    $(document).ready(function () {
-
-    @if (TempData["ConfirmDialog"] != null) {
-
-        @:$("#modalConfirm").modal("show");
-    }
-        })
-
-
-</script>
-
 
 @section Scripts {
     @{

@@ -13,6 +13,7 @@ using EFS_23298_23327.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using System.Globalization;
 using System.Linq.Dynamic.Core;
+using System.Diagnostics;
 
 namespace EFS_23298_23327.Areas.Gerir.Controllers
 {
@@ -259,6 +260,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             List<Salas> s = await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
             ViewBag.s = s.Except(a).ToList();
             ViewBag.TemaAntigo = temas.Nome;
+            ViewBag.SalaAntiga = temas.SalaID;
 
             temas.PrecoStr = temas.Preco.ToString();
 
@@ -383,36 +385,53 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
 
 
+        
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-        // POST: /Gerir/Temas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+            // POST: /Gerir/Temas/Edit/5
+            // To protect from overposting attacks, enable the specific properties you want to bind to.
+            // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+            [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Icone,PrecoStr,AnunciarTema")] Temas temas, string nomeAntigo) {
+        public async Task<IActionResult> Edit(int id, [Bind("TemaId,Nome,Descricao,TempoEstimado,MinPessoas,MaxPessoas,Dificuldade,SalaID,Icone,PrecoStr,AnunciarTema")] Temas temas, string nomeAntigo,int? SalaAntiga,string? confirmSala,string? guid) {
+
+
+            if (confirmSala == "false") {
+                var localizacaoImagemTemp = _webHostEnvironment.WebRootPath;
+                localizacaoImagemTemp = Path.Combine(localizacaoImagemTemp, "Imagens/Temp");
+
+                try {
+                    if (guid != null) {
+                        var files = Directory.GetFiles(localizacaoImagemTemp, "*_" + guid);
+                        foreach (var i in files) {
+                            System.IO.File.Delete(i);
+
+                        }
+                    }
+
+                } catch (Exception e) {
+
+
+                }
+                return RedirectToAction("Edit", new { id = temas.TemaId });
+            }
 
             //É improvável que aconteça,mas o temaID pode ter sido adulterado
             if (id != temas.TemaId) {
                 return NotFound();
             }
+
+           
             //Exclui tema atual da lista de salas a usadas por temas
             List<Salas> a = await _context.Temas.Where(s => !s.Deleted && s.TemaId != temas.TemaId).Select(s => s.Sala).Where(s => !s.Deleted && s.SalaId != temas.SalaID).ToListAsync();
             List<Salas> s = await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
-            ViewBag.s = s.Except(a).ToList();
+
+                ViewBag.s = s.Except(a).ToList();
+           
             //Remove Nome antigo(do tema) do modelstate.Isto foi adicionado pois por vezes o modelstate não era válido devido ao nomeAntigo
             //Visto que não faz parte do modelo "Temas"
             if (ModelState.ContainsKey("nomeAntigo")) {
@@ -493,12 +512,81 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
                     return View(temas);
                 }
+                if (confirmSala == null) {
+                    if (temas.SalaID != SalaAntiga && temas.SalaID != null) {
+                        var c = _context.Salas.Where(s => s.SalaId == temas.SalaID).Include(s => s.ListaReservas.Where(s => s.ReservaDate > DateTime.Now));
+                        if (c != null) {
+                            TempData["ConfirmDialog"] = "Esta sala ainda tem reservas pendentes! Ao trocar de sala,estas reservas irão ser movidas para a nova sala!";
+                            TempData["SalaAntiga"] = SalaAntiga;
+                            if (hasImagem) {
+                                Guid g = Guid.NewGuid();
+                                TempData["Guid"] = g;
+                                string localizacaoImagem = _webHostEnvironment.WebRootPath;
+                                localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens/Temp");
+                                if (!Directory.Exists(localizacaoImagem)) {
+                                    Directory.CreateDirectory(localizacaoImagem);
+                                }
+                                foreach (KeyValuePair<Fotos, IFormFile> i in mapFotos) {
+
+                                    localizacaoImagem = Path.Combine(localizacaoImagem, i.Key.Nome+"_"+g);
+                                    using var stream = new FileStream(
+                                  localizacaoImagem, FileMode.Create
+                                  );
+                                    await i.Value.CopyToAsync(stream);
+                                    localizacaoImagem = _webHostEnvironment.WebRootPath;
+                                    localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens/Temp");
+                                }
+
+
+
+                            }
+                            temas.ListaFotos.Clear();
+                            return View(temas);
+                        }
+                    }
+
+                } else {
+                    if (confirmSala == "true" && SalaAntiga!=null) {
+                        string localizacaoImagem = _webHostEnvironment.WebRootPath;
+                       var localizacaoImagemNova = Path.Combine(localizacaoImagem, "Imagens/");
+                        localizacaoImagem = Path.Combine(localizacaoImagem, "Imagens/Temp");
+                       
+                        try {
+                            var files = Directory.GetFiles(localizacaoImagem,"*_"+guid);
+                            foreach(var i in files) {
+                                var fileName = Path.GetFileName(i).Split("_").FirstOrDefault();
+                                Fotos f = new Fotos(fileName);
+
+                                f.TemaId = temas.TemaId;
+                                f.Tema = temas;
+
+                                temas.ListaFotos.Add(f);
+
+                                Directory.Move(i,localizacaoImagemNova+fileName);
+                            }
+                        } catch (Exception e) {
+
+                        }
+                        
+
+
+
+                        var res = await _context.Reservas.Where(r => r.SalaId == (int)SalaAntiga && r.ReservaDate>DateTime.Now && !r.Cancelada && !r.Deleted).ToListAsync();
+                        var c = res.Count();
+                        foreach(var r in res) {
+                            r.SalaId= (int)temas.SalaID;
+                        }
+                        _context.UpdateRange(res);
+                        TempData["CountReservas"] = "Movidas " + c + " reservas para a sala" + temas.SalaID + "!";
+                    }
+                }
                 try {
 
                     _context.Update(temas);
                     //Exclui estas propriedades de serem modificadas
                     //O que estava a acontecer é que a data em que o tema foi editado esta a dar overwrite à data em que foi criado
                     _context.Entry(temas).Property(t => t.DataCriacao).IsModified = false;
+                        
                     _context.Entry(temas).Property(t => t.CriadoPorOid).IsModified = false;
                     _context.Entry(temas).Property(t => t.CriadoPorUsername).IsModified = false;
 
@@ -530,6 +618,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                         throw;
                     }
                 }
+                TempData["SalaAntiga"] = temas.SalaID;
                 ViewBag.TemaAntigo = temas.Nome;
                 ViewBag.ShowAlert = true;
                 if (temas.SalaID == null && temas.AnunciarTema) {
