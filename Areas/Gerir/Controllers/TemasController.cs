@@ -260,7 +260,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             List<Salas> s = await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
             ViewBag.s = s.Except(a).ToList();
             ViewBag.TemaAntigo = temas.Nome;
-            ViewBag.SalaAntiga = temas.SalaID;
+            TempData["SalaAntiga"] = temas.SalaID;
 
             temas.PrecoStr = temas.Preco.ToString();
 
@@ -519,8 +519,8 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     //Se sala atual for diferente de null(nenhuma) e se for diferente da sala antiga(ter sido escolhido outra sala)
                     if (temas.SalaID != SalaAntiga && temas.SalaID != null) {
                         //Se houverem reservas pendentes na sala antiga
-                        var c = _context.Salas.Where(s => s.SalaId == temas.SalaID).Include(s=>s.ListaReservas).Where(s=>s.ListaReservas.Where(s => s.ReservaDate > DateTime.Now).Count() >0);
-                        if (c != null) {
+                        var c = await _context.Salas.Where(s => s.SalaId == SalaAntiga).Include(s => s.ListaReservas.Where(r => r.ReservaDate > DateTime.Now)).Where(s => s.ListaReservas.Any()).ToListAsync();
+                        if (c.Any()) {
                             TempData["ConfirmDialog"] = "Esta sala ainda tem reservas pendentes! Ao trocar de sala,estas reservas irão ser movidas para a nova sala!";
                             //Guarda sala antiga
                             TempData["SalaAntiga"] = SalaAntiga;
@@ -649,7 +649,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 tema = await _context.Temas.Include(f => f.ListaFotos.Where(f => !f.Deleted)).Where(t => t.TemaId == temas.TemaId).FirstOrDefaultAsync();
 
 
-
+                return RedirectToAction(nameof(Edit),new { id = tema.TemaId });
                 return View(tema);
             }
 
