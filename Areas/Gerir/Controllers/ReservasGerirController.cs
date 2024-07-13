@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -108,6 +109,29 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         }
         */
 
+        // GET: Salas/Edit/5
+        public async Task<IActionResult> Edit(int? id) {
+            if (id == null) {
+                return NotFound();
+            }
+
+            var res = await _context.Reservas.Include(s => s.ListaAnfitrioes.Where(a=>!a.Deleted)).Include(s=>s.Sala).Include(c=>c.Cliente).Where(s => s.ReservaId == id && !s.Deleted).FirstOrDefaultAsync();
+            if (res == null) {
+                return NotFound();
+            }
+            var listaRes = await _context.Reservas.Include(s => s.ListaAnfitrioes.Where(a => !a.Deleted)).Include(s => s.Sala).Include(c => c.Cliente).Where(s =>!s.Cancelada && !s.Deleted).ToListAsync();
+            var tema = await _context.Temas.Where(t => !t.Deleted && t.SalaID == res.SalaId).FirstOrDefaultAsync();
+
+            var listaSalas = await _context.Salas.Where(s => !s.Deleted).ToListAsync();
+            TempData["ListaSalas"] = listaSalas;
+            var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
+            HashSet<Utilizadores> anfitrioes = userList.ToList().Where(a => a.Deleted == false).ToHashSet();
+            ViewBag.SelectionIdList = anfitrioes;
+
+            EditReservaViewModel r = new EditReservaViewModel(res,listaRes, tema);
+            return View(r);
+
+        }
 
         /// <summary>
         /// Função responsável por aplicar filtros à tabela reservas,do index.

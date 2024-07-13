@@ -105,6 +105,18 @@ else
 
     @functions {
 
+        public bool isMostrarCanceladas(){
+            if(Model.UserPrefs != null){
+            if(!Model.UserPrefs.mostrarCanceladas){
+       @* listaReservasCal = Model.Reservas.Where(r=>!r.Cancelada).ToList();*@
+                    return false;
+        }
+                     return true;
+        }
+        return true;
+        }
+
+
         public string GeraAnfsStringHtmlSingle(Reservas s) {
             var str = "";
             foreach (var a in s.ListaAnfitrioes) {
@@ -129,13 +141,20 @@ else
             foreach (var r in lstReservas) {
                 var salaCor = ((Dictionary<int?, string>)ViewBag.RandColors).GetValueOrDefault(r.Sala.SalaId);
                 //str+= "<li class='list-group-item text-white border-success border-3 bg-secondary flex-fill ms-2' >" + r.Sala.Numero + "</li>";
-                str += @"<div class='accordion-body rounded-pill border border-2 mb-3 text-white flex-fill' style='border-color:" + salaCor +" !important'><table class='table text-center justify-content-center align-items-center table-hover table-sm'><thead><tr><th scope='col'>Nº Reserva</th><th scope='col'>Sala</th><th scope='col'>Data</th><th scope='col'>Tema</th><th scope='col'>Criada Por</th><th scope='col'>Ações</th></tr></thead><tbody><tr><th scope='row'>"+ r.ReservaId + "</th><td style='color:"+salaCor+"'>" + r.Sala.Numero + "</td><td>"+r.ReservaDate.ToString("dd/MM/yyyy HH:mm")+"</td><td><span class='text-"+@DifficultiesValue.GetDifficultyColor((int)r.TemaDif)+"'>"+r.TemaNome+"</span></td><td>"+r.Cliente.PrimeiroNome +" "+ r.Cliente.UltimoNome+"</td><td><i class='bi bi-eye-fill me-2 ver' style='font-size:1.5rem;cursor:pointer'  id='"+ r.ReservaId+"Ver' data-bs-toggle='tooltip' data-bs-placement='top' title='Mais informações sobre a reserva' ></i><i class='bi bi-calendar-event cal' data-bs-toggle='tooltip' data-bs-placement='top' title='Ver no calendário' style='font-size:1.5rem;cursor:pointer' id='"+ r.ReservaId+"Cal' ></i></td></tr></tbody></table> </div>";
+                str += @"<div class='accordion-body rounded-pill border border-2 mb-3 text-white flex-fill' style='border-color:" + salaCor +" !important'><table class='table text-center justify-content-center align-items-center table-hover table-sm'><thead><tr><th scope='col'>Nº Reserva</th><th scope='col'>Sala</th><th scope='col'>Data</th><th scope='col'>Tema</th><th scope='col'>Criada Por</th><th scope='col'>Ações</th></tr></thead><tbody><tr><th scope='row'>"+ r.ReservaId + "</th><td style='color:"+salaCor+"'>" + r.Sala.Numero + "</td><td>"+r.ReservaDate.ToString("dd/MM/yyyy HH:mm")+"</td><td><span class='text-"+@DifficultiesValue.GetDifficultyColor((int)r.TemaDif)+"'>"+r.TemaNome+"</span></td><td>"+r.Cliente.PrimeiroNome +" "+ r.Cliente.UltimoNome+"</td><td><i class='bi bi-eye-fill me-2 ver' style='font-size:1.5rem;cursor:pointer'  id='"+ r.ReservaId+"Ver' data-bs-toggle='tooltip' data-bs-placement='top' title='Mais informações sobre a reserva'></i>";
+                if(r.Cancelada && !isMostrarCanceladas()){
+                    str+="</td></tr></tbody></table> </div>";
+                }else{
+                    str+=" <i class='bi bi-calendar-event cal' data-bs-toggle='tooltip' data-bs-placement='top' title='Ver no calendário' style='font-size:1.5rem;cursor:pointer' id='"+ r.ReservaId+"'Cal'></i></td></tr></tbody></table> </div>";
+
+                }
+                
 
             }
             return str;
 
 
-
+            <i class='bi bi-calendar-event cal' data-bs-toggle='tooltip' data-bs-placement='top' title='Ver no calendário' style='font-size:1.5rem;cursor:pointer' id='"+ r.ReservaId+"Cal' ></i>
 
         }
 
@@ -860,5 +879,5 @@ else
 
                   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
 <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+          
 }

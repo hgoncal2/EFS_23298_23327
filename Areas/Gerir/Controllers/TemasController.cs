@@ -519,7 +519,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     //Se sala atual for diferente de null(nenhuma) e se for diferente da sala antiga(ter sido escolhido outra sala)
                     if (temas.SalaID != SalaAntiga && temas.SalaID != null) {
                         //Se houverem reservas pendentes na sala antiga
-                        var c = _context.Salas.Where(s => s.SalaId == temas.SalaID).Include(s=>s.ListaReservas).Where(s=>s.ListaReservas.Where(s => s.ReservaDate > DateTime.Now).Count() >0);
+                        var c =await _context.Salas.Where(s => s.SalaId == SalaAntiga).Include(s => s.ListaReservas.Where(r => r.ReservaDate > DateTime.Now)).Where(s => s.ListaReservas.Any()).ToListAsync();
                         if (c != null) {
                             TempData["ConfirmDialog"] = "Esta sala ainda tem reservas pendentes! Ao trocar de sala,estas reservas irão ser movidas para a nova sala!";
                             //Guarda sala antiga
