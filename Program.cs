@@ -22,7 +22,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddDefaultIdentity<Utilizadores>(options => options.SignIn.RequireConfirmedAccount = false)
    .AddRoles<IdentityRole>()
-   .AddEntityFrameworkStores<ApplicationDbContext>();
+   .AddEntityFrameworkStores<ApplicationDbContext>().AddErrorDescriber<ErrosIdentityUser>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
@@ -37,6 +37,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
+    app.UseItToSeedSqlServer();
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();

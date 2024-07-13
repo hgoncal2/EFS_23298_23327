@@ -1,0 +1,534 @@
+﻿@model EFS_23298_23327.ViewModel.EditReservaViewModel
+
+@{
+    ViewData["Title"] = "Editar";
+  var salas = (List<Salas>)TempData["ListaSalas"];
+   
+}
+<link href="~/lib/datetimepicker/jquery.datetimepicker.css" rel="stylesheet" />
+<script src="~/lib/datetimepicker/jquery.datetimepicker.full.js"></script>
+
+<script type="text/javascript">
+
+   
+    // https://github.com/davidstutz/bootstrap-multiselect/issues/1230
+    //Depois de 4 horas à procura de um plugin que funcionasse com bs 5,
+    //Muito Obrigado andyg2
+    $(document).ready(function () {
+        $(".multiple-checkboxes").multiselect({
+            templates: {
+                button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+            },
+            buttonWidth: '100%',
+            nonSelectedText: 'Selecionar anfitriões',
+            includeSelectAllOption: true,
+            selectAllText: 'Selecionar todos',
+            numberDisplayed: 0,
+            allSelectedText: false
+
+        });
+        
+    });
+</script>
+<div class="mt-4">
+    <a class="bi bi-arrow-left-circle-fill h2 me-5 text-info iconesConf" style="float:left;text-decoration: none;" asp-action="Index"></a>
+
+</div>
+
+
+<h2 class="ms-2  mt-4">Editar Reserva <span style="color:mediumpurple"><strong>@Model.Reserva.ReservaId</strong></span> </h2>
+
+<hr class="bg-primary " />
+
+@if (ViewBag.ShowAlert == true) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Sala <strong>@Model.Reserva.Sala.Numero</strong> guardado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+
+@if (TempData["EditSave"] != null) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Reserva <strong>@Model.Reserva.ReservaId</strong> guardado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ReservaDif"] != null) {
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        Reserva Mudada para dia @TempData["ReservaDif"]. Deseja avisar o cliente?
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (@ViewBag.SalaExistente != null && ViewBag.SalaExistente != Model.Reserva.Sala.Numero) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Erro! Sala <strong>@ViewBag.SalaExistente</strong> já existe!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+}
+
+
+
+
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="reservaMudada" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="exampleModalLabel">Data da reserva alterada!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body h5 text-center">
+                    Reserva mudada para <span class="text-success" id="novaData"></span>
+                    <br /> 
+                    <br/>
+                    <span class=" text-center"> @Html.DisplayNameFor(model=> model.NotificarCliente): <input type="checkbox" class="ms-2 form-check-input" asp-for="NotificarCliente"></input></span>
+
+                </div>
+                <div class="modal-footer text-center">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                 
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" asp-for="Reserva.Sala.SalaId" />
+    <input type="hidden" asp-for="Reserva.ReservaDate" id="dateI" value="@Model.Reserva.ReservaDate" />
+    <input type="hidden" asp-for="Reserva.ReservaEndDate" id="dateF" value="@Model.Reserva.ReservaEndDate" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
+    
+    <div class="container-fluid mt-1 justify-content-center h-100 d-inline-block">
+        <div class="row">
+            <div class="col">
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Reserva.ReservaId, new { @class = "required" })
+                    <input disabled asp-for="Reserva.ReservaId" class="form-control" />
+                   @Html.HiddenFor(a=>a.Reserva.ReservaId)
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Reserva.TotalPreco, new { @class = "required" })
+                    <input disabled asp-for="Reserva.TotalPreco" class="form-control" />
+                </div>
+                @Html.LabelFor(m => m.Reserva.Sala  , new { @class = "required" })
+                <select class="form-select filter text-dark bg-white w-100"  asp-for="Reserva.SalaId" id="Salas" aria-label="Default select example">
+                    <option selected value="@Model.Reserva.SalaId">@Model.Reserva.Sala.Numero</option>
+                    @foreach (var i in @salas) {
+
+
+                       
+                            <option class=" text-white bg-warning flex-fill" value="@i.SalaId">@i.Numero</option>
+
+                        
+
+
+                    }
+
+                </select>
+
+            </div>
+                <div class="col">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Reserva.Cliente)
+                    <input disabled value="@Model.Reserva.Cliente.PrimeiroNome @Model.Reserva.Cliente.UltimoNome" class="form-control" />
+                </div>
+               <div class="form-group">
+                    @Html.LabelFor(m => m.Reserva.NumPessoas, new { @class = "required" })
+                    <input asp-for="Reserva.NumPessoas" class="form-control" />
+                    <span asp-validation-for="Reserva.NumPessoas" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Reserva.ListaAnfitrioes)
+                    @*
+                    @Html.ListBoxFor(model => model.ListaAnfitrioes, (MultiSelectList)ViewBag.SelectionIdList, new { @class = "form-control" })
+                    *@
+                    <select multiple="multiple" class="form-control multiple-checkboxes" id="Anfs"  asp-for="RlistaAnfitrioes">
+
+                        @foreach (var u in @ViewBag.SelectionIdList as HashSet<Utilizadores>) {
+                            @if (Model.RlistaAnfitrioes.Contains(u.Id)) {
+                                <option selected="selected" value="@u.Id">@u.UserName</option>
+                            } else {
+                                <option value="@u.Id">@u.UserName</option>
+                            }
+
+                        }
+                    </select>
+                    <span asp-validation-for="RlistaAnfitrioes" class="text-danger"></span>
+                </div>
+            </div>
+
+           
+    </div>
+    <br /><br />
+
+        <input id="datetimepicker" type="text">
+
+
+
+        
+    </div>
+    <br />
+   
+    <br />
+    <br />
+
+
+
+    <div class="form-group text-center mt-lg-4  mx-auto">
+        <a onclick="">
+
+
+            @Html.Hidden("numeroAntigo", (int)Model.Reserva.Sala.Numero)
+
+
+            <button class="btn btn-outline-secondary btn-lg"><i class="fa fa-floppy-disk me-2"></i>Guardar Reserva</button>
+        </a>
+    </div>
+
+</form>
+
+<form asp-action="CancelaReserva"   method="post">
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title" id="exampleModalLabel">Deseja apagar reserva?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body h5 text-center">
+                    Deseja cancelar a reserva nº<strong>@Model.Reserva.ReservaId</strong>
+                    <br />
+                    <br />
+                    @Html.Hidden("resId",@Model?.Reserva.ReservaId)
+                    <span class=" text-center"> Notificar Cliente de cancelamento da reserva: <input type="checkbox" name="notificar" class="ms-2 form-check-input" ></input></span>
+
+                </div>
+                <div class="modal-footer text-center">
+                    <div class="modal-footer">
+                        <button class="btn btn-danger float-end mt-lg-5" type="submit"> <i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button>
+                        <button type="button" class="btn btn-secondary float-end mt-lg-5" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="text-center d-inline-block align-items-center mb-2">
+@if (DateTime.Now.AddHours(48) <= Model.Reserva.ReservaDate) {
+
+           
+
+
+        <button class="btn btn-danger float-end mt-lg-5" type="button" onclick="function showAlert(){$('#modalApagar').modal('show')};showAlert();"> <i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button>
+} else {
+    <button class="btn btn-danger float-end mt-lg-5 pe-auto" disabled data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html='true' title="As reservas apenas podem ser canceladas até <strong>48h antes da data marcada</strong>"> <i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button>
+
+}
+</div>
+</form>
+
+<div>
+<div id='calendar' class=" text-white "></div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<script>
+    var start = '@Model.Reserva.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")';
+    var end = '@Model.Reserva.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")';
+
+    function a(){
+
+
+        var a =
+        console.log(start)
+            $.post('/Gerir/RervasGerir/Edit/@Model.Reserva.ReservaId', { RlistaAnfitrioes: $("#Anfs").val(), ReservaDate:start.toString() }
+    , function (result) {
+
+            if (result.failed) {
+
+            } else {
+                $("#save").html(result);
+                $("#modalPrefs").modal("hide")
+
+                setTimeout(function () {
+                    window.location.reload();
+                }, 1000);
+            }
+
+
+        });
+    }
+
+    $(document).ready(function () {
+        $(document).ready(function () {
+            $(".multiple-checkboxes").multiselect({
+                templates: {
+                    button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+                },
+                buttonWidth: '100%',
+                nonSelectedText: 'Selecionar anfitriões',
+                includeSelectAllOption: true,
+                selectAllText: 'Selecionar todos',
+                numberDisplayed: 0,
+                allSelectedText: false
+
+            });
+        });
+    $('#Salas   ').select2({
+        minimumResultsForSearch: -1,
+
+    });
+
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        themeSystem: 'bootstrap5',
+
+        initialView: 'timeGridWeek',
+        locale: 'pt',
+       
+        slotEventOverlap: false,
+        resourceGroupField: 'groupId',
+
+        initialDate: '@Model.Reserva.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+        stickyHeaderDates: true,
+
+        eventMouseEnter: function (info) {
+            $(info.el).css('cursor', 'pointer');
+        },
+    @{
+
+        var tempo = (int)Model.tema.TempoEstimado + 30;
+        var strTempo = TimeSpan.FromMinutes(tempo).ToString(@"hh\:mm\:ss");
+
+        <text>slotDuration: '@strTempo', </text>
+    }
+        slotMinTime: "06:00:00",
+        slotMaxTime: "22:00:00",
+       
+
+        validRange: {
+            start: new Date(),
+        
+    },
+
+        hiddenDays: [0],
+        eventOverlap: false,
+        timeZone: 'UTC',
+
+        selectOverlap: false,
+        eventAllow: function (dropInfo, draggedEvent) {
+           
+                return dropInfo.start>= new Date(); // a boolean
+          
+        },
+        nowIndicator: true,
+        selectable: false,
+        //eventColor: '#2a602a',
+        selectAllow: function (info) {
+            console.log(info.start >= new Date())
+            return (info.start >= new Date());
+        },
+        editable: true,
+        eventDisplay: 'background',
+        eventStartEditable: true,
+        eventDurationEditable: false,
+        contentHeight: 'auto',
+        dragScroll:true,
+        eventTextColor: 'white',
+        allDaySlot: false,
+        customButtons: {
+            reserva: {
+                text: 'ver reserva',
+                click: function () {
+                var r = calendar.getEventById('@Model.Reserva.ReservaId');
+                console.log(r)
+                calendar.gotoDate(r.startStr);
+                calendar.changeView('timeGridWeek');
+                }
+            }
+    },
+        headerToolbar: {
+        left: 'dayGridMonth timeGridWeek reserva',
+        center: 'title',
+        right: "prev next"
+
+
+        },
+        dateClick: function(info){
+            var r = calendar.getEventById('@Model.Reserva.ReservaId');
+          var allow=true;
+            
+           
+           $.each(calendar.getEvents(),function(i,e){
+               console.log(info.date)
+                if ((info.date <= e.end && info.date >= e.start) || (moment(info.date).add(@Model.tema.TempoEstimado, "m").toDate() >= e.start && moment(info.date).add(@Model.tema.TempoEstimado, "m").toDate() <= e.end)) {
+                   allow=false;
+                  
+                }
+
+               
+           })
+           if(allow){
+                if (info.view.type == "dayGridMonth") {
+                   console.log("entrei")
+                        r.setStart(moment(info.date).set({ h: 7, m: 0 }).toDate());
+                     r.setEnd(moment(info.date).set({ h: 7, m: @Model.tema.TempoEstimado }).toDate());
+               }else{
+                     r.setStart(info.dateStr)
+                    r.setEnd(moment(info.date).add(@Model.tema.TempoEstimado, "m").toDate())
+                    console.log(info.date)
+                    $("#dateI").val(moment(info.date).subtract(60,"m").format("DD/MM/YYYY HH:mm"))
+                    $("#dateF").val(moment(info.date).subtract(60,"m").add(@Model.tema.TempoEstimado, "m").format("DD/MM/YYYY HH:mm"))
+                        $("#novaData").text(moment(info.date).subtract(60, "m").format("DD/MM/YYYY HH:mm"))
+                    $("#reservaMudada").modal("show");
+               }
+               
+           }
+          
+        },
+       
+        datesSet: function (info) {
+            
+            if (info.view.type == "dayGridMonth" || info.view.type == "dayGridYear")  {
+               
+                
+                calendar.setOption('eventDisplay', 'block');
+                calendar.setOption('eventOverlap', true);
+            } else {
+                calendar.setOption('eventDisplay', 'background');
+                calendar.setOption('eventOverlap', false);
+            }
+            
+            
+                
+                
+               
+        },
+
+        buttonText: {
+
+            today: 'Ver dia atual',
+            month: 'ver mês',
+            week: 'ver semana',
+            day: 'ver dia'
+
+        },
+
+        eventDidMount: function (info) {
+            if (!info.isMirror) {
+                $(info.el).tooltip({
+                    title: info.event.extendedProps.description,
+                    placement: "top",
+                    trigger: "hover",
+                    container: "body"
+                });
+            }
+        },
+
+
+        eventClassNames: function (arg) {
+            console.log(arg.event.extendedProps.cancelada)
+            if (arg.event.extendedProps.cancelada == "True") {
+                return ['strike-class']
+            } else {
+                return ['textWhite']
+            }
+        },
+
+        events: [
+    @foreach (var i in Model.ListaReservas) {
+        @if(i.ReservaId == Model.Reserva.ReservaId){
+             <text>{
+                    title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero',
+                    id:  '@i.ReservaId',
+                    start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                    className: '@i.ReservaId',
+                    display:"block",
+                    end: '@i.ReservaEndDate.AddMinutes(30).ToString("yyyy-MM-ddTHH:mm:ss")',
+                    description:'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+                      extendedProps: {
+                        nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                        dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                        idReserva: '@i.ReservaId',
+                        dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                        temaNome: '@i.TemaNome',
+                        salaId: '@i.SalaId',
+                        reservaId:'@i.ReservaId',
+                        diffStr: '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
+                        sala: "@i.Sala.Numero",
+                         strHoras: 'Em @TimeSpan.FromHours((@i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+                        nPessoas: '@i.NumPessoas',
+                        totalPreco: '@i.TotalPreco',
+                        cancelada: '@i.Cancelada',
+               
+
+                              },
+               color:"green",
+                allDay: false
+                },
+
+                </text>
+        }else{
+            <text>{
+                    title: 'Reserva @i.ReservaId - Sala @i.Sala.Numero',
+                    start: '@i.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                    className: '@i.ReservaId',
+                    id: '@i.ReservaId',
+                    end: '@i.ReservaEndDate.AddMinutes(30).ToString("yyyy-MM-ddTHH:mm:ss")',
+                    editable:false,
+                    description: 'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+                    extendedProps: {
+                        nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
+                        dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                        idReserva: '@i.ReservaId',
+                        dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
+                        temaNome: '@i.TemaNome',
+                        salaId: '@i.SalaId',
+                        reservaId: '@i.ReservaId',
+                        diffStr: '@DifficultiesValue.GetDifficultyColor((int)i.TemaDif)',
+                        sala: "@i.Sala.Numero",
+                        strHoras: 'Em @TimeSpan.FromHours((@i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+                        nPessoas: '@i.NumPessoas',
+                        totalPreco: '@i.TotalPreco',
+                        cancelada: '@i.Cancelada',
+                       
+
+
+                    },
+                @if (i.Cliente.UserName.Equals(User.Identity.Name)) {
+                    @:color: '#a463eb',
+                }
+                    allDay: false
+                            },
+
+            </text>
+        }
+    }
+
+    ],
+    
+    });
+    calendar.render();
+
+    });
+</script>
+
+                        

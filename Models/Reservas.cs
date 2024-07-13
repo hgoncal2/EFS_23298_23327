@@ -31,7 +31,7 @@ namespace EFS_23298_23327.Models
         /// Número de pessoas da Reserva
         /// </summary>
         [Display(Name = "Número de pessoas")]
-        [RegularExpression("^\\[1 - 9]{1}", ErrorMessage ="Deve conter apenas dígitos")]
+        [RegularExpression("^[1-9]{0,3}$",ErrorMessage ="Por favor insira um caracter de 1-9,opcionalmente seguiod de,no máximo 3 caracteres de 1-9 ")]
         public int NumPessoas { get; set; }
 
         /// <summary>

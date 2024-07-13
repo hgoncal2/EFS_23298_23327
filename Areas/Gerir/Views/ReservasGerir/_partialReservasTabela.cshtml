@@ -203,7 +203,12 @@
                     @Html.DisplayFor(modelItem => item.DataCriacao)
                 </td>
                 <td class="align-content-center text-nowrap">
-                    <a asp-action="Edit" title="Editar" asp-route-id="@item.ReservaId"><i class="fa fa-pencil link-success icons-index"></i></a>
+                    @if (DateTime.Now.AddHours(48) >= item.ReservaDate || item.Cancelada) {
+                        <a asp-action="Edit" title="Só é possível editar reservas com mais de 48 de antecedência" asp-route-id="@item.ReservaId" class="disabled" data-bs-toggle='tooltip' data-html='true' data-bs-placement='top'  ><i class="fa fa-pencil link-success icons-index"></i></a>
+
+                    } else {
+                        <a asp-action="Edit" title="Editar" asp-route-id="@item.ReservaId"><i class="fa fa-pencil link-success icons-index"></i></a>
+                    }
                     <a asp-action="Details" title="Ver" asp-route-id="@item.ReservaId"><i class="fa-solid fa-circle-info icons-index"></i></a>
                     <a data-bs-toggle="modal" title="Apagar" style="cursor:pointer" data-bs-target="#modalApagar" onclick="teste('@item.ReservaId','@item.ReservaId')"><i class="fa fa-trash icons-index link-danger delete"></i></a>
                 </td>
@@ -218,7 +223,8 @@
   
 
     $(".table").ready(function () {
-
+        var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
         $('#Pendentes').select2({
             minimumResultsForSearch: -1
         });

@@ -66,7 +66,7 @@
     <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
             <div class="modal-header modal-header-danger">
-                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar Reserva '<span id="nomeReserva">a</span>' ?</h5>
+                <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-circle-fill display-6 me-5 "></i> Deseja apagar Reserva '<span id="nomeReserva">a</span>' ?</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-footer ">
@@ -81,18 +81,8 @@
 </div>
 
 <h1>Reservas</h1>
-@if (@TempData["ReservaApagado"] != null) {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Reserva <strong>@TempData["ReservaApagado"]</strong> apagado com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (@TempData["NomeReservaCriado2"] != null) {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        Reserva <strong>@TempData["NomeReservaCriado2"]</strong> criado com sucesso!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
+
+
 @if (@TempData["ErroAdmin"] != null) {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         @Html.Raw(@TempData["ErroAdmin"])
@@ -301,9 +291,16 @@
                 @Html.DisplayFor(modelItem => item.DataCriacao)
             </td>
                 <td class="align-content-center text-nowrap">
-                    <a asp-action="Edit" title="Editar" asp-route-id="@item.ReservaId"><i class="fa fa-pencil link-success icons-index"></i></a>
+
+                        @if (DateTime.Now.AddHours(48) >= item.ReservaDate  || item.Cancelada) {
+                            <a asp-action="Edit" title="Editar" asp-route-id="@item.ReservaId" class="disabled"><i class="fa fa-pencil link-success icons-index"></i></a>
+
+                        }else{
+                            <a asp-action="Edit" title="Editar" asp-route-id="@item.ReservaId" ><i class="fa fa-pencil link-success icons-index"></i></a>
+                        }
+                   
+
                     <a asp-action="Details" title="Ver" asp-route-id="@item.ReservaId"><i class="fa-solid fa-circle-info icons-index"></i></a>
-                    <a data-bs-toggle="modal" title="Apagar" style="cursor:pointer" data-bs-target="#modalApagar" onclick="teste('@item.ReservaId','@item.ReservaId')"><i class="fa fa-trash icons-index link-danger delete"></i></a>
                 </td>
         </tr>
 }

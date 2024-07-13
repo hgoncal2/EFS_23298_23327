@@ -36,7 +36,7 @@
     <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
             <div class="modal-header modal-header-danger">
-                <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Deseja apagar Sala '<span id="nomeSala">a</span>' ?</h5>
+                <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-circle-fill display-6 me-5 "></i> Deseja apagar Sala '<span id="nomeSala">a</span>' ?</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-footer ">
@@ -87,6 +87,11 @@
 <table  class="table table-bordered table-hover table-striped">
     <thead class="table-info text-center">
         <tr>
+                <th class="w-25 text-nowrap">
+
+                    <span>@Html.DisplayNameFor(model => model.SalaId)</span><br />
+                    <input class="w-100 filter" id="SalaId" onkeyup="filter(this)"></input>
+                </th>
                 <th class="w-25 text-nowrap">
 
                     <span>@Html.DisplayNameFor(model => model.Numero)</span><br />
@@ -153,6 +158,13 @@
             }
 
             <tr class="text-center table-primary align-text-top">
+                    <td>
+                        <ul class="list-group list-group-horizontal">
+
+
+                            <li class="list-group-item text-white  flex-fill ms-2" style="background-color:@salaCor">@Html.DisplayFor(modelItem => item.SalaId)</li>
+                        </ul>
+                    </td>
                 <td>
                     <ul class="list-group list-group-horizontal">
 
