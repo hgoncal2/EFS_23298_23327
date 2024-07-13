@@ -29,7 +29,6 @@ namespace EFS_23298_23327.Models
         public  Salas Sala { get; set; }
         public bool Cancelada { get; set; }
         public String? TemaNome { get; set; }
-        [EnumDataType(typeof(Dificuldade))]
 
         public Dificuldade? TemaDif { get; set; }
 

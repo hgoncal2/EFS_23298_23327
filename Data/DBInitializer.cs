@@ -35,7 +35,7 @@
                 var hasher = new PasswordHasher<Utilizadores>();
                 if (!dbContext.Utilizadores.Any()) {
                     users = [
-                       new Utilizadores{UserName="admin",NormalizedUserName="ADMIN",Email="teste@teste.com",PasswordHash=hasher.HashPassword(null,"teste123")}
+                       new Utilizadores{UserName="admin",PrimeiroNome="Senhor", UltimoNome="Admin", NormalizedUserName="ADMIN",Email="teste@teste.com",PasswordHash=hasher.HashPassword(null,"teste123")}
 
                     ];
                     await dbContext.Utilizadores.AddRangeAsync(users);
