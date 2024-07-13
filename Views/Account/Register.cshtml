@@ -12,13 +12,9 @@
 }
 
 
-<div class="mt-4">
-    <a class="fa fa-angles-left display-6 link-underline-opacity-0 link-secondary" style="float:left;text-decoration: none;" asp-action="Index"></a>
-
-</div>
 
 
-<h2 class="ms-2  mt-4">Registar</h2>
+<h2 class="ms-2  mt-4"> <i class="bi bi-person-vcard me-2"></i>Registar</h2>
 
 <hr class="bg-primary " />
 <form asp-action="Register">
@@ -33,7 +29,7 @@
                     <span asp-validation-for="Username" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="PrimeiroNome" class="control-label "></label>
+                    <label asp-for="PrimeiroNome" class="control-label required"></label>
                     <input asp-for="PrimeiroNome" class="form-control" />
                     <span asp-validation-for="PrimeiroNome" class="text-danger"></span>
                 </div>
@@ -45,14 +41,19 @@
             </div>
             <div class="col ">
                 <div class="form-group">
-                    <label asp-for="Email" class="control-label"></label>
+                    <label asp-for="Email" class="control-label required"></label>
                     <input asp-for="Email" class="form-control" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="UltimoNome" class="control-label "></label>
+                    <label asp-for="UltimoNome" class="control-label required"></label>
                     <input asp-for="UltimoNome" class="form-control" />
                     <span asp-validation-for="UltimoNome" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword" class="control-label required"></label>
+                    <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
                
             </div>

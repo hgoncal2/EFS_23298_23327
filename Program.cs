@@ -22,7 +22,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddDefaultIdentity<Utilizadores>(options => options.SignIn.RequireConfirmedAccount = false)
    .AddRoles<IdentityRole>()
-   .AddEntityFrameworkStores<ApplicationDbContext>();
+   .AddEntityFrameworkStores<ApplicationDbContext>().AddErrorDescriber<ErrosIdentityUser>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 

@@ -117,6 +117,12 @@ namespace EFS_23298_23327.Controllers
         public async Task<IActionResult> Register(RegisterViewModel vm) {
             if (ModelState.IsValid) {
 
+                if(vm.Password != vm.ConfirmPassword) {
+                    ModelState.AddModelError("ConfirmPassword", "A password e a password de confirmação não são iguais!");
+                    vm.Password = "";
+                    vm.ConfirmPassword = "";
+                    return View(vm);
+                }
                 var user = await _context.Utilizadores.Where(a => !a.Deleted).Where(a => a.UserName == vm.Username).FirstOrDefaultAsync();
 
                 if (user != null) {
