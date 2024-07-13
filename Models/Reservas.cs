@@ -7,38 +7,97 @@ namespace EFS_23298_23327.Models
 {
     public class Reservas : BaseEntity
     {
-
+        /// <summary>
+        /// Id da Reserva
+        /// </summary>
         [Key]
         public int ReservaId { get; set; }
+
+        /// <summary>
+        /// Data de inicio da Reserva
+        /// </summary>
         [Display(Name = "Data de início reserva")]
         public DateTime ReservaDate { get; set; }
+
+        /// <summary>
+        /// Data do fim da Reserva
+        /// </summary>
         [Display(Name = "Data de fim reserva")]
         public DateTime ReservaEndDate { get; set; }
+
+        /// <summary>
+        /// Número de pessoas da Reserva
+        /// </summary>
         [Display(Name = "Número de pessoas")]
         [RegularExpression("^[1-9]{0,3}$",ErrorMessage ="Por favor insira um caracter de 1-9,opcionalmente seguiod de,no máximo 3 caracteres de 1-9 ")]
         public int NumPessoas { get; set; }
+
+        /// <summary>
+        /// Preço Total da Reserva (preço do Tema * num Pessoas)
+        /// </summary>
         [Display(Name = "Preço Total")]
         [DisplayFormat(DataFormatString = "{0:F1}", ApplyFormatInEditMode = true)]
         public decimal TotalPreco { get; set; }
+
+        /// <summary>
+        /// Lista de Anfitriões do Tema Reservado
+        /// </summary>
         public ICollection<Anfitrioes>? ListaAnfitrioes { get; set; }
+
+        /// <summary>
+        /// Id de quem faz a reserva (Cliente)
+        /// </summary>
         [ForeignKey(nameof(Clientes))]
         public String? ClienteID { get; set; }
+
+        /// <summary>
+        /// Cliente que fez a reserva
+        /// </summary>
         public  Clientes? Cliente { get; set; }
+
+        /// <summary>
+        /// Id da Sala a que pertence o Tema Reservado
+        /// </summary>
         [ForeignKey(nameof(Salas))]
         public int SalaId { get; set; }
-        public  Salas Sala { get; set; }
-        public bool Cancelada { get; set; }
-        public String? TemaNome { get; set; }
-        [EnumDataType(typeof(Dificuldade))]
 
+        /// <summary>
+        /// Sala a que pertence o Tema Reservado
+        /// </summary>
+        public Salas Sala { get; set; }
+
+        /// <summary>
+        /// Boolean que define se a reserva está cancelada
+        /// </summary>
+        public bool Cancelada { get; set; }
+
+        /// <summary>
+        /// Nome do Tema reservado
+        /// </summary>
+        public String? TemaNome { get; set; }
+
+        /// <summary>
+        /// Dificuldade do Tema reservado
+        /// </summary>
         public Dificuldade? TemaDif { get; set; }
 
+        /// <summary>
+        /// Data em que a reserva foi cancelada
+        /// </summary>
         public DateTime DataCancel {  get; set; }
-       
+
+        /// <summary>
+        /// Construtor que recebe uma instância do Cliente que está a fazer a reserva
+        /// </summary>
+        /// <param name="u"></param>
         public Reservas(Clientes u) {
             this.ClienteID = u.Id;
             this.Cliente = u;
         }
+
+        /// <summary>
+        /// Construtor por defeito
+        /// </summary>
         public Reservas() {
            
         }
