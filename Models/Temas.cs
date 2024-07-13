@@ -108,6 +108,7 @@ namespace EFS_23298_23327.Models
         /// <summary>
         /// Sala a que o Tema será atribuído
         /// </summary>
+        [DisplayName("Sala")]
         public Salas? Sala { get; set; }
 
         /// <summary>

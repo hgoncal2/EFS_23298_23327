@@ -7,6 +7,7 @@ namespace EFS_23298_23327.ViewModel
 {
     public class AnfitriaoSalaViewModel
     {
+
         public int Id { get; set; }
 
         public  Salas? Sala { get; set; }
