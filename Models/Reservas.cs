@@ -15,7 +15,7 @@ namespace EFS_23298_23327.Models
         [Display(Name = "Data de fim reserva")]
         public DateTime ReservaEndDate { get; set; }
         [Display(Name = "Número de pessoas")]
-        [RegularExpression("^\\[1 - 9]{1}")]
+        [RegularExpression("^[1-9]{0,3}$",ErrorMessage ="Por favor insira um caracter de 1-9,opcionalmente seguiod de,no máximo 3 caracteres de 1-9 ")]
         public int NumPessoas { get; set; }
         [Display(Name = "Preço Total")]
         [DisplayFormat(DataFormatString = "{0:F1}", ApplyFormatInEditMode = true)]

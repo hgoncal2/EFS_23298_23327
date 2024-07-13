@@ -259,7 +259,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             List<Salas> a = await _context.Temas.Where(s => !s.Deleted && s.TemaId != id).Select(s => s.Sala).ToListAsync();
             List<Salas> s = await _context.Salas.Where(s => s.Deleted == false).ToListAsync();
             ViewBag.s = s.Except(a).ToList();
-            ViewBag.TemaAntigo = temas.Nome;
+            TempData["TemaAntigo"] = temas.Nome;
             TempData["SalaAntiga"] = temas.SalaID;
 
             temas.PrecoStr = temas.Preco.ToString();
@@ -452,7 +452,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     //Volta a definir o nome do tema como sendo o nome antigo,caso contrário,apesar de o novo nome "não ser válido",teríamos que fazer
                     //uma query à base de dados para ir buscar o estado original do tema
                     temas.Nome = nomeAntigo;
-                    ViewBag.TemaAntigo = temas.Nome;
+                    TempData["TemaAntigo"] = temas.Nome;
                     return View(temas);
 
                 }
@@ -519,8 +519,8 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                     //Se sala atual for diferente de null(nenhuma) e se for diferente da sala antiga(ter sido escolhido outra sala)
                     if (temas.SalaID != SalaAntiga && temas.SalaID != null) {
                         //Se houverem reservas pendentes na sala antiga
-                        var c = await _context.Salas.Where(s => s.SalaId == SalaAntiga).Include(s => s.ListaReservas.Where(r => r.ReservaDate > DateTime.Now)).Where(s => s.ListaReservas.Any()).ToListAsync();
-                        if (c.Any()) {
+                        var c = await _context.Salas.Where(s => s.SalaId == SalaAntiga).Include(s => s.ListaReservas).Select(s=>s.ListaReservas.Where(r => (r.ReservaDate > DateTime.Now) && !r.Cancelada)).ToListAsync();
+                        if (c.Any() && c.First().Any()) {
                             TempData["ConfirmDialog"] = "Esta sala ainda tem reservas pendentes! Ao trocar de sala,estas reservas irão ser movidas para a nova sala!";
                             //Guarda sala antiga
                             TempData["SalaAntiga"] = SalaAntiga;
@@ -633,11 +633,11 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 }
                 //Sala antiga leva o valor da nova sala,que caso seja mudada será a antiga.Caso não seja,salaantiga==novaSala,logo não se faz nada.
                 TempData["SalaAntiga"] = temas.SalaID;
-                ViewBag.TemaAntigo = temas.Nome;
-                ViewBag.ShowAlert = true;
+                TempData["TemaAntigo"] = temas.Nome;
+                TempData["ShowAlert"]= true;
                 //Não é permitido anunciar o tema aos cliente se não tiver sala atribuida
                 if (temas.SalaID == null && temas.AnunciarTema) {
-                    ViewBag.MensagemErro = "Não foi possível anunciar tema porque <strong class=''>nenhuma sala foi associada</strong>";
+                    TempData["MensagemErro"]= "Não foi possível anunciar tema porque <strong class=''>nenhuma sala foi associada</strong>";
                 } else {
                     //Faz anúncio por websockets ao grupo clientes
                     if (temas.SalaID != null && temas.AnunciarTema) {
@@ -674,6 +674,9 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(temas);
         }
         */
+
+       
+
 
         /// <summary>
         /// POST: /Gerir/Temas/Delete/{id}

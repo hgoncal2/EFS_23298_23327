@@ -25,7 +25,13 @@ html {
     z-index:999999999999999;
 }
 
+a.disabled {
+    pointer-events: none;
+}
 
+disabled-delete {
+    background-color:#e44c55 !important;
+}
 .teste {
     background-color: yellow !important;
 }

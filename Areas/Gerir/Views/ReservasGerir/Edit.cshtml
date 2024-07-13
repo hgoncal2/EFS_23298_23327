@@ -48,6 +48,20 @@
 }
 
 
+
+@if (TempData["EditSave"] != null) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Reserva <strong>@Model.Reserva.ReservaId</strong> guardado com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ReservaDif"] != null) {
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        Reserva Mudada para dia @TempData["ReservaDif"]. Deseja avisar o cliente?
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 @if (@ViewBag.SalaExistente != null && ViewBag.SalaExistente != Model.Reserva.Sala.Numero) {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         Erro! Sala <strong>@ViewBag.SalaExistente</strong> já existe!
@@ -56,8 +70,41 @@
 
 }
 
+
+
+
+
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="reservaMudada" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="exampleModalLabel">Data da reserva alterada!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body h5 text-center">
+                    Reserva mudada para <span class="text-success" id="novaData"></span>
+                    <br /> 
+                    <br/>
+                    <span class=" text-center"> @Html.DisplayNameFor(model=> model.NotificarCliente): <input type="checkbox" class="ms-2 form-check-input" asp-for="NotificarCliente"></input></span>
+
+                </div>
+                <div class="modal-footer text-center">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                 
+                </div>
+            </div>
+        </div>
+    </div>
     <input type="hidden" asp-for="Reserva.Sala.SalaId" />
+    <input type="hidden" asp-for="Reserva.ReservaDate" id="dateI" value="@Model.Reserva.ReservaDate" />
+    <input type="hidden" asp-for="Reserva.ReservaEndDate" id="dateF" value="@Model.Reserva.ReservaEndDate" />
+
     <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
     
     <div class="container-fluid mt-1 justify-content-center h-100 d-inline-block">
@@ -67,12 +114,11 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Reserva.ReservaId, new { @class = "required" })
                     <input disabled asp-for="Reserva.ReservaId" class="form-control" />
-                   
+                   @Html.HiddenFor(a=>a.Reserva.ReservaId)
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.Reserva.TotalPreco, new { @class = "required" })
                     <input disabled asp-for="Reserva.TotalPreco" class="form-control" />
-                    <span asp-validation-for="Reserva.TotalPreco" class="text-danger"></span>
                 </div>
                 @Html.LabelFor(m => m.Reserva.Sala  , new { @class = "required" })
                 <select class="form-select filter text-dark bg-white w-100"  asp-for="Reserva.SalaId" id="Salas" aria-label="Default select example">
@@ -92,6 +138,10 @@
 
             </div>
                 <div class="col">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Reserva.Cliente)
+                    <input disabled value="@Model.Reserva.Cliente.PrimeiroNome @Model.Reserva.Cliente.UltimoNome" class="form-control" />
+                </div>
                <div class="form-group">
                     @Html.LabelFor(m => m.Reserva.NumPessoas, new { @class = "required" })
                     <input asp-for="Reserva.NumPessoas" class="form-control" />
@@ -103,10 +153,10 @@
                     @*
                     @Html.ListBoxFor(model => model.ListaAnfitrioes, (MultiSelectList)ViewBag.SelectionIdList, new { @class = "form-control" })
                     *@
-                    <select multiple="multiple"  class="form-control multiple-checkboxes" asp-for="Reserva.ListaAnfitrioes">
+                    <select multiple="multiple" class="form-control multiple-checkboxes" id="Anfs"  asp-for="RlistaAnfitrioes">
 
                         @foreach (var u in @ViewBag.SelectionIdList as HashSet<Utilizadores>) {
-                            @if (Model.Reserva.ListaAnfitrioes.Select(a=>a.Id).Contains(u.Id)) {
+                            @if (Model.RlistaAnfitrioes.Contains(u.Id)) {
                                 <option selected="selected" value="@u.Id">@u.UserName</option>
                             } else {
                                 <option value="@u.Id">@u.UserName</option>
@@ -114,7 +164,7 @@
 
                         }
                     </select>
-                    <span asp-validation-for="Reserva.ListaAnfitrioes" class="text-danger"></span>
+                    <span asp-validation-for="RlistaAnfitrioes" class="text-danger"></span>
                 </div>
             </div>
 
@@ -129,26 +179,70 @@
         
     </div>
     <br />
+   
+    <br />
+    <br />
+
+
+
     <div class="form-group text-center mt-lg-4  mx-auto">
-        <a type="submit">
-            
+        <a onclick="">
 
-                @Html.Hidden("numeroAntigo", (int)Model.Reserva.Sala.Numero)
-            
 
-            <button class="btn btn-outline-secondary btn-lg"><i class="fa fa-floppy-disk me-2"></i>Guardar Sala</button>
+            @Html.Hidden("numeroAntigo", (int)Model.Reserva.Sala.Numero)
+
+
+            <button class="btn btn-outline-secondary btn-lg"><i class="fa fa-floppy-disk me-2"></i>Guardar Reserva</button>
         </a>
     </div>
 
-    <br />
-    <br />
-
-
-
 </form>
 
+<form asp-action="CancelaReserva"   method="post">
 
+    <!-- Modal -->
+    <div class="modal fade" id="modalApagar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title" id="exampleModalLabel">Deseja apagar reserva?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body h5 text-center">
+                    Deseja cancelar a reserva nº<strong>@Model.Reserva.ReservaId</strong>
+                    <br />
+                    <br />
+                    @Html.Hidden("resId",@Model?.Reserva.ReservaId)
+                    <span class=" text-center"> Notificar Cliente de cancelamento da reserva: <input type="checkbox" name="notificar" class="ms-2 form-check-input" ></input></span>
+
+                </div>
+                <div class="modal-footer text-center">
+                    <div class="modal-footer">
+                        <button class="btn btn-danger float-end mt-lg-5" type="submit"> <i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button>
+                        <button type="button" class="btn btn-secondary float-end mt-lg-5" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="text-center d-inline-block align-items-center mb-2">
+@if (DateTime.Now.AddHours(48) <= Model.Reserva.ReservaDate) {
+
+           
+
+
+        <button class="btn btn-danger float-end mt-lg-5" type="button" onclick="function showAlert(){$('#modalApagar').modal('show')};showAlert();"> <i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button>
+} else {
+    <button class="btn btn-danger float-end mt-lg-5 pe-auto" disabled data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html='true' title="As reservas apenas podem ser canceladas até <strong>48h antes da data marcada</strong>"> <i class="bi bi-slash-circle fa-1x me-2"></i>Cancelar Reserva</button>
+
+}
+</div>
+</form>
+
+<div>
 <div id='calendar' class=" text-white "></div>
+</div>
 
 
 @section Scripts {
@@ -157,9 +251,47 @@
     }
 }
 <script>
+    var start = '@Model.Reserva.ReservaDate.ToString("yyyy-MM-ddTHH:mm:ss")';
+    var end = '@Model.Reserva.ReservaEndDate.ToString("yyyy-MM-ddTHH:mm:ss")';
 
+    function a(){
+
+
+        var a =
+        console.log(start)
+            $.post('/Gerir/RervasGerir/Edit/@Model.Reserva.ReservaId', { RlistaAnfitrioes: $("#Anfs").val(), ReservaDate:start.toString() }
+    , function (result) {
+
+            if (result.failed) {
+
+            } else {
+                $("#save").html(result);
+                $("#modalPrefs").modal("hide")
+
+                setTimeout(function () {
+                    window.location.reload();
+                }, 1000);
+            }
+
+
+        });
+    }
 
     $(document).ready(function () {
+        $(document).ready(function () {
+            $(".multiple-checkboxes").multiselect({
+                templates: {
+                    button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+                },
+                buttonWidth: '100%',
+                nonSelectedText: 'Selecionar anfitriões',
+                includeSelectAllOption: true,
+                selectAllText: 'Selecionar todos',
+                numberDisplayed: 0,
+                allSelectedText: false
+
+            });
+        });
     $('#Salas   ').select2({
         minimumResultsForSearch: -1,
 
@@ -262,6 +394,11 @@
                }else{
                      r.setStart(info.dateStr)
                     r.setEnd(moment(info.date).add(@Model.tema.TempoEstimado, "m").toDate())
+                    console.log(info.date)
+                    $("#dateI").val(moment(info.date).subtract(60,"m").format("DD/MM/YYYY HH:mm"))
+                    $("#dateF").val(moment(info.date).subtract(60,"m").add(@Model.tema.TempoEstimado, "m").format("DD/MM/YYYY HH:mm"))
+                        $("#novaData").text(moment(info.date).subtract(60, "m").format("DD/MM/YYYY HH:mm"))
+                    $("#reservaMudada").modal("show");
                }
                
            }

@@ -31,8 +31,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
         public async Task<IActionResult> Index() {
             //todos os utilizadores não apagados
-            
-            var reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a=>a.ListaAnfitrioes).Include(c=>c.Cliente).Include(s=>s.Sala).OrderByDescending(u => u.DataCriacao).ToListAsync();
+            var reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a=>a.ListaAnfitrioes).Include(c=>c.Cliente).Include(s=>s.Sala).OrderBy(r => r.Cancelada).ThenByDescending(u => u.DataCriacao).ThenByDescending(u => u.ReservaDate).ToListAsync();
             var ud = User.FindFirstValue(ClaimTypes.NameIdentifier);
             TempData["UserLogado"] = User.FindFirstValue(ClaimTypes.Name);
 
@@ -110,19 +109,20 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         */
 
         // GET: Salas/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id) {
             if (id == null) {
                 return NotFound();
             }
 
-            var res = await _context.Reservas.Include(s => s.ListaAnfitrioes.Where(a=>!a.Deleted)).Include(s=>s.Sala).Include(c=>c.Cliente).Where(s => s.ReservaId == id && !s.Deleted).FirstOrDefaultAsync();
+            var res = await _context.Reservas.Include(s => s.ListaAnfitrioes.Where(a=>!a.Deleted)).Include(s=>s.Sala).Include(c=>c.Cliente).Where(s => s.ReservaId == id && !s.Deleted && !s.Cancelada).FirstOrDefaultAsync();
             if (res == null) {
                 return NotFound();
             }
             var listaRes = await _context.Reservas.Include(s => s.ListaAnfitrioes.Where(a => !a.Deleted)).Include(s => s.Sala).Include(c => c.Cliente).Where(s =>!s.Cancelada && !s.Deleted).ToListAsync();
             var tema = await _context.Temas.Where(t => !t.Deleted && t.SalaID == res.SalaId).FirstOrDefaultAsync();
-
-            var listaSalas = await _context.Salas.Where(s => !s.Deleted).ToListAsync();
+            var listaSalasComtema = await _context.Temas.Where(t => !t.Deleted).Select(s => s.SalaID).ToListAsync();
+            var listaSalas = await _context.Salas.Where(s => !s.Deleted && s.SalaId != res.SalaId && listaSalasComtema.Contains(s.SalaId)).ToListAsync();
             TempData["ListaSalas"] = listaSalas;
             var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
             HashSet<Utilizadores> anfitrioes = userList.ToList().Where(a => a.Deleted == false).ToHashSet();
@@ -130,6 +130,60 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
             EditReservaViewModel r = new EditReservaViewModel(res,listaRes, tema);
             return View(r);
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditReservaViewModel rvm) {
+            if (rvm.Reserva.ReservaId == null) {
+                return NotFound();
+            }
+
+            var r = await _context.Reservas.Include(r=>r.ListaAnfitrioes).Include(c=>c.Cliente).Where(r=> r.ReservaId== rvm.Reserva.ReservaId).FirstOrDefaultAsync();
+           
+            r.ReservaDate = rvm.Reserva.ReservaDate;
+            r.ReservaEndDate = rvm.Reserva.ReservaEndDate;
+            r.SalaId = rvm.Reserva.SalaId;
+            r.NumPessoas = rvm.Reserva.NumPessoas;
+            r.ListaAnfitrioes = await _context.Anfitrioes.Where(a => !a.Deleted && rvm.RlistaAnfitrioes.Contains(a.Id)).ToListAsync();
+
+            _context.Update(r);
+            await _context.SaveChangesAsync();
+            TempData["EditSave"] = "sucesso";
+            return RedirectToAction(nameof(Edit), new {id=r.ReservaId});
+
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<IActionResult> CancelaReserva(int resId,string? notificar) {
+
+            var r = notificar;
+                var reserva = await _context.Reservas.Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate).FirstOrDefaultAsync();
+
+            if (reserva == null) {
+                return Unauthorized();
+            }
+
+
+            if (notificar == "on") {
+
+                //mandar email
+
+
+            }
+            reserva.Cancelada = true;
+            reserva.DataCancel = DateTime.Now;
+
+            _context.Update(reserva);
+            await _context.SaveChangesAsync();
+
+            TempData["ReservaCancel"] = "Reserva <strong>" + reserva.ReservaId + "</strong> cancelada com sucesso!";
+            return RedirectToAction(nameof(Details), new { id = reserva.ReservaId });
+
+
+
+
+
 
         }
 

@@ -21,9 +21,9 @@
 
 
 <hr class="bg-primary " />
-@if (@ViewBag.MensagemErro != null) {
+@if (TempData["MensagemErro"] != null) {
     <div class="alert alert-warning  text-center alert-dismissible fade show" role="alert">
-        @Html.Raw(@ViewBag.MensagemErro)
+        @Html.Raw(@TempData["MensagemErro"])
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
@@ -32,8 +32,7 @@
 
 
 
-@if (ViewBag.ShowAlert == true)
-{
+@if ((bool?)TempData["ShowAlert"] == true) {
     <div class="alert alert-success alert-dismissible text-center fade show" role="alert">
         Tema <strong>@Model.Nome</strong> guardado com sucesso!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -69,7 +68,7 @@
     <div class="modal-dialog modal-dialog-centered ">
     <div class="modal-content">
     <div class="modal-header bg-warning">
-    <h5 class="modal-title" id="exampleModalLabel"><i class="fa-solid fa-triangle-exclamation display-6 me-5 "></i> Sala @TempData["SalaAntiga"] contém reservas ativas!
+    <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-circle-fill display-6 me-5 "></i> Sala antiga contém reservas ativas!
     <button type = "button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
                     <div class="modal-body">
@@ -217,9 +216,8 @@
     <div class="form-group text-center mt-lg-4  mx-auto">
         <a type="submit">
            
-            @if (@ViewBag.TemaAntigo != null)
-            {
-                @Html.Hidden("NomeAntigo",(String) @ViewBag.TemaAntigo)
+            @if (TempData["TemaAntigo"] != null) {
+                @Html.Hidden("NomeAntigo", (String?)@TempData["TemaAntigo"])
             }
                 @Html.Hidden("SalaAntiga", (int?)@TempData["SalaAntiga"])
             
