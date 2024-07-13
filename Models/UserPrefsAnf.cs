@@ -33,7 +33,9 @@ namespace EFS_23298_23327.Models
         public bool mostrarCanceladas { get; set; }
 
 
-        
+        /// <summary>
+        /// construtor por defeito
+        /// </summary>
         public UserPrefsAnf() {
             this.Cores = new HashSet<UserPrefAnfCores>();
         }

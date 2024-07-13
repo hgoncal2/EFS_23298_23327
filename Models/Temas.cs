@@ -99,11 +99,15 @@ namespace EFS_23298_23327.Models
         public virtual ICollection<Fotos>? ListaFotos { get; set; }
 
         /// <summary>
-        /// Sala a que o Tema será atribuído
+        /// ID da Sala a que o Tema será atribuído
         /// </summary>
         [ForeignKey(nameof(Salas))]
         [Display(Name = "Sala")]
         public int? SalaID { get; set; }
+
+        /// <summary>
+        /// Sala a que o Tema será atribuído
+        /// </summary>
         public Salas? Sala { get; set; }
 
         /// <summary>
@@ -114,7 +118,9 @@ namespace EFS_23298_23327.Models
         public bool AnunciarTema { get; set; }
         
      
-
+        /// <summary>
+        /// Construtor por defeito
+        /// </summary>
         public Temas()
         {
            

@@ -19,14 +19,25 @@ namespace EFS_23298_23327.Models
         /// </summary>
         public Boolean reservas {  get; set; }
 
-
+        /// <summary>
+        /// Preferências do Anfitrião
+        /// </summary>
         public int? UserPrefsAnf { get; set; }
+
+        /// <summary>
+        /// Construtor que recebe uma instância do Anfitrião
+        /// </summary>
+        /// <param name="u"></param>
         public UserPrefs(Anfitrioes u)
         {
             this.UtilizadorId = u.Id;
             this.reservas = true;
             this.UserPrefsAnf = u.userPrefsAnfId;
         }
+
+        /// <summary>
+        /// Construtor por defeito
+        /// </summary>
         public UserPrefs()
         {
             this.reservas = true;

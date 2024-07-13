@@ -22,8 +22,14 @@ namespace EFS_23298_23327.Models
         /// </summary>
         public string Value { get; set; }
 
+        /// <summary>
+        /// Id das preferencias do user
+        /// </summary>
         public int UserPrefId { get; set; }
 
+        /// <summary>
+        /// Preferências do Anfitrião
+        /// </summary>
         public UserPrefsAnf UserPrefsAnf { get; set; }
     }
 }

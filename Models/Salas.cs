@@ -18,7 +18,7 @@ namespace EFS_23298_23327.Models
         /// Número da Sala
         /// </summary>
         [DisplayName("Número da Sala")]
-        [StringLength(3)]
+        [RegularExpression("^[0-9]{1,3}$", ErrorMessage = "Deve conter no máximo 3 números")]
         [Required]
         public int Numero { get; set; }
 
@@ -34,11 +34,13 @@ namespace EFS_23298_23327.Models
         [DisplayName("Reservas")]
         public ICollection<Reservas>? ListaReservas { get; set; }
 
+        /// <summary>
+        /// Construtor por defeito
+        /// </summary>
         public Salas()
         {
             this.ListaAnfitrioes = new HashSet<Anfitrioes>();
-            this.ListaReservas = new HashSet<Reservas>();
-           
+            this.ListaReservas = new HashSet<Reservas>();          
         }
     }
 }

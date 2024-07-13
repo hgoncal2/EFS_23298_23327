@@ -18,7 +18,7 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
     [Required]
     [Display(Name = "Primeiro Nome")]
     [StringLength(20, MinimumLength = 3, ErrorMessage = "Deve conter pelo menos 3 letras")]
-    [RegularExpression("^[A-Z][a-zA-Z]*$")]
+    [RegularExpression("^[A-Z][a-zA-Z]*$", ErrorMessage = "Deve começar por letra maiúscula e conter apenas letras")]
     public String? PrimeiroNome { get; set; }
 
     /// <summary>
@@ -26,7 +26,7 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
     /// </summary>
     [Required]
     [StringLength(20, MinimumLength = 2, ErrorMessage = "Deve conter pelo menos 2 letras")]
-    [RegularExpression("^[A-Z][a-zA-Z]*$")]
+    [RegularExpression("^[A-Z][a-zA-Z]*$", ErrorMessage = "Deve começar por letra maiúscula e conter apenas letras")]
     [Display(Name = "Último Nome")]
     public String? UltimoNome { get; set; }
     
@@ -54,12 +54,19 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
     [Display(Name = "Criado Por")]
     public string? CriadoPorUsername { get; set; }
 
+    /// <summary>
+    /// Contrutor por defeito
+    /// </summary>
     public Utilizadores()
         {
             this.DataCriacao = DateTime.Now;
        
     }
 
+    /// <summary>
+    /// Contrutor que recebe um parametro RegisterViewModel
+    /// </summary>
+    /// <param name="r"></param>
     public Utilizadores(RegisterViewModel r) {
         this.DataCriacao = DateTime.Now;
         var hasher = new PasswordHasher<Utilizadores>();
@@ -69,6 +76,11 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
         this.PasswordHash=hasher.HashPassword(null,r.Password);
         this.Email = r.Email;
     }
+
+    /// <summary>
+    /// Construtor que recebe um parametro UtilizadoresViewModel
+    /// </summary>
+    /// <param name="r"></param>
     public Utilizadores(UtilizadoresViewModel r) {
         this.DataCriacao = DateTime.Now;
         
@@ -79,6 +91,10 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
         this.Email = r.Email;
     }
 
+    /// <summary>
+    /// função que recebe o nome completo do User (Primeiro + Último nome)
+    /// </summary>
+    /// <returns></returns>
     public String getUserNameString() {
         return this.PrimeiroNome + " " + this.UltimoNome;
     }
