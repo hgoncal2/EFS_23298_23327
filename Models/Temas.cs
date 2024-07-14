@@ -39,7 +39,7 @@ namespace EFS_23298_23327.Models
         /// <summary>
         /// Tempo estimado de duração do Tema (Em minutos)
         /// </summary>
-        [Display(Name = "Tempo Estimado (Em minutos)")]
+        [Display(Name = "Tempo Estimado (min)")]
         [Required(ErrorMessage = "Por favor indique  {0}")]
         public int TempoEstimado { get; set; }
 
@@ -58,7 +58,7 @@ namespace EFS_23298_23327.Models
         [Required(ErrorMessage = "Por favor indique o {0}")]      
         [StringLength(9)]
         [RegularExpression("[0-9]{1,6}([,.][0-9]{1,2})?", ErrorMessage = "Escreva um número com, no máximo 2 casa decimal, separadas por . ou ,")]
-        [Display(Name = "Preço  (Por pessoa)")]
+        [Display(Name = "Preço (Por pessoa)")]
         public string PrecoStr { get; set; }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace EFS_23298_23327.Models
         /// <summary>
         /// Lotação Mínima do Tema
         /// </summary>
-        [Display(Name = "Lotação mínima")]
+        [Display(Name = "min Pax", Description = "Lotação mínima")]
         [Required(ErrorMessage = "Por favor indique a {0}")]
         [Range( 0, 20)]
         public int? MinPessoas { get; set; }
@@ -79,7 +79,7 @@ namespace EFS_23298_23327.Models
         /// Lotação Máxima do Tema
         /// </summary>
         [Required(ErrorMessage = "Por favor indique a {0}")]
-        [Display(Name = "Lotação máxima")]
+        [Display(Name = "max Pax")]
         [Range ( 0, 20)]
         public int? MaxPessoas { get; set; }
 

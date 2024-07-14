@@ -12,7 +12,7 @@ namespace EFS_23298_23327.Models
         /// Id da Reserva
         /// </summary>
         [Key]
-        [DisplayName("Id da Reserva")]
+        [DisplayName("Id")]
         public int ReservaId { get; set; }
 
         /// <summary>

@@ -34,7 +34,7 @@
         </div>
     </div>
 </div>
-
+<div class="container">
 <h1>Temas</h1>
 @if (TempData["MensagemErro"] != null) {
     <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
@@ -66,7 +66,7 @@
 <span class="text-center text-white mb-2">@AppUtils.GetHumanReadableCount("resultado", Model.Count())</span>
 
     <table id="temas" class="table table-bordered table-sm table-hover table-striped " style="border-collapse: collapse;">
-    <thead class="text-center  table-info">
+    <thead class="text-center  table-info" style="font-size:13px;">
         <tr>
                
                 <th class="w-100 text-nowrap">
@@ -98,14 +98,14 @@
             </th>
                 <th class="w-100 text-nowrap">
                     @Html.DisplayNameFor(model => model.Dificuldade)<br />
-                    <select class="form-select w-100 text-white bg-primary w-100  filter" id="Dificuldade" >
+                    <select class="form-select w-100 text-white bg-primary w-100 filter" id="Dificuldade" style="font-size:9px;">
                         <option class="text-white" value="Dificuldade">Todas</option>
                         @foreach (var dif in Html.GetEnumSelectList<Dificuldade>()) {
                             <option class="text-@DifficultiesValue.GetDifficultyColorStr(dif.Value)" value="@dif.Value">@dif.Text</option>
                         }
                     </select>
             </th>
-                <th class="w-100 text-nowrap">
+                <th class="w-100 text-nowrap" style="font-size:18px;">
                     <br />
                 @Html.DisplayNameFor(model => model.ListaFotos)
             </th>
@@ -195,18 +195,18 @@
                     @if (@item.ListaFotos != null || @item.ListaFotos.Any()) {
                         <div id="carouselIndex" class="carousel slide card-text " data-bs-ride="carousel">
 
-                            <div class="carousel-inner" style="height=200px;width:200px;">
+                            <div class="carousel-inner" style="width:170px;">
                                 @foreach (var i in @item.ListaFotos) {
                                     @if (i.FotoId == @item.ListaFotos.First().FotoId) {
                                         <div class="carousel-item active" data-bs-interval="2000">
                                             <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                                               href="~/Imagens/@i.Nome"> <img height="200px;width:200px;" src="/Imagens/@i.Nome" class="d-block w-100 "></a>
+                                               href="~/Imagens/@i.Nome"> <img  src="/Imagens/@i.Nome" class="d-block w-100 "></a>
 
                                         </div>
                                     } else {
                                         <div class="carousel-item" data-bs-interval="2000">
                                             <a data-fancybox="gallery" data-caption="Imagem do tema '@Html.DisplayFor(modelItem => item.Nome)'"
-                                               href="~/Imagens/@i.Nome"><img height="200px;width:200px;" src="/Imagens/@i.Nome" class="d-block w-100"></a>
+                                               href="~/Imagens/@i.Nome"><img  src="/Imagens/@i.Nome" class="d-block w-100"></a>
                                         </div>
                                     }
                                 }
@@ -280,6 +280,7 @@
     </tbody>
 
 </table>
+</div>
 </div>
 
 <script>

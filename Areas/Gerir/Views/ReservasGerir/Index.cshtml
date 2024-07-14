@@ -108,7 +108,7 @@
 
 <table class="table text-center table-bordered table-hover table-striped table-secondary">
     <thead>
-        <tr class=" text-center">
+        <tr class=" text-center ">
                 <th class="w-100 text-nowrap">
                     @Html.DisplayNameFor(model => model.ReservaId)<br />
                     <input class="w-100 filter" id="ReservaId" onkeyup="filter(this)"></input>
@@ -249,7 +249,7 @@
                 <td class="text-center align-items-center align-content-center">
 
                     @if (@item.ListaAnfitrioes.Any()) {
-                        <ul class="list-group list-group-horizontal">
+                        <ul class="list-group list-group-horizontal" style="font-size:13px;">
 
                             @foreach (var anf in @item.ListaAnfitrioes) {
 
@@ -331,12 +331,12 @@
         });
         $("#ListaAnfitrioes").multiselect({
             templates: {
-                button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+                button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text" style="width: 200px; max-width: fit-content; min-width: 300px !important;"></span></button>',
             },
             buttonWidth: '100%',
             nonSelectedText: 'Selecionar anfitriões',
 
-            buttonWidth: '400px',
+            buttonWidth: '250px',
             onChange: function (option, checked, select) {
                 console.log($("#ListaAnfitrioes"));
                  filter($("#ListaAnfitrioes"));
