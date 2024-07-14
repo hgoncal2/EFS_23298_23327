@@ -1,5 +1,6 @@
 ﻿using EFS_23298_23327.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EFS_23298_23327.Models
@@ -9,22 +10,26 @@ namespace EFS_23298_23327.Models
         /// <summary>
         /// Lista de Salas
         /// </summary>
+        [DisplayName("Lista de Salas")]
         public ICollection<Salas>? ListaSalas { get; set; }
 
         /// <summary>
         /// Lista de Reservas
         /// </summary>
+        [DisplayName("Lista de Reservas")]
         public ICollection<Reservas>? ListaReservas { get; set; }
 
         /// <summary>
         /// Id das preferências do Anfitrião
         /// </summary>
-        [ForeignKey(nameof(UserPrefsAnf))]     
+        [ForeignKey(nameof(UserPrefsAnf))]
+        [DisplayName("Id das Preferências do Anfitrião")]
         public int? userPrefsAnfId { get; set; }
 
         /// <summary>
         /// Preferências do Anfitrião
         /// </summary>
+        [DisplayName("Preferências do Anfitrião")]
         public UserPrefsAnf? userPrefsAn { get; set; }
 
         /// <summary>

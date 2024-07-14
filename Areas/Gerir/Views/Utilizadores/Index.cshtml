@@ -179,15 +179,15 @@
                         @:N.A
                     }
                 </td>
-                <td>
+                <td style="max-width:200px;">
 
                     @if (dictRoles.GetValueOrDefault(item.Id).Any())
                     {
-                        <ul class="list-group list-group-horizontal">
+                            <ul class="list-group list-group-horizontal" style="font-size:13px;">
                             @foreach (var role in dictRoles.GetValueOrDefault(item.Id))
                             {
                                
-                                    <li class="list-group-item text-white  bg-@RolesColourValue.GetRoleColour(role) flex-fill ms-2">@role</li>
+                                    <li class="list-group-item text-white  bg-@RolesColourValue.GetRoleColour(role) flex-fill ms-1">@role</li>
 
                                
 
@@ -221,12 +221,12 @@
     $(document).ready(function () {
         $("#ListaRoles").multiselect({
             templates: {
-                button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+                button: '<button type="button" class="multiselect dropdown-toggle btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false" max-width:fit-content; min-width:300px !important;"><span class="multiselect-selected-text"></span></button>',
             },
             buttonWidth: '100%',
             nonSelectedText: 'Selecionar anfitriões',
 
-            buttonWidth: '400px',
+            buttonWidth: '200px',
             onChange: function (option, checked, select) {
                 console.log($("#ListaRoles"));
                 filter($("#ListaRoles"));

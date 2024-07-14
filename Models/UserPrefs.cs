@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 
@@ -12,16 +13,19 @@ namespace EFS_23298_23327.Models
         /// <summary>
         /// Id do Utilizador a que serão atribuídas as Preferências
         /// </summary>
+        [DisplayName("Id do Utilizador")]
         public String UtilizadorId {  get; set; }
 
         /// <summary>
         /// Ativar/Desativar Alertas de Reservas
         /// </summary>
+        [DisplayName("Ativar Alerta de Reservas")]
         public Boolean reservas {  get; set; }
 
         /// <summary>
         /// Preferências do Anfitrião
         /// </summary>
+        [DisplayName("Preferências do Anfitrião")]
         public int? UserPrefsAnf { get; set; }
 
         /// <summary>

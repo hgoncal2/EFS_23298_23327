@@ -1,5 +1,6 @@
 ﻿using EFS_23298_23327.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel;
 
 namespace EFS_23298_23327.Models
 {
@@ -8,6 +9,7 @@ namespace EFS_23298_23327.Models
         /// <summary>
         /// Lista de Reservas
         /// </summary>
+        [DisplayName("Lista de Reservas")]
         public ICollection<Reservas>? ListaReservas { get; set; }
 
         /// <summary>

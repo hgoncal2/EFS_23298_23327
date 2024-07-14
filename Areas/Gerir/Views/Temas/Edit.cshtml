@@ -64,25 +64,25 @@
 <div id="confirm"></div>
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     @if(TempData["ConfirmDialog"] != null){
-        <div class="modal fade" id="modalConfirm" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
-    <div class="modal-content">
-    <div class="modal-header bg-warning">
-    <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-circle-fill display-6 me-5 "></i> Sala antiga contém reservas ativas!
-    <button type = "button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-                    <div class="modal-body">
-                        @TempData["ConfirmDialog"]
-                    </div>
-    <div class="modal-footer ">
+    <div class="modal fade" id="modalConfirm" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered ">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-circle-fill display-6 me-5 "></i> Sala antiga contém reservas ativas!</h5>
+                    <button type = "button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @TempData["ConfirmDialog"]
+                </div>
+                <div class="modal-footer ">
 
-                        <button type="submit" asp-route-guid="@TempData["Guid"]" asp-route-confirmSala="false" class="btn btn-danger mr-auto" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" asp-route-guid="@TempData["Guid"]" asp-route-confirmSala="false" class="btn btn-danger mr-auto" data-bs-dismiss="modal">Fechar</button>
 
-                        <button asp-route-confirmSala="true" asp-route-SalaAntiga="@TempData["SalaAntiga"]" asp-route-guid="@TempData["Guid"]" type="submit" class="btn btn-success">Eu percebi</button>
+                    <button asp-route-confirmSala="true" asp-route-SalaAntiga="@TempData["SalaAntiga"]" asp-route-guid="@TempData["Guid"]" type="submit" class="btn btn-success">Eu percebi</button>
     
-    </div>
-    </div>
-    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
 }  
