@@ -24,6 +24,8 @@
 
     }
 
+
+
     @if (TempData["EmailSucc"] != null) {
         <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
             @TempData["EmailSucc"]
@@ -69,6 +71,17 @@
                 <input type="submit" value="Login" class="btn btn-primary" />
             </div>
         </form>
+        </br>
+        <div class="">
+
+            <a class="text-decoration-none" asp-action="ResetPassword" asp-controller="Account"><i class="bi bi-question-circle-fill fa fa-2x"></i><span class="h3 ms-3">Esqueceu password?</span></a>
+
+            <br/>
+            <br />
+            <a class="text-decoration-none" asp-action="Register" asp-controller="Account"><i class="bi bi-person-vcard fa fa-2x "></i><span class="h3 ms-3">Criar conta</span></a>
+            
+            
+        </div>
     </div>
 </div>
 

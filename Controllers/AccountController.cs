@@ -1,6 +1,7 @@
 ﻿using EFS_23298_23327.Data;
 using EFS_23298_23327.Models;
 using EFS_23298_23327.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -51,7 +52,7 @@ namespace EFS_23298_23327.Controllers
             _emailSender = emailSender;
         }
 
-        [CustomAuthorize]
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult Login(bool unauth)
 
@@ -67,7 +68,7 @@ namespace EFS_23298_23327.Controllers
 
 
 
-        [CustomAuthorize]
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginVM)
         {
@@ -133,7 +134,7 @@ namespace EFS_23298_23327.Controllers
 
         }
 
-        [CustomAuthorize]
+        [AllowAnonymous]
         [HttpGet]
         public  ActionResult Register(string returnUrl=null) {
             ReturnUrl = returnUrl;
@@ -241,6 +242,80 @@ namespace EFS_23298_23327.Controllers
                 return RedirectToAction("Index", "Home", new {area = ""});
             }
         }
+
+        [CustomAuthorize]
+        [HttpGet]
+        public ActionResult ResetPassword() {
+
+           
+            return View(new LoginViewModel());
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(LoginViewModel l) {
+            ModelState.Remove("Password");
+            
+            if (ModelState.IsValid) {
+                TempData["ResetPasswordSucc"] = "Pedido de reset password enviado!Por favor verifique o seu email!";
+                var user = await _userManager.FindByNameAsync(l.Username);
+                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user))) {
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return View(new LoginViewModel());
+                }
+
+                // For more information on how to enable account confirmation and password reset please
+                // visit https://go.microsoft.com/fwlink/?LinkID=532713
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var callbackUrl = Url.Action(
+                    "ResetPasswordConfirm", "Account",
+                   
+                    values: new { area = "", code },
+                    protocol: Request.Scheme);
+
+                await _emailSender.SendEmailAsync(
+                    user.Email,
+                    "Reset Password",
+                    $"Por favor clique no link para dar reset à password:\n {callbackUrl}");
+
+                
+            }
+            TempData["ResetPasswordErr"] = "Erro indesperado,por favor tente mais tarde!";
+            return View(new LoginViewModel());
+        }
+        [HttpGet]
+        public IActionResult ResetPasswordConfirm(string code = null) {
+            if (code == null) {
+                return BadRequest("Deve ser fornecido um código");
+            } else {
+                var r = new RegisterViewModel();
+                TempData["Code"] = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+                
+                return View(r);
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> ResetPasswordConfirm([Bind("Password,ConfirmPassword,Username")] RegisterViewModel u,String code) {
+          
+
+            var user = await _userManager.FindByNameAsync(u.Username);
+            if (user == null) {
+                
+                return View();
+            }
+            var result = await _userManager.ResetPasswordAsync(user, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code)) ,u.Password);
+            if (result.Succeeded) {
+                TempData["EmailSucc"] = "Reset à password com sucesso!";
+                return RedirectToAction(nameof(Login));
+            }
+
+            foreach (var error in result.Errors) {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+            return View();
+        }
+
 
         private Utilizadores CreateUser() {
             try {
