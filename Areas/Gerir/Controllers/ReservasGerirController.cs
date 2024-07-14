@@ -156,6 +156,12 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         }
 
 
+        /// <summary>
+        /// Post /GERIR/RESERVAS/EDIT/{EditReservaViewModel}
+        /// </summary>
+        /// 
+        /// <param name="rvm">Instância do objeto EditReservaViewModel,que recebe atributos normais de uma reserva,porém recebe uma lista de IDs de anfitriões,e não do objeto 'Anfitrioes'</param>
+        /// <returns>Partial view tabela reservas</returns>
         [HttpPost]
         public async Task<IActionResult> Edit(EditReservaViewModel rvm) {
             if (rvm.Reserva.ReservaId == null) {
@@ -168,7 +174,9 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             r.ReservaEndDate = rvm.Reserva.ReservaEndDate;
             r.SalaId = rvm.Reserva.SalaId;
             r.NumPessoas = rvm.Reserva.NumPessoas;
+            //Vai buscar os objetos "Anfitrioes" que correspondem aos IDs
             r.ListaAnfitrioes = await _context.Anfitrioes.Where(a => !a.Deleted && rvm.RlistaAnfitrioes.Contains(a.Id)).ToListAsync();
+            //Se for para notificar cliente,manda email
             if (rvm.NotificarCliente) {
                 var callbackUrl = Url.Action(
                        "Index", "Perfil", values: new { area = "", resId = r.ReservaId }, protocol: HttpContext.Request.Scheme
@@ -185,18 +193,25 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
         }
 
+        /// <summary>
+        /// Cacnela reserva
+        /// </summary>
+        /// <param name="resId">ID da reserva para cancelar</param>
+        /// <param name="notificar">Se deseja notificar cliente</param>
+        /// <returns></returns>
         [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> CancelaReserva(int resId,string? notificar) {
 
             var r = notificar;
-                var reserva = await _context.Reservas.Include(c=>c.Cliente).Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate).FirstOrDefaultAsync();
+            //vai buscar a reserva correspondente ao ID,verifica que a pessoa que criou a reserva é a pessoa que está a fazer o pedido
+                var reserva = await _context.Reservas.Include(c=>c.Cliente).Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate && r.Cliente.UserName == User.Identity.Name).FirstOrDefaultAsync();
 
             if (reserva == null) {
                 return Unauthorized();
             }
 
-
+            //Notificar utilizador de cancelamento da reserva
             if (notificar == "on") {
                 var callbackUrl = Url.Action(
                         "Index", "Perfil", values: new { area = "", resId = reserva.ReservaId}, protocol: HttpContext.Request.Scheme

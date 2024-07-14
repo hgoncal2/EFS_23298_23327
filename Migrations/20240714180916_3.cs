@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EFS_23298_23327.Migrations
 {
     /// <inheritdoc />
-    public partial class mssql_migration_664 : Migration
+    public partial class _3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
