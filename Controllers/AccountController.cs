@@ -99,10 +99,7 @@ namespace EFS_23298_23327.Controllers
                         
                         if (u.UserName == "admin" && !User.IsInRole("Admin"))
                         {
-                            //Mete o email como tendo sido confirmado
-                            await _emailStore.SetEmailConfirmedAsync(u, true, CancellationToken.None).ConfigureAwait(false);
-                              _context.Update(u);
-                            await _context.SaveChangesAsync();
+                            
                             await _userManager.AddToRoleAsync(u, "Admin");
                             
                             await _signInManager.PasswordSignInAsync(u, loginVM.Password, false, false);
@@ -179,7 +176,8 @@ namespace EFS_23298_23327.Controllers
                 await _userStore.SetUserNameAsync(u, vm.Username, CancellationToken.None);
                 
                 await _emailStore.SetEmailAsync(u, vm.Email, CancellationToken.None);
-                
+                u.PrimeiroNome = vm.PrimeiroNome;
+                u.UltimoNome = vm.UltimoNome;
                 var result = await _userManager.CreateAsync(u, vm.Password);
                 //_context.Add(u);
                 //       await _context.SaveChangesAsync();
@@ -189,8 +187,7 @@ namespace EFS_23298_23327.Controllers
 
 
                 if (result.Succeeded) {
-                    u.PrimeiroNome = vm.PrimeiroNome;
-                    u.UltimoNome = vm.UltimoNome;
+                  
                     await _userManager.AddToRoleAsync(u, "Cliente");
                     _context.Update(u);
                     await _context.SaveChangesAsync();
@@ -338,6 +335,8 @@ namespace EFS_23298_23327.Controllers
                 return RedirectToAction("Index","Home");
             }
 
+
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) {
                 return NotFound($"Unable to load user with ID '{userId}'.");
@@ -353,7 +352,37 @@ namespace EFS_23298_23327.Controllers
             }
             return RedirectToAction(nameof(Login));
         }
-    
 
-}
+
+        [HttpGet]
+        public IActionResult ResendEmailConfirmation() {
+
+            return View(new LoginViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResendEmailConfirmation(LoginViewModel u) {
+          
+
+            var user = await _userManager.FindByNameAsync(u.Username);
+            if (user == null) {
+
+                TempData["ReenvioEmail"] = "Novo Email de confirmação enviado com sucesso!";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var userId = await _userManager.GetUserIdAsync(user);
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = Url.Action(
+                         "ConfirmarEmail", "Account", values: new { area = "", userId = userId, code = code }, protocol: HttpContext.Request.Scheme
+                         );
+            await _emailSender.SendEmailAsync(user.Email, "Confirme o seu email",
+          $"Por favor verifique a sua conta clicando no link:\n{callbackUrl}");
+            TempData["ReenvioEmail"] = "Novo Email de confirmação enviado com sucesso!";
+            return RedirectToAction(nameof(Login));
+        }
+
+
+    }
 }

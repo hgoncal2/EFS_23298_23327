@@ -32,6 +32,10 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Index da página para gerir reservas
+        /// </summary>
+        /// <returns>View com lista de reservas</returns>
         public async Task<IActionResult> Index() {
             //todos os utilizadores não apagados
             var reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a=>a.ListaAnfitrioes).Include(c=>c.Cliente).Include(s=>s.Sala).OrderBy(r => r.Cancelada).ThenByDescending(u => u.DataCriacao).ThenByDescending(u => u.ReservaDate).ToListAsync();
@@ -111,7 +115,13 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         }
         */
 
-        // GET: Salas/Edit/5
+        /// <summary>
+        /// GET /GERIR/RESERVAS/EDIT/{id}
+        /// </summary>
+        /// 
+        /// <param name="id"> ID da reserva a ser editada</param>
+        /// <returns>Partial view tabela reservas</returns>
+
         [HttpGet]
         public async Task<IActionResult> Edit(int? id) {
             if (id == null) {
@@ -122,11 +132,20 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             if (res == null) {
                 return NotFound();
             }
+            //Só podem ser editadas reservas com +48 de antecedência
+            if(DateTime.Now.AddHours(48) >= res.ReservaDate) {
+                return Unauthorized();
+            }
+            //lista de reservas,para mostrar no calendário
             var listaRes = await _context.Reservas.Include(s => s.ListaAnfitrioes.Where(a => !a.Deleted)).Include(s => s.Sala).Include(c => c.Cliente).Where(s =>!s.Cancelada && !s.Deleted).ToListAsync();
+            //tema associado à reserva(sala)
             var tema = await _context.Temas.Where(t => !t.Deleted && t.SalaID == res.SalaId).FirstOrDefaultAsync();
+            //Todas as salas com tema
             var listaSalasComtema = await _context.Temas.Where(t => !t.Deleted).Select(s => s.SalaID).ToListAsync();
+            //Todas as salas com tema associado,só vamos incluir salas com temas associados
             var listaSalas = await _context.Salas.Where(s => !s.Deleted && s.SalaId != res.SalaId && listaSalasComtema.Contains(s.SalaId)).ToListAsync();
             TempData["ListaSalas"] = listaSalas;
+            //Todos os anfitriões
             var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
             HashSet<Utilizadores> anfitrioes = userList.ToList().Where(a => a.Deleted == false).ToHashSet();
             ViewBag.SelectionIdList = anfitrioes;
@@ -135,6 +154,8 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(r);
 
         }
+
+
         [HttpPost]
         public async Task<IActionResult> Edit(EditReservaViewModel rvm) {
             if (rvm.Reserva.ReservaId == null) {
