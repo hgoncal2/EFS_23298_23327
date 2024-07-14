@@ -90,7 +90,7 @@ namespace EFS_23298_23327.Controllers
                 if (pass)
                 {
                    
-                    var result = await _signInManager.PasswordSignInAsync(u, loginVM.Password, false, false);
+                    var result = await _signInManager.PasswordSignInAsync(u, loginVM.Password,false,false);
                  
 
                     if (result.Succeeded)
@@ -104,6 +104,8 @@ namespace EFS_23298_23327.Controllers
                             await _context.SaveChangesAsync();
                             await _userManager.AddToRoleAsync(u, "Admin");
                             
+                            await _signInManager.PasswordSignInAsync(u, loginVM.Password, false, false);
+
                         }
                         TempData["NomeUtilizadorLogado"] = u.UserName;
                         if (User.IsInRole("Admin") && !User.IsInRole("Anfitriao")) {
@@ -115,6 +117,10 @@ namespace EFS_23298_23327.Controllers
                        
                         
                         return RedirectToAction("Index", "Home", new { area = "" });
+                    }
+                    var confirmed = await _userManager.IsEmailConfirmedAsync(u);
+                    if (!confirmed) {
+                        TempData["EmailNotConfirmed"] = "Por favor confirme o seu email para conseguir dar login!";
                     }
                 }
                 ViewBag.Erro = true;
@@ -184,7 +190,8 @@ namespace EFS_23298_23327.Controllers
                 if (result.Succeeded) {
                     u.PrimeiroNome = vm.PrimeiroNome;
                     u.UltimoNome = vm.UltimoNome;
-                     _context.Update(u);
+                    await _userManager.AddToRoleAsync(u, "Cliente");
+                    _context.Update(u);
                     await _context.SaveChangesAsync();
 
                     var userId = await _userManager.GetUserIdAsync(u);

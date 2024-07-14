@@ -1,0 +1,119 @@
+﻿@model EFS_23298_23327.Models.Reservas
+
+
+@{
+    var nomeC = @Model.Cliente.PrimeiroNome + " " + @Model.Cliente.UltimoNome;
+
+    var canc = "";
+   
+
+}
+<div class="modal" tabindex="-1" id="reserva">
+    <div class="modal-dialog">
+    <div class="modal-content border-danger border-2">
+        
+
+        <div class="modal-header text-center">
+            
+
+            <h5 class="modal-title text-center">Reserva @Model.ReservaId - @nomeC</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            
+        </div>
+        @if(Model.Cancelada){
+            @:<div class="text-center">
+            @:<i class="bi bi-x text-danger fa-5x"></i></br>
+            @:<span class='text-danger h3'>Cancelada!</span
+            @: </div>
+        }
+        <div class="modal-body">
+            
+            <div class="container-fluid text-center justify-content-center">
+                
+                <div class="row">
+                    
+                     <div class="col ">
+                        
+                        <div>
+                            
+                            Ínicio :<span class="text-success ms-1">@Model.ReservaDate</span>
+
+                            
+                        </div>
+                        <div>
+                            
+                            Fim : <span class="text-danger ms-1">@Model.ReservaEndDate</span>
+
+                            
+                        </div>
+                        
+                    </div> 
+                     <div class="col">
+                        
+                        <div class="text-info">
+                            
+                             Número de pessoas: @Model.NumPessoas
+                            
+                        </div>
+                        <div>
+                            
+                            Sala: <span style="color:${salaColor}">@Model.Sala.Numero</span>
+                            
+                        </div>
+                        
+                    </div> 
+                    
+                </div> 
+                <div class="mt-2 text-center  ">
+                    
+                    Tema: <span class="text-${difStr}">@Model.TemaNome</span>
+                    
+                </div>
+                <div class="mt-2 text-center  ">
+                    
+                     Preço Total: <span class="">@Model.TotalPreco</span>
+                    
+                </div>
+                 <div class="mt-5 text-center  ">
+                    
+                    <span class="">Anfitriões</span></br>
+
+                    <ul class="list-group text-break list-group-horizontal mt-2 mb-2">
+
+                        @{
+                            foreach (var a in Model.ListaAnfitrioes) {
+                                var v = a.PrimeiroNome + " " + a.UltimoNome;
+                                if (v.Equals(@TempData["userLoggedNome"])) {
+                                    <li class='list-group-item text-white border-success border-3 bg-secondary flex-fill ms-2' data-bs-toggle='tooltip' data-html='true' data-bs-placement='top' title='EU'>"@v</li>
+                                }else{
+                                    <li class='list-group-item text-white bg-warning flex-fill ms-2'>@v</li>
+                                }
+                        }
+                        }
+                        
+                        
+                </div>
+                
+            </div>
+            
+        </div>
+
+        <div class="modal-footer">
+            
+
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<script>
+
+
+    $(document).ready(function () {
+        $(".modal").modal("show")
+    })
+</script>
+  

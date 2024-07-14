@@ -264,10 +264,15 @@
                     @:display:'background',
                 }
                    description:'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
-                    extendedProps: {
+                   
+                   @if(@i.Cliente.UserName == User.Identity.Name){
+
+                 <text>
+                   extendedProps: {
                         nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
                         dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
                         idReserva: '@i.ReservaId',
+                        username:'@i.Cliente.UserName',
                         dataF: '@i.ReservaEndDate.ToString("dd-MM-yyyy HH:mm:ss")',
                         temaNome: '@i.TemaNome',
                         salaId: '@i.SalaId',
@@ -281,6 +286,10 @@
                
 
                               },
+                    </text>
+
+
+        }
 
 
                 @if (i.Cliente.UserName.Equals(User.Identity.Name)) {
@@ -297,9 +306,18 @@
                 }
                     end: '@i.ReservaEndDate.AddMinutes(30).ToString("yyyy-MM-ddTHH:mm:ss")',
                     description:'Reserva @i.ReservaId - Sala @i.Sala.Numero - Em @TimeSpan.FromHours((i.ReservaDate - DateTime.Now).TotalHours).Humanize(2)',
+                    
+                    
+                     
+                   @if(@i.Cliente.UserName == User.Identity.Name){
+
+                 <text>
+                    
+                    
                     extendedProps: {
                      nome: '@i.Cliente.PrimeiroNome @i.Cliente.UltimoNome',
                       salaId: '@i.SalaId',
+                        username: '@i.Cliente.UserName',
                         reservaId:'@i.ReservaId',
                     dataI: '@i.ReservaDate.ToString("dd-MM-yyyy HH:mm:ss")',
                     idReserva:'@i.ReservaId',
@@ -314,6 +332,9 @@
               
                     
                   },
+                   </text>
+
+                  }
 
 
 
@@ -393,6 +414,10 @@
 
                 },
     eventClick: function(info) {
+
+        if(info.event.extendedProps.username != '@User.Identity.Name'){
+            return false;
+        }
         console.log(info.event.extendedProps);
         var nome = info.event.extendedProps.nome;
         var dataI = info.event.extendedProps.dataI;

@@ -3,6 +3,7 @@ using EFS_23298_23327.Data;
 using EFS_23298_23327.Models;
 using EFS_23298_23327.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
@@ -20,11 +21,13 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
+        private readonly IEmailSender _emailSender;
 
 
         public ReservasGerirController(ApplicationDbContext context, UserManager<Utilizadores> userManager,
-     RoleManager<IdentityRole> roleManager) {
+     RoleManager<IdentityRole> roleManager, IEmailSender emailSender) {
             _context = context;
+            _emailSender = emailSender;
             _roleManager = roleManager;
             _userManager = userManager;
         }
@@ -145,7 +148,15 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             r.SalaId = rvm.Reserva.SalaId;
             r.NumPessoas = rvm.Reserva.NumPessoas;
             r.ListaAnfitrioes = await _context.Anfitrioes.Where(a => !a.Deleted && rvm.RlistaAnfitrioes.Contains(a.Id)).ToListAsync();
+            if (rvm.NotificarCliente) {
+                var callbackUrl = Url.Action(
+                       "Index", "Perfil", values: new { area = "", resId = r.ReservaId }, protocol: HttpContext.Request.Scheme
+                       );
+                await _emailSender.SendEmailAsync(r.Cliente.Email, "Reserva Alterada!",
+              $"A sua reserva para o dia {r.ReservaDate} foi alterada! Clique no link para ver mais detalhes:\n{callbackUrl}");
 
+
+            }
             _context.Update(r);
             await _context.SaveChangesAsync();
             TempData["EditSave"] = "sucesso";
@@ -158,7 +169,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         public async Task<IActionResult> CancelaReserva(int resId,string? notificar) {
 
             var r = notificar;
-                var reserva = await _context.Reservas.Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate).FirstOrDefaultAsync();
+                var reserva = await _context.Reservas.Include(c=>c.Cliente).Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate).FirstOrDefaultAsync();
 
             if (reserva == null) {
                 return Unauthorized();
@@ -166,8 +177,13 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
 
             if (notificar == "on") {
+                var callbackUrl = Url.Action(
+                        "Index", "Perfil", values: new { area = "", resId = reserva.ReservaId}, protocol: HttpContext.Request.Scheme
+                        );
+                await _emailSender.SendEmailAsync(reserva.Cliente.Email, "Reserva cancelada!",
+              $"A sua reserva para o dia {reserva.ReservaDate} foi cancelada! Clique no link para ver mais detalhes:\n{callbackUrl}");
 
-                //mandar email
+                
 
 
             }

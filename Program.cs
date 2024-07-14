@@ -34,7 +34,7 @@ builder.Services.AddTransient<IEmailSender, EnviaEmail>(i =>
 
 
 
-builder.Services.AddDefaultIdentity<Utilizadores>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<Utilizadores>(options => options.SignIn.RequireConfirmedAccount =bool.Parse(builder.Configuration["RequirePasswordLogin:RequirePassword"]))
    .AddRoles<IdentityRole>()
    .AddEntityFrameworkStores<ApplicationDbContext>().AddErrorDescriber<ErrosIdentityUser>();
 builder.Services.AddControllersWithViews();

@@ -6,16 +6,9 @@
     IEnumerable<Reservas> reservasAnt = Model.Where(r => r.ReservaEndDate < DateTime.Now && !r.Cancelada).OrderByDescending(r => r.ReservaEndDate).ToList();
     IEnumerable<Reservas> reservasCanc = Model.Where(r => r.Cancelada).OrderBy(r => r.ReservaEndDate).ToList();
 }
-<div class="card card-header text-center text-info m-2">
-    <h2>Reservas pertencentes a @Model.First().Cliente.UserName</h2>
-</div>
-<div class="card border-2 border-info mt-2 mb-2 text-center">Próximas Reservas</div>
-<div class="card m-1" style="min-width:100% !important;">
-    <div class="float-end">
-        <i class='ms-2 bi bi-circle text-danger'> Dentro de 3 dias</i>
-        <i class='ms-2 bi bi-circle text-success'> Posterior a 3 dias</i>
-    </div>
-</div>
+
+
+
 @foreach(var i in reservasProx)
 {
     String c = "success";
@@ -23,6 +16,13 @@
     {
         c = "danger";
     }
+
+
+
+
+
+
+   
     
     <div class="card border-2 rounded-pill m-4 border-@c text-center text-info">
             <div class="row m-2">
@@ -46,7 +46,13 @@
                 <div class="text-info m-2">Reservado a</div>
                 <div class="text-light m-2">@i.DataCriacao.ToString("d")</div>
                 </div>
+            <div class="col m-2 text-center justify-content-center align-items-center">
+               
+                <i class='bi bi-eye-fill cal res mt-5 text-success fa fa-2x' data-bs-toggle='tooltip' data-bs-placement='top' title='Ver reserva' style='font-size:1.5rem;cursor:pointer' id='@i.ReservaId'></i>
             </div>
+            </div>
+           
+            
            
         </div>
      
@@ -75,6 +81,10 @@
             <div class="col m-2">
                 <div class="text-info">Reservado a</div>
                 <div class="text-light">@i.DataCriacao.ToString("d")</div>
+            </div>
+            <div class="col m-2 text-center justify-content-center align-items-center">
+
+                <i class='bi bi-eye-fill cal res mt-5 text-info fa fa-2x' data-bs-toggle='tooltip' data-bs-placement='top' title='Ver reserva' style='font-size:1.5rem;cursor:pointer' id='@i.ReservaId'></i>
             </div>
         </div>
 
@@ -107,8 +117,55 @@
                 <div class="text-info">Reservado a</div>
                 <div class="text-light">@i.DataCriacao.ToString("d")</div>
             </div>
+            <div class="col m-2 text-center justify-content-center align-items-center">
+
+                <i class='bi bi-eye-fill cal res mt-5 text-white fa fa-2x' data-bs-toggle='tooltip' data-bs-placement='top' title='Ver reserva' style='font-size:1.5rem;cursor:pointer' id='@i.ReservaId'></i>
+            </div>
         </div>
 
     </div>
 
 }
+<div id="verRes"></div>
+
+                <script>
+    $(document).ready(function () {
+    var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+    @if(TempData["ResId"] != null){
+        <text>
+                $.get("/Perfil/VerReserva", { reservaId: @TempData["ResId"] }, function (data, status) {
+
+    $("#verRes").html(data)
+
+
+
+
+    });
+        </text>
+    }
+
+
+                        $(".res").on("click",function(){
+
+                          
+
+        $.get("/Perfil/VerReserva", { reservaId: $(this).attr('id') }, function (data, status) {
+
+            $("#verRes").html(data)
+           
+
+
+
+        });
+                        })
+
+    })
+
+       
+                    
+
+
+
+                </script>
