@@ -140,8 +140,16 @@
             }
 
         }
+        @if (@TempData["ConfirmEmail"] != null) {
+           
+                <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+                @TempData["ConfirmEmail"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
 
-    }
+        }
+
 
     
     @if (@TempData["logOut"] != null)
@@ -164,7 +172,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-    <div class="container    " style="min-width:90%;max-width:90%">
+    <div class="container" style="min-width:90%;max-width:90%">
         <main role="main" class="pb-3 mt-2 vw-90">
             
             @RenderBody()

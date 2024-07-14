@@ -3,7 +3,10 @@ using EFS_23298_23327.Hubs;
 using EFS_23298_23327.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +22,19 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
 builder.Services.AddSignalR();
+builder.Services.AddTransient<IEmailSender, EnviaEmail>(i =>
+                new EnviaEmail(
+                    builder.Configuration["EnviaEmail:Host"],
+                    int.Parse(builder.Configuration["EnviaEmail:Port"]),
+                  bool.Parse(builder.Configuration["EnviaEmail:EnableSSL"]),
+                     builder.Configuration["EnviaEmail:Username"],
+                    builder.Configuration["EnviaEmail:Password"]
+                )
+            );
 
-builder.Services.AddDefaultIdentity<Utilizadores>(options => options.SignIn.RequireConfirmedAccount = false)
+
+
+builder.Services.AddDefaultIdentity<Utilizadores>(options => options.SignIn.RequireConfirmedAccount = true)
    .AddRoles<IdentityRole>()
    .AddEntityFrameworkStores<ApplicationDbContext>().AddErrorDescriber<ErrosIdentityUser>();
 builder.Services.AddControllersWithViews();
