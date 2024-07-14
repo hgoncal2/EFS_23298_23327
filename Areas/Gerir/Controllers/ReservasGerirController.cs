@@ -32,6 +32,10 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Index da página para gerir reservas
+        /// </summary>
+        /// <returns>View com lista de reservas</returns>
         public async Task<IActionResult> Index() {
             //todos os utilizadores não apagados
             var reservas = await _context.Reservas.Where(u => u.Deleted != true).Include(a=>a.ListaAnfitrioes).Include(c=>c.Cliente).Include(s=>s.Sala).OrderBy(r => r.Cancelada).ThenByDescending(u => u.DataCriacao).ThenByDescending(u => u.ReservaDate).ToListAsync();
@@ -111,7 +115,13 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         }
         */
 
-        // GET: Salas/Edit/5
+        /// <summary>
+        /// GET /GERIR/RESERVAS/EDIT/{id}
+        /// </summary>
+        /// 
+        /// <param name="id"> ID da reserva a ser editada</param>
+        /// <returns>Partial view tabela reservas</returns>
+
         [HttpGet]
         public async Task<IActionResult> Edit(int? id) {
             if (id == null) {
@@ -122,11 +132,20 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             if (res == null) {
                 return NotFound();
             }
+            //Só podem ser editadas reservas com +48 de antecedência
+            if(DateTime.Now.AddHours(48) >= res.ReservaDate) {
+                return Unauthorized();
+            }
+            //lista de reservas,para mostrar no calendário
             var listaRes = await _context.Reservas.Include(s => s.ListaAnfitrioes.Where(a => !a.Deleted)).Include(s => s.Sala).Include(c => c.Cliente).Where(s =>!s.Cancelada && !s.Deleted).ToListAsync();
+            //tema associado à reserva(sala)
             var tema = await _context.Temas.Where(t => !t.Deleted && t.SalaID == res.SalaId).FirstOrDefaultAsync();
+            //Todas as salas com tema
             var listaSalasComtema = await _context.Temas.Where(t => !t.Deleted).Select(s => s.SalaID).ToListAsync();
+            //Todas as salas com tema associado,só vamos incluir salas com temas associados
             var listaSalas = await _context.Salas.Where(s => !s.Deleted && s.SalaId != res.SalaId && listaSalasComtema.Contains(s.SalaId)).ToListAsync();
             TempData["ListaSalas"] = listaSalas;
+            //Todos os anfitriões
             var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
             HashSet<Utilizadores> anfitrioes = userList.ToList().Where(a => a.Deleted == false).ToHashSet();
             ViewBag.SelectionIdList = anfitrioes;
@@ -135,6 +154,14 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(r);
 
         }
+
+
+        /// <summary>
+        /// Post /GERIR/RESERVAS/EDIT/{EditReservaViewModel}
+        /// </summary>
+        /// 
+        /// <param name="rvm">Instância do objeto EditReservaViewModel,que recebe atributos normais de uma reserva,porém recebe uma lista de IDs de anfitriões,e não do objeto 'Anfitrioes'</param>
+        /// <returns>Partial view tabela reservas</returns>
         [HttpPost]
         public async Task<IActionResult> Edit(EditReservaViewModel rvm) {
             if (rvm.Reserva.ReservaId == null) {
@@ -147,7 +174,9 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             r.ReservaEndDate = rvm.Reserva.ReservaEndDate;
             r.SalaId = rvm.Reserva.SalaId;
             r.NumPessoas = rvm.Reserva.NumPessoas;
+            //Vai buscar os objetos "Anfitrioes" que correspondem aos IDs
             r.ListaAnfitrioes = await _context.Anfitrioes.Where(a => !a.Deleted && rvm.RlistaAnfitrioes.Contains(a.Id)).ToListAsync();
+            //Se for para notificar cliente,manda email
             if (rvm.NotificarCliente) {
                 var callbackUrl = Url.Action(
                        "Index", "Perfil", values: new { area = "", resId = r.ReservaId }, protocol: HttpContext.Request.Scheme
@@ -164,18 +193,25 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
         }
 
+        /// <summary>
+        /// Cacnela reserva
+        /// </summary>
+        /// <param name="resId">ID da reserva para cancelar</param>
+        /// <param name="notificar">Se deseja notificar cliente</param>
+        /// <returns></returns>
         [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> CancelaReserva(int resId,string? notificar) {
 
             var r = notificar;
-                var reserva = await _context.Reservas.Include(c=>c.Cliente).Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate).FirstOrDefaultAsync();
+            //vai buscar a reserva correspondente ao ID,verifica que a pessoa que criou a reserva é a pessoa que está a fazer o pedido
+                var reserva = await _context.Reservas.Include(c=>c.Cliente).Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate && r.Cliente.UserName == User.Identity.Name).FirstOrDefaultAsync();
 
             if (reserva == null) {
                 return Unauthorized();
             }
 
-
+            //Notificar utilizador de cancelamento da reserva
             if (notificar == "on") {
                 var callbackUrl = Url.Action(
                         "Index", "Perfil", values: new { area = "", resId = reserva.ReservaId}, protocol: HttpContext.Request.Scheme

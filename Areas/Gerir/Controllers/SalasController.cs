@@ -36,33 +36,39 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             _userManager = userManager;
         }
 
-        // GET: Salas
+
+        /// <summary>
+        /// GET /GERIR/SALAS
+        /// </summary>
+        /// <returns>Lista de salas</returns>
         public async Task<IActionResult> Index()
 
             
         {
-
-
+            //Mapa que irá conter sala e número de reservas pendentes da semana
             Dictionary<int, int> mapSalaRes = new Dictionary<int,int>();
-
+            //Todas as reservas pendentes
             var r = await _context.Reservas.Include(s=>s.Sala).Where(r => !r.Deleted).Where(r => r.ReservaEndDate > DateTime.Now).ToListAsync();
-            var d = new DateTime();
+            //Todas as salas
             var applicationDbContext = _context.Salas.Include(m => m.ListaAnfitrioes.Where(f => f.Deleted != true)).OrderByDescending(m => m.DataCriacao);
             var s = await applicationDbContext.ToListAsync();
+            //Por cada sala,adiciona número de reservas pendentes da semana ao map
             foreach (var item in s)
             {  
 
                 mapSalaRes.Add(item.SalaId, r.Where(r => !r.Deleted && r.SalaId == item.SalaId && ISOWeek.GetWeekOfYear(r.ReservaDate) == ISOWeek.GetWeekOfYear(DateTime.Now)).Count());
 
-               // var s3 =await _context.Reservas.Where(r => !r.Deleted).Where(r => r.SalaId == item.SalaId).Where(r => r.ReservaEndDate > DateTime.Now).Where(r=>ISOWeek.GetWeekOfYear(r.ReservaDate)==ISOWeek.GetWeekOfYear(new DateTime()) ).CountAsync();
             }
+            //User logado. Poderia se usar,também, o User.Identity.Name,quis experimentar outras abordagens
             var ud = User.FindFirstValue(ClaimTypes.NameIdentifier);
             TempData["UserLogado"] = User.FindFirstValue(ClaimTypes.Name);
 
+            //Lista de anfitriões,irá ser preciso para fazer os filtros.Está a ser incluido as preferencias,de modo a mostrar as cores das salas de acordo come stas
             var u = await _context.Anfitrioes.Where(u => u.Id == ud).Include(u => u.userPrefsAn).ThenInclude(u => u.Cores).FirstOrDefaultAsync();
             if (u != null)
             {
                 if (u.userPrefsAn != null)
+                    //Criado mapa que irá conter a sala e a respetiva cor,de acordo com as preferências do utilizador
                 {
                     Dictionary<int, string> coresSalas = new Dictionary<int, string>();
 
@@ -84,6 +90,15 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         }
 
 
+        /// <summary>
+        /// Filtro das salas. Ver comentários efetuados no ReservasGerirController,no mesmo método,onde cada linha é explicada com mais detalhe
+        /// </summary>
+        /// <param name="dictVals"></param>
+        /// <param name="dic"></param>
+        /// <param name="last"></param>
+        /// <param name="anfs"></param>
+        /// <param name="dicSalasCount"></param>
+        /// <returns>Partial view com tabela filtrada</returns>
         [HttpGet]
         public async Task<IActionResult> Filter(Dictionary<string, string> dictVals, Dictionary<int, string> dic, string last, string anfs,Dictionary<int, int> dicSalasCount)
         {
@@ -300,8 +315,12 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
 
 
-
-        // GET: Salas/Details/5
+        /// <summary>
+        /// GET GERIR/SALAS/DETAILS/{id}
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>View detlhes com modelo sala</returns>
+       
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -319,7 +338,11 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(salas);
         }
 
-        // GET: Salas/Create
+        /// <summary>
+        /// GET GERIR/SALAS/CREATE - Cria nova sala
+        /// </summary>
+        /// 
+        /// <returns>Retorna View criação de sala</returns>
         public async Task<IActionResult> Create()
         {
 
@@ -331,9 +354,11 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(ViewModel);
         }
 
-        // POST: Salas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// POST GERIR/SALAS/CREATE - Cria nova sala
+        /// </summary>
+        /// <param name="salasAnf">Viewmodel com sala e lista de anfitriões</param>
+        /// <returns>Retorna para o index salas</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Sala,ListaAnfitrioes")] AnfitriaoSalaViewModel salasAnf)
@@ -379,7 +404,11 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(salasAnf);
         }
 
-        // GET: Salas/Edit/5
+        /// <summary>
+        /// GET GERIR/SALAS/EDIT/{id}
+        /// </summary>
+        /// <param name="id">ID da sala para editar</param>
+        /// <returns>View edit</returns>
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -402,10 +431,13 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(ViewModel);
           
         }
-
-        // POST: Salas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// POST GERIR/SALAS/EDIT/{id} ?=
+        /// </summary>
+        /// <param name="id">ID da sala que está a ser editada</param>
+        /// <param name="salaVM">Viewmodel sala com anfitrioões</param>
+        /// <param name="numeroAntigo"> número antigo da sala,para ser possível repô-lo caso dê erro</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Sala,ListaAnfitrioes")] AnfitriaoSalaViewModel salaVM,int numeroAntigo)
@@ -423,6 +455,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 Salas? s = null;
                 var sala = _context.Salas.FirstOrDefault(m => m.Numero == salaVM.Sala.Numero && m.SalaId != salaVM.Sala.SalaId);
                 if (sala != null) {
+                    //Se número da sala já existir
                     ViewBag.SalaExistente = sala.Numero;
                     salaVM.Sala.Numero = numeroAntigo;
                     ViewBag.SalaAntiga = salaVM.Sala.Numero;
@@ -461,25 +494,12 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             return View(salaVM);
         }
 
-        // GET: Salas/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var salas = await _context.Salas
-                .FirstOrDefaultAsync(m => m.SalaId == id);
-            if (salas == null)
-            {
-                return NotFound();
-            }
-
-            return View(salas);
-        }
-
-        // POST: Salas/Delete/5
+  
+       /// <summary>
+       /// POST /GERIR/SALAS/DELETE
+       /// </summary>
+       /// <param name="id"></param>
+       /// <returns></returns>
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -487,31 +507,25 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             var salas = await _context.Salas.FindAsync(id);
             if (salas != null)
             {
-                try {
-                    _context.Salas.Remove(salas); await _context.SaveChangesAsync();
-
-                    TempData["SalaApagada"] = salas.Numero;
-                } catch (SqlException e) {
-
-                    var tema = await _context.Temas.Where(t => t.SalaID == salas.SalaId).FirstOrDefaultAsync();
-                    if (tema != null) {
-                        TempData["ErroEliminar"] = tema.Nome;
-                        return RedirectToAction(nameof(Index));
-                    }
 
 
-                } catch (DbUpdateException ex) {
-                    var tema = await _context.Temas.Where(t => t.SalaID == salas.SalaId).FirstOrDefaultAsync();
-                    if (tema != null) {
-                        TempData["ErroEliminar"] = tema.Nome;
-                        return RedirectToAction(nameof(Index));
-                    }
+                var tema = await _context.Temas.Where(t => t.SalaID == salas.SalaId).FirstOrDefaultAsync();
+                if (tema != null) {
+                    TempData["ErroEliminar"] = tema.Nome;
+                    return RedirectToAction(nameof(Index));
                 }
 
-                }
+                salas.Deleted = true;
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                 _context.Update(salas);
+
+                TempData["SalaApagada"] = salas.Numero;
+
+                return RedirectToAction(nameof(Index));
+
+           
+        }
+            return NotFound();
         }
 
         private bool SalasExists(int id)

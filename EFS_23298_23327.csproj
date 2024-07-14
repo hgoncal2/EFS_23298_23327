@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Views\Account\ResetPassword.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="EFCore.AutomaticMigrations" Version="8.0.5" />
     <PackageReference Include="Humanizer.Core.pt" Version="2.14.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.6" />
@@ -33,10 +29,7 @@
     <Folder Include="Areas\Gerir\Data\" />
     <Folder Include="Areas\Gerir\Models\" />
     <Folder Include="Areas\Gerir\Views\Shared\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Views\Account\ResetPassword.cshtml" />
+    <Folder Include="Views\Error\" />
   </ItemGroup>
 
 </Project>

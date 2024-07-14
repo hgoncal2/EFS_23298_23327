@@ -60,28 +60,32 @@ namespace EFS_23298_23327.Controllers
             return View(TmVm);
             
         }
-        
+
+        public ActionResult NotFound() {
+            return View();
+        }
+
+        public IActionResult Error(int? statusCode = null) {
+            if (statusCode != null) {
+                //Redireciona para as paginas criadas
+                if (statusCode == 404 || statusCode == 500) {
+                    var viewName = statusCode.ToString();
+                    return View(viewName);
+                }
+            }
+
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+
         public async Task<IActionResult> Privacy() {
 
             return NotFound();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-           var s= HttpContext.Response.StatusCode;
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+      
 
-       
-
-
-
-
-
-
-
-
+     
     }
 
    
