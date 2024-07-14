@@ -2,113 +2,136 @@
 
 @{
     ViewData["Title"] = "Utilizadores";
-    IEnumerable<Reservas> reservasProx = Model.Where(r => r.ReservaDate >= DateTime.Now && !r.Cancelada).OrderBy(r => r.ReservaDate).ToList();
-    IEnumerable<Reservas> reservasAnt = Model.Where(r => r.ReservaEndDate < DateTime.Now && !r.Cancelada).OrderByDescending(r => r.ReservaEndDate).ToList();
-    IEnumerable<Reservas> reservasCanc = Model.Where(r => r.Cancelada).OrderBy(r => r.ReservaEndDate).ToList();
+    IEnumerable<Reservas> reservasProx = Model.Where(r => r.ReservaDate >= DateTime.Now && !r.Cancelada && r.ClienteID == Model.First().ClienteID).OrderBy(r => r.ReservaDate).ToList();
+    IEnumerable<Reservas> reservasAnt = Model.Where(r => r.ReservaEndDate < DateTime.Now && !r.Cancelada && r.ClienteID == Model.First().ClienteID).OrderByDescending(r => r.ReservaEndDate).ToList();
+    IEnumerable<Reservas> reservasCanc = Model.Where(r => r.Cancelada && r.ClienteID == Model.First().ClienteID).OrderBy(r => r.ReservaEndDate).ToList();
 }
 <div class="card card-header text-center text-info m-2">
-    <h2>Reservas pertencentes a @Model.First().Cliente.UserName</h2>
+    @if(Model.Any()){
+        <h2>Reservas pertencentes a @Model.First().Cliente.UserName</h2>
+    }else{
+        <h2>Não tem reservas.</h2>
+    }
 </div>
 <div class="card border-2 border-info mt-2 mb-2 text-center">Próximas Reservas</div>
-<div class="card m-1" style="min-width:100% !important;">
+
+@if(reservasProx.Any()){
+    <div class="card m-1" style="min-width:100% !important;">
     <div class="float-end">
         <i class='ms-2 bi bi-circle text-danger'> Dentro de 3 dias</i>
         <i class='ms-2 bi bi-circle text-success'> Posterior a 3 dias</i>
     </div>
 </div>
-@foreach(var i in reservasProx)
-{
-    String c = "success";
-    @if (i.ReservaDate < DateTime.Now.AddDays(3))
+    @foreach(var i in reservasProx)
     {
-        c = "danger";
-    }
+        String c = "success";
+        @if (i.ReservaDate < DateTime.Now.AddDays(3))
+        {
+            c = "danger";
+        }
     
-    <div class="card border-2 rounded-pill m-4 border-@c text-center text-info">
-            <div class="row m-2">
-            <div class="col m-2">
-                    <div class="text-info m-2">Reserva</div>
-                    <div class="text-light m-2">@i.ReservaId</div>
+        <div class="card border-2 rounded-pill m-4 border-@c text-center text-info">
+                <div class="row m-2">
+                <div class="col m-2">
+                        <div class="text-info m-2">Reserva</div>
+                        <div class="text-light m-2">@i.ReservaId</div>
+                    </div>
+                <div class="col m-2">
+                    <div class="text-info m-2">Tema</div>
+                    <div class="text-light m-2">@i.TemaNome</div>
+                    </div>
+                <div class="col m-2">
+                    <div class="text-info m-2">Nº de Pessoas</div>
+                    <div class="text-light m-2">@i.NumPessoas</div>
+                    </div>
+                <div class="col m-2">
+                    <div class="text-info m-2">Sessão</div>
+                    <div class="text-light m-2">@i.ReservaDate.ToString("g")</div>
+                    </div>
+                <div class="col m-2">
+                    <div class="text-info m-2">Reservado a</div>
+                    <div class="text-light m-2">@i.DataCriacao.ToString("d")</div>
+                    </div>
                 </div>
-            <div class="col m-2">
-                <div class="text-info m-2">Tema</div>
-                <div class="text-light m-2">@i.TemaNome</div>
-                </div>
-            <div class="col m-2">
-                <div class="text-info m-2">Nº de Pessoas</div>
-                <div class="text-light m-2">@i.NumPessoas</div>
-                </div>
-            <div class="col m-2">
-                <div class="text-info m-2">Sessão</div>
-                <div class="text-light m-2">@i.ReservaDate.ToString("g")</div>
-                </div>
-            <div class="col m-2">
-                <div class="text-info m-2">Reservado a</div>
-                <div class="text-light m-2">@i.DataCriacao.ToString("d")</div>
-                </div>
-            </div>
            
-        </div>
+            </div>
      
+    }
+}else{
+    <div class="card border-2 rounded-pill m-4 border-danger text-center text-info"><p>Não tem reservas futuras.</p></div>
+    
 }
 <div class="card border-2 border-primary mt-2 mb-2 text-center">Reservas Anteriores</div>
-@foreach(var i in reservasAnt)
-{
-    <div class="card border-2 rounded-pill m-4 border-dark text-center text-info">
-        <div class="row m-2">
-            <div class="col m-2">
-                <div class="text-info">Reserva</div>
-                <div class="text-light">@i.ReservaId</div>
+@if(reservasAnt.Any()){
+    @foreach(var i in reservasAnt)
+    {
+        <div class="card border-2 rounded-pill m-4 border-dark text-center text-info">
+            <div class="row m-2">
+                <div class="col m-2">
+                    <div class="text-info">Reserva</div>
+                    <div class="text-light">@i.ReservaId</div>
+                </div>
+                <div class="col m-2">
+                    <div class="text-info">Tema</div>
+                    <div class="text-light">@i.TemaNome</div>
+                </div>
+                <div class="col m-2">
+                    <div class="text-info">Nº de Pessoas</div>
+                    <div class="text-light">@i.NumPessoas</div>
+                </div>
+                <div class="col m-2">
+                    <div class="text-info">Sessão</div>
+                    <div class="text-light">@i.ReservaDate.ToString("g")</div>
+                </div>
+                <div class="col m-2">
+                    <div class="text-info">Reservado a</div>
+                    <div class="text-light">@i.DataCriacao.ToString("d")</div>
+                </div>
             </div>
-            <div class="col m-2">
-                <div class="text-info">Tema</div>
-                <div class="text-light">@i.TemaNome</div>
-            </div>
-            <div class="col m-2">
-                <div class="text-info">Nº de Pessoas</div>
-                <div class="text-light">@i.NumPessoas</div>
-            </div>
-            <div class="col m-2">
-                <div class="text-info">Sessão</div>
-                <div class="text-light">@i.ReservaDate.ToString("g")</div>
-            </div>
-            <div class="col m-2">
-                <div class="text-info">Reservado a</div>
-                <div class="text-light">@i.DataCriacao.ToString("d")</div>
-            </div>
-        </div>
 
-    </div>
+        </div>
     
+    }
+}
+else
+{
+    <div class="card border-2 rounded-pill m-4 border-danger text-center text-info"><p>Não tem reservas anteriores.</p></div>
+
 }
 <div class="card border-2 border-danger mt-2 mb-2 text-center">Reservas Canceladas</div>
+@if(reservasCanc.Any()){
+    @foreach (var i in reservasCanc)
+    {
+        <div class="card bg-danger border-2 rounded-pill m-4 border-dark text-center text-info">
+            <div class="row m-2">
+                <div class="col m-2">
+                    <div class="text-info">Reserva</div>
+                    <div class="text-light">@i.ReservaId</div>
+                </div>
+                <div class="col m-2">
+                    <div class="text-info">Tema</div>
+                    <div class="text-light">@i.TemaNome</div>
+                </div>
+                <div class="col m-2">
+                    <div class="text-info">Nº de Pessoas</div>
+                    <div class="text-light">@i.NumPessoas</div>
+                </div>
+                <div class="col m-2">
+                    <div class="text-info">Sessão</div>
+                    <div class="text-light">@i.ReservaDate.ToString("g")</div>
+                </div>
+                <div class="col m-2">
+                    <div class="text-info">Reservado a</div>
+                    <div class="text-light">@i.DataCriacao.ToString("d")</div>
+                </div>
+            </div>
 
-@foreach (var i in reservasCanc)
-{
-    <div class="card bg-danger border-2 rounded-pill m-4 border-dark text-center text-info">
-        <div class="row m-2">
-            <div class="col m-2">
-                <div class="text-info">Reserva</div>
-                <div class="text-light">@i.ReservaId</div>
-            </div>
-            <div class="col m-2">
-                <div class="text-info">Tema</div>
-                <div class="text-light">@i.TemaNome</div>
-            </div>
-            <div class="col m-2">
-                <div class="text-info">Nº de Pessoas</div>
-                <div class="text-light">@i.NumPessoas</div>
-            </div>
-            <div class="col m-2">
-                <div class="text-info">Sessão</div>
-                <div class="text-light">@i.ReservaDate.ToString("g")</div>
-            </div>
-            <div class="col m-2">
-                <div class="text-info">Reservado a</div>
-                <div class="text-light">@i.DataCriacao.ToString("d")</div>
-            </div>
         </div>
 
-    </div>
+    }
+}
+else
+{
+    <div class="card border-2 rounded-pill m-4 border-success text-center text-info"><p>Não tem reservas canceladas.</p></div>
 
 }
