@@ -5,8 +5,7 @@
 }
 
 <h1>Login</h1>
-@if (@ViewBag.erro != null)
-{
+@if (@ViewBag.erro != null && @TempData["EmailNotConfirmed"] == null) {
     <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
         Erro! Username ou password errado/a!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -25,7 +24,29 @@
 
     }
 
+    @if (TempData["EmailSucc"] != null) {
+        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+            @TempData["EmailSucc"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["EmailErr"] != null) {
+        <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+            @TempData["EmailErr"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["EmailNotConfirmed"] != null) {
+        <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+            @TempData["EmailNotConfirmed"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+
 }
+
+ 
 
 <hr />
 <div class="row">

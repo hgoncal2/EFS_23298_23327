@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Antiforgery;
 using Humanizer;
 using System.Globalization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace EFS_23298_23327.Controllers
 {
@@ -23,8 +25,10 @@ namespace EFS_23298_23327.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<ClassHub> _progressHubContext;
-        public TemasGeralController(ApplicationDbContext context, IHubContext<ClassHub> progressHubContext)
-        {   
+        private readonly IEmailSender _emailSender;
+        public TemasGeralController(ApplicationDbContext context, IHubContext<ClassHub> progressHubContext, IEmailSender emailSender)
+        {
+            _emailSender = emailSender;
             _progressHubContext = progressHubContext;
             _context = context;
         }
@@ -112,7 +116,11 @@ namespace EFS_23298_23327.Controllers
             
             reserva.Cancelada = true;
             reserva.DataCancel = DateTime.Now;
-
+            var callbackUrl = Url.Action(
+                        "Index", "Perfil", values: new { area = "", resId = reserva.ReservaId }, protocol: HttpContext.Request.Scheme
+                        );
+            await _emailSender.SendEmailAsync(reserva.Cliente.Email, "Nova reserva criada!!",
+          $"A sua reserva para o dia {reserva.ReservaDate} foi cancelada com sucesso! Clique no link para ver mais detalhes:\n{callbackUrl}");
             _context.Update(reserva);
             await _context.SaveChangesAsync();
 
@@ -197,7 +205,15 @@ namespace EFS_23298_23327.Controllers
             r.ReservaEndDate = endDate;
             tema.Sala.ListaReservas.Add(r);
             _context.Update(tema.Sala);
+           
             await _context.SaveChangesAsync();
+
+             var callbackUrl = Url.Action(
+                        "Index", "Perfil", values: new { area = "", resId = r.ReservaId }, protocol: HttpContext.Request.Scheme
+                        );
+            await _emailSender.SendEmailAsync(r.Cliente.Email, "Nova reserva criada!",
+          $"A sua reserva para o dia {r.ReservaDate} foi criada com sucesso! Clique no link para ver mais detalhes:\n{callbackUrl}");
+
             TempData["viewEnd"] = rvm.viewEnd;
             TempData["viewStart"] = rvm.viewStart;
 

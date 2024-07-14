@@ -37,12 +37,13 @@ namespace EFS_23298_23327.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index( int? resId)
         {
             var user = await _context.Utilizadores.FindAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
             HashSet<string> roles = _userManager.GetRolesAsync(user).Result.ToHashSet();
             var vm = new UtilizadoresViewModel(user);
             vm.Roles = roles;
+            TempData["ResId"] = resId;
             return View(vm);
             
         }
@@ -57,12 +58,14 @@ namespace EFS_23298_23327.Controllers
 
         }
 
-        public async Task<IActionResult> Reservas()
+        public async Task<IActionResult> Reservas(int? resId)
         {
             var user = await _context.Utilizadores.FindAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var c = await _context.Clientes.Where(c => c.UserName.Equals(user.UserName)).FirstAsync();
             var r = await _context.Reservas.Where(r => r.Cliente.UserName.Equals(user.UserName)).ToListAsync();
             var vm = new Reservas(c);
+
+            TempData["ResId"] = resId;
             return PartialView("_PartialViewReservas", r);
 
         }
@@ -94,6 +97,27 @@ namespace EFS_23298_23327.Controllers
             }
             return RedirectToAction("Index");
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> VerReserva(int reservaId) {
+
+            if(reservaId == null) {
+                return NotFound();
+            }
+
+            var res =await _context.Reservas.Include(r => r.Cliente).Include(r => r.Sala).Include(r => r.ListaAnfitrioes).Where(r => (r.ReservaId == reservaId) && (r.Cliente.UserName == User.Identity.Name) && !r.Deleted).FirstOrDefaultAsync();
+
+            if (res == null || res.Cliente.UserName != User.Identity.Name) {
+                return NotFound();
+            }
+
+
+            return PartialView("_PartialVerReserva",res);
+
+        }
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -16,7 +16,6 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
     /// <summary>
     /// Primeiro Nome do Utilizador
     /// </summary>
-    [Required]
     [Display(Name = "Primeiro Nome")]
     [StringLength(20, MinimumLength = 3, ErrorMessage = "Deve conter pelo menos 3 letras")]
     [RegularExpression("^[A-Z][a-zA-Z]*$", ErrorMessage = "Deve começar por letra maiúscula e conter apenas letras")]
@@ -25,7 +24,6 @@ public class Utilizadores:IdentityUser,BaseEntityInterface
     /// <summary>
     /// Último Nome do Utilizador
     /// </summary>
-    [Required]
     [StringLength(20, MinimumLength = 2, ErrorMessage = "Deve conter pelo menos 2 letras")]
     [RegularExpression("^[A-Z][a-zA-Z]*$", ErrorMessage = "Deve começar por letra maiúscula e conter apenas letras")]
     [Display(Name = "Último Nome")]

@@ -31,6 +31,31 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
+    @if (@TempData["ResId"] != null){
+
+        <text>
+
+                $.post('/Perfil/Reservas', { resId: @TempData["ResId"] }, function (result) {
+
+                    if (result.failed) {
+                        console.log("wdwad");
+                        return false;
+                    } else {
+                        $('#mod1').html(result);
+                        $("#btnR").removeClass("btn-dark").addClass("btn-primary");
+                        $("#btnP").removeClass("btn-primary").addClass("btn-dark");
+                        $("#btnDP").removeClass("btn-primary").addClass("btn-dark");
+                        $('#exampleModal').modal("show");
+                    }
+
+                });
+        
+        
+        
+        </text>
+      
+    }
+
 
         $("#btnP").on("click", function () {
             $.post('/Perfil/Pref', function (result) {
@@ -91,6 +116,8 @@
 @{
    
 }
+
+
 
 <div class="container w-100 d-flex">
     <div class="card border-warning mb-3 btn-group-vertical m-3 align-items-center rounded-3" style="height:100% !important; width:11% !important;">

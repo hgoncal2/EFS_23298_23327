@@ -404,6 +404,15 @@
            }
           
         },
+            eventDrop:function(info){
+
+                
+                $("#dateI").val(moment(info.event.start).subtract(60, "m").format("DD/MM/YYYY HH:mm"))
+                $("#dateF").val(moment(info.event.end).subtract(60, "m").format("DD/MM/YYYY HH:mm"))
+                $("#novaData").text(moment(info.event.start).subtract(60, "m").format("DD/MM/YYYY HH:mm"))
+                $("#reservaMudada").modal("show");
+            },
+
        
         datesSet: function (info) {
             
