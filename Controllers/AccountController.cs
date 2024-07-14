@@ -179,7 +179,8 @@ namespace EFS_23298_23327.Controllers
                 await _userStore.SetUserNameAsync(u, vm.Username, CancellationToken.None);
                 
                 await _emailStore.SetEmailAsync(u, vm.Email, CancellationToken.None);
-                
+                u.PrimeiroNome = vm.PrimeiroNome;
+                u.UltimoNome = vm.UltimoNome;
                 var result = await _userManager.CreateAsync(u, vm.Password);
                 //_context.Add(u);
                 //       await _context.SaveChangesAsync();
