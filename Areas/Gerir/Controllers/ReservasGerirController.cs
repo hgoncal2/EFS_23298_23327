@@ -205,7 +205,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
 
             var r = notificar;
             //vai buscar a reserva correspondente ao ID,verifica que a pessoa que criou a reserva é a pessoa que está a fazer o pedido
-                var reserva = await _context.Reservas.Include(c=>c.Cliente).Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate && r.Cliente.UserName == User.Identity.Name).FirstOrDefaultAsync();
+                var reserva = await _context.Reservas.Include(c=>c.Cliente).Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate).FirstOrDefaultAsync();
 
             if (reserva == null) {
                 return Unauthorized();
