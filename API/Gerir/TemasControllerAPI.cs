@@ -29,7 +29,7 @@ namespace EFS_23298_23327.API.Gerir
             var applicationDbContext = await _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Include(s => s.Sala).Where(s => s.Deleted != true).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao).ToListAsync();
             foreach (var item in applicationDbContext)
             {
-                item.ListaFotosNome = item.ListaFotos.Select(f => f.Nome).ToList();
+                item.ListaFotosNome = item.ListaFotos?.Select(f => f.Nome).ToList();
                 item.ListaFotos = new HashSet<Fotos>();
 
 

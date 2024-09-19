@@ -134,7 +134,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             }
             //Só podem ser editadas reservas com +48 de antecedência
             if(DateTime.Now.AddHours(48) >= res.ReservaDate) {
-                return Unauthorized();
+               // return Unauthorized();
             }
             //lista de reservas,para mostrar no calendário
             var listaRes = await _context.Reservas.Include(s => s.ListaAnfitrioes.Where(a => !a.Deleted)).Include(s => s.Sala).Include(c => c.Cliente).Where(s =>!s.Cancelada && !s.Deleted).ToListAsync();
