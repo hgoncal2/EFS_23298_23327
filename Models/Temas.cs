@@ -99,6 +99,12 @@ namespace EFS_23298_23327.Models
         public virtual ICollection<Fotos>? ListaFotos { get; set; }
 
         /// <summary>
+        /// Usado para mandar o nome das fotos pela API
+        /// </summary>
+        [NotMapped]
+        public  ICollection<String>? ListaFotosNome { get; set; }
+
+        /// <summary>
         /// ID da Sala a que o Tema será atribuído
         /// </summary>
         [ForeignKey(nameof(Salas))]
@@ -126,6 +132,7 @@ namespace EFS_23298_23327.Models
         {
            
             ListaFotos = new HashSet<Fotos>();
+         
 
 
         }

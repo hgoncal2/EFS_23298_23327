@@ -34,11 +34,14 @@ builder.Services.AddTransient<IEmailSender, EnviaEmail>(i =>
 
 
 
-builder.Services.AddDefaultIdentity<Utilizadores>(options => options.SignIn.RequireConfirmedAccount =bool.Parse(builder.Configuration["RequirePasswordLogin:RequirePassword"]))
+builder.Services.AddDefaultIdentity<Utilizadores>(options => options.SignIn.RequireConfirmedAccount = bool.Parse(builder.Configuration["RequirePasswordLogin:RequirePassword"]))
    .AddRoles<IdentityRole>()
-   .AddEntityFrameworkStores<ApplicationDbContext>().AddErrorDescriber<ErrosIdentityUser>();
+   .AddEntityFrameworkStores<ApplicationDbContext>().AddErrorDescriber<ErrosIdentityUser>().AddApiEndpoints();
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
+
+
 
 var app = builder.Build();
 
@@ -58,18 +61,19 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+app.MapIdentityApi<Utilizadores>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthentication();
-
+app.MapGroup("/api").MapIdentityApi<Utilizadores>();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "Gerir",
     pattern: "{area:exists}/{controller=Temas}/{action=Index}/{id?}");
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

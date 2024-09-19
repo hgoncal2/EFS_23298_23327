@@ -1,6 +1,7 @@
 ﻿using EFS_23298_23327.Models;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace EFS_23298_23327.ViewModel
@@ -23,6 +24,8 @@ namespace EFS_23298_23327.ViewModel
         /// </summary>
         [DisplayName("Anfitriões")]
         public ICollection<String>? ListaAnfitrioes { get; set; }
+        [NotMapped]
+        public ICollection<int>? ListaReservas { get; set; }
 
         /// <summary>
         /// Construtor que recebe parametros Sala e ListaAnfitriões
@@ -35,14 +38,26 @@ namespace EFS_23298_23327.ViewModel
             this.Sala = Sala;
            
         }
+        public AnfitriaoSalaViewModel(Salas Sala, ICollection<String>? ListaAnfitrioes, ICollection<int>? res)
+        {
+            this.ListaAnfitrioes = ListaAnfitrioes;
+            this.Sala = Sala;
+            this.ListaReservas = res;
+
+        }
 
         /// <summary>
         /// Construtor por defeito
         /// </summary>
-        public AnfitriaoSalaViewModel() {
+        public AnfitriaoSalaViewModel()
+        {
             this.ListaAnfitrioes = new HashSet<String>();
-            
+            this.ListaReservas = new HashSet<int>();
+
+
 
         }
+
+     
     }
 }

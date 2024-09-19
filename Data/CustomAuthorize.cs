@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using EFS_23298_23327.Controllers;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 
 //https://stackoverflow.com/questions/73555584/c-sharp-net-6-0-how-to-redirect-an-unauthorized-user-to-an-unauthorizedpage
@@ -24,10 +25,17 @@ namespace EFS_23298_23327.Data
             //https://stackoverflow.com/a/63940184
             if (filterContext.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any()) return;
             var controller = filterContext.Controller as Controller;
-            var controllerName= filterContext.Controller.ToString().Split(".").Last(); 
+            var controllerName= filterContext.Controller.ToString().Split(".").Last();
+            var isAPI = controllerName.ToLower().EndsWith("api");
             //Se o utilizador não estiver autenticado
             if (filterContext.HttpContext.User.Identity == null || !filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
+                if (isAPI)
+                {
+                    filterContext.HttpContext.Response.StatusCode = 403;
+                    filterContext.Result = new Microsoft.AspNetCore.Mvc.UnauthorizedResult();
+                    return;
+                }
                 //Se não estiver autenticado e não estiver na scope do Accountcontroller(pagina de login,register,etc),redireciona para login
                 if (controllerName != "AccountController") {
                     controller.TempData["Autenticado"] = false;
