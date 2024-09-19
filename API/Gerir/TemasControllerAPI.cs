@@ -115,7 +115,7 @@ namespace EFS_23298_23327.API.Gerir
 
         private bool TemasExists(int id)
         {
-            return _context.Temas.Any(e => e.TemaId == id);
+            return _context.Temas.Any(e => e.TemaId == id && !e.Deleted);
         }
     }
 }
