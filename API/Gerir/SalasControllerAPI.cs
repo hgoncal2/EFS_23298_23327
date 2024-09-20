@@ -82,7 +82,7 @@ namespace EFS_23298_23327.Controllers
       //  [CustomAuthorize(Roles = "Admin,Anfitriao")]
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSala(int id,[FromBody] SalaDTO s) {
+        public async Task<IActionResult> PutSala(int id,[FromBody][Bind("SalaId,Numero,Area,ListaAnfitrioes")] SalaDTO s) {
             if (id != s.SalaId) {
                 return NotFound();
             }
@@ -108,6 +108,7 @@ namespace EFS_23298_23327.Controllers
                     sala = await _context.Salas.Include(a => a.ListaAnfitrioes).Include(a=>a.ListaReservas).Where(a => a.SalaId == s.SalaId).FirstOrDefaultAsync();
                     sala.Numero = s.Numero;
                     sala.Area = s.Area;
+                    //Vamos assumir que o anfitrião especificado existe
                     List<Anfitrioes> listaUsers = await _context.Anfitrioes.Where(m => s.ListaAnfitrioes.Contains(m.UserName)).ToListAsync();
                     sala.ListaAnfitrioes = listaUsers;
                     _context.Update(sala);
@@ -135,13 +136,84 @@ namespace EFS_23298_23327.Controllers
                 return NotFound(); // Se o recurso não foi encontrado
             }
 
-            return Ok(result.Result.); // Retorna o objeto atualizado
+            return Ok(((ObjectResult)result.Result).Value); // Retorna o objeto atualizado
         }
         private bool SalasExists(int id) {
             return _context.Salas.Any(e => e.SalaId == id);
         }
 
+
+        /// <summary>
+        /// POST GERIR/SALAS/CREATE - Cria nova sala
+        /// </summary>
+        /// <param name="salasAnf">Viewmodel com sala e lista de anfitriões</param>
+        /// <returns>Retorna para o index salas</returns>
+         [CustomAuthorize(Roles = "Admin,Anfitriao")]
+        [HttpPost]
+        public async Task<IActionResult> CreateSala([Bind("Numero,Area,ListaAnfitrioes")] SalaDTO s) {
+            if (ModelState.IsValid) {
+                var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
+                var salaExiste = _context.Salas.FirstOrDefault(m => m.Numero == s.Numero && !m.Deleted);
+                if (salaExiste != null) {
+                    return BadRequest(new { Error = "Sala " + s.Numero + " já existe!" });
+                }
+                Salas sala = new Salas(s);
+                if (s.ListaAnfitrioes.Any()) {
+                    var anfs = await _context.Anfitrioes.Where(m => !m.Deleted).ToListAsync();
+                    foreach (var item in s.ListaAnfitrioes) {
+                        var anf =anfs.Where(m => m.UserName == item).FirstOrDefault();
+                        if (anf != null) {
+                            sala.ListaAnfitrioes?.Add(anf);
+                        }
+                    }
+
+
+
+                }
+
+                sala.CriadoPorOid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                sala.CriadoPorUsername = User.FindFirstValue(ClaimTypes.Name);
+                _context.Add(sala);
+                await _context.SaveChangesAsync();
+
+                var result = await GetSala(sala.SalaId);
+
+                // Retornar o resultado apropriado
+                if (result.Result is NotFoundResult) {
+                    return NotFound(); // Se o recurso não foi encontrado
+                }
+
+                return Ok(((ObjectResult)result.Result).Value); // Retorna o objeto atualizado
+            }
+            return BadRequest();
+        }
+        [CustomAuthorize(Roles = "Admin,Anfitriao")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSala(int id) {
+            var salas = await _context.Salas.FindAsync(id);
+            if (salas != null) {
+
+
+                var tema = await _context.Temas.Where(t => t.SalaID == salas.SalaId && !t.Deleted).FirstOrDefaultAsync();
+                if (tema != null) {
+                    return BadRequest(new {Error="Não pode eliminar sala pois tem o tema " + tema.Nome + " atribuído!"});
+                }
+
+                salas.Deleted = true;
+
+                _context.Update(salas);
+
+                await _context.SaveChangesAsync();
+                return Ok();
+
+
+            }
+            return NotFound();
+        }
+
     }
+
+
 
 
 }

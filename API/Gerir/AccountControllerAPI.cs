@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EFS_23298_23327.API.Gerir
 {
-    [Route("api/gerir/[controller]")]
+    [Route("api/gerir/account")]
 
     [ApiController]
     public class AccountControllerAPI : Controller
@@ -46,7 +46,7 @@ namespace EFS_23298_23327.API.Gerir
             return Unauthorized(new { Error = "Senha incorreta." });
         }
 
-        // GET: AccountController
+        // POST
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginViewModel loginVM)
         {
