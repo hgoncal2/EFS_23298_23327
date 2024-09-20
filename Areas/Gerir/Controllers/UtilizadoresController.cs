@@ -331,6 +331,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
         {
             HashSet<String> allRoles = _roleManager.Roles.Select(r => r.Name).ToHashSet();
             ViewBag.SelectionIdList = allRoles;
+            ModelState.Remove("confirmPassword");
             if (ModelState.IsValid)
             {
                 var user = _context.Utilizadores.Where(u=> u.UserName.Trim() == rvm.Username.Trim()).FirstOrDefault();
