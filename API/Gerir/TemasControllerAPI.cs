@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using EFS_23298_23327.Data;
 using EFS_23298_23327.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
+using EFS_23298_23327.API.DTOs;
+using EFS_23298_23327.Data.Enum;
 
 namespace EFS_23298_23327.API.Gerir
 {
@@ -23,98 +25,123 @@ namespace EFS_23298_23327.API.Gerir
             _context = context;
         }
         [CustomAuthorize(Roles = "Admin,Anfitriao")]
-        // GET: api/TemasControllerAPI
+        // GET: api/gerir/temas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Temas>>> GetTemas()
+        public async Task<ActionResult<IEnumerable<TemaDTO>>> GetTemas()
         {
-            var applicationDbContext = await _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Include(s => s.Sala).Where(s => s.Deleted != true).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao).ToListAsync();
-            foreach (var item in applicationDbContext)
+            var temas = await _context.Temas.Where(t => !t.Deleted).Include(t => t.ListaFotos).ToListAsync();
+
+            var result = new List<TemaDTO>();
+            foreach (var tema in temas)
             {
-                item.ListaFotosNome = item.ListaFotos.Select(f => f.Nome).ToList();
-                item.ListaFotos = new HashSet<Fotos>();
+                var fotos = tema.ListaFotos.Select(f => f.Nome).ToList();
 
+                var dto = new TemaDTO(tema, fotos);
 
+                result.Add(dto);
             }
-            return applicationDbContext;
+            return Ok(result);
         }
 
-        // GET: api/TemasControllerAPI/5
+        // GET: api/gerir/temas/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Temas>> GetTemas(int id)
+        public async Task<ActionResult<TemaDTO>> GetTemas(int id)
         {
-            var temas = await _context.Temas.Include(f => f.ListaFotos).FirstOrDefaultAsync(t => t.TemaId == id && !t.Deleted);
+            var tema = await _context.Temas
+               .Where(t => !t.Deleted)
+               .Include(t => t.ListaFotos)
+               .FirstOrDefaultAsync(t => t.TemaId == id);
 
-            if (temas == null)
+            if (tema == null)
             {
                 return NotFound();
             }
 
-            temas.ListaFotosNome = temas.ListaFotos.Select(f => f.Nome).ToList();
-            temas.ListaFotos = new HashSet<Fotos>();
-            return temas;
+            var fotos = tema.ListaFotos?.Select(f => f.Nome).ToList();
+
+
+
+            var viewModel = new TemaDTO(tema, fotos);
+
+            return Ok(viewModel);
         }
+    
+
+
 
         // PUT: api/gerir/temas/<id>
         //[CustomAuthorize(Roles = "Admin,Anfitriao")]
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTemas(int id, [FromBody] Temas temas)
-        {
-            if (id != temas.TemaId)
-            {
+        public async Task<IActionResult> PutTemas(int id, [FromBody][Bind("Nome,Descricao,TempoEstimado,Preco,Icone,MinPessoas,MaxPessoas,Dificuldade,ListaDeFotos")] TemaDTO temas) {
+            if (id != temas.TemaId) {
                 return NotFound();
             }
-            ModelState.Remove("PrecoStr");
 
-            var tema = await _context.Temas.FirstOrDefaultAsync(t => t.TemaId == temas.TemaId);
-            if (tema == null)
+            //Estes campos devem permanecer iguais,então não nos vamos preocupar se estão a ser mandados ou não
+            ModelState.Remove("TemaId");
+            ModelState.Remove("DataCriacao");
+            ModelState.Remove("CriadoPorOid");
+            ModelState.Remove("CriadoPorUsername");
+            ModelState.Remove("ListaDeFotos");
+
+            if (ModelState.IsValid)
             {
-                tema = await _context.Temas.Include(t => t.ListaFotos).Where(t => t.TemaId == temas.TemaId).FirstOrDefaultAsync();
-                try
+
+                var tema = await _context.Temas.FirstOrDefaultAsync(t => t.TemaId == temas.TemaId);
+                if (tema == null)
                 {
-
-                    List<Fotos> listaDeFotos = await _context.Fotos.Where(f => tema.ListaFotosNome.Contains(f.Nome)).ToListAsync();
-
-                    tema = temas;
-
-                    tema.ListaFotos = listaDeFotos;
-
-                    _context.Update(tema);
-                    _context.Entry(tema).Property(t => t.DataCriacao).IsModified = false;
-                    _context.Entry(tema).Property(t => t.CriadoPorOid).IsModified = false;
-                    _context.Entry(tema).Property(t => t.CriadoPorUsername).IsModified = false;
-
-
-                    await _context.SaveChangesAsync();
-
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
+                    try
+                    {
+                        tema = await _context.Temas.Include(t => t.ListaFotos).Where(t => t.TemaId == temas.TemaId).FirstOrDefaultAsync();
+                        tema.Nome = temas.Nome;
+                        tema.Descricao = temas.Descricao;
+                        tema.TempoEstimado = temas.TempoEstimado;
+                        tema.Preco = temas.Preco;
+                        tema.Icone = temas.Icone;
+                        tema.MinPessoas = temas.MinPessoas;
+                        tema.MaxPessoas = temas.MaxPessoas;
+                        tema.Dificuldade = temas.Dificuldade;
+                        List<Fotos> listaDeFotos = await _context.Fotos.Where(f => tema.ListaFotosNome.Contains(f.Nome)).ToListAsync();
+                        tema.ListaFotos = listaDeFotos;
+                        _context.Update(tema);
+                        _context.Entry(tema).Property(t => t.TemaId).IsModified = false;
+                        _context.Entry(tema).Property(t => t.DataCriacao).IsModified = false;
+                        _context.Entry(tema).Property(t => t.CriadoPorOid).IsModified = false;
+                        _context.Entry(tema).Property(t => t.CriadoPorUsername).IsModified = false;
 
 
-                    if (!TemasExists(id))
-                    {
-                        return NotFound();
+                        await _context.SaveChangesAsync();
+
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!TemasExists(id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
-                }
+                
             }
-            var result = await GetTemas(tema.TemaId);
+            var result = await GetTemas(temas.TemaId);
 
             // Retornar o resultado apropriado
             if (result.Result is NotFoundResult)
             {
                 return NotFound(); // Se o recurso não foi encontrado
             }
-            
-            return Ok(result.Result); // Retorna o objeto atualizado
-            }
 
-            // POST: api/TemasControllerAPI
-            [CustomAuthorize(Roles = "Admin,Anfitriao")]
+            return Ok(((ObjectResult)result.Result).Value); // Retorna o objeto atualizado
+        }
+
+        // POST: api/TemasControllerAPI
+        //    [CustomAuthorize(Roles = "Admin,Anfitriao")]
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Temas>> PostTemas(Temas temas)
