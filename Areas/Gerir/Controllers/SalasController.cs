@@ -50,7 +50,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
             //Todas as reservas pendentes
             var r = await _context.Reservas.Include(s=>s.Sala).Where(r => !r.Deleted).Where(r => r.ReservaEndDate > DateTime.Now).ToListAsync();
             //Todas as salas
-            var applicationDbContext = _context.Salas.Include(m => m.ListaAnfitrioes.Where(f => f.Deleted != true)).OrderByDescending(m => m.DataCriacao);
+            var applicationDbContext = _context.Salas.Include(m => m.ListaAnfitrioes.Where(f => f.Deleted != true)).Where(sa=>!sa.Deleted).OrderByDescending(m => m.DataCriacao);
             var s = await applicationDbContext.ToListAsync();
             //Por cada sala,adiciona número de reservas pendentes da semana ao map
             foreach (var item in s)
@@ -518,6 +518,7 @@ namespace EFS_23298_23327.Areas.Gerir.Controllers
                 salas.Deleted = true;
 
                  _context.Update(salas);
+                await _context.SaveChangesAsync();
 
                 TempData["SalaApagada"] = salas.Numero;
 

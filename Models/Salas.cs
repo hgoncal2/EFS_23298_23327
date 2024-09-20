@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using EFS_23298_23327.API.DTOs;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EFS_23298_23327.Models
 {
@@ -33,6 +35,9 @@ namespace EFS_23298_23327.Models
         /// </summary>
         [DisplayName("Reservas")]
         public ICollection<Reservas>? ListaReservas { get; set; }
+        [NotMapped]
+        public ICollection<int>? ListaReservasId { get; set; }
+
 
         /// <summary>
         /// Construtor por defeito
@@ -41,6 +46,17 @@ namespace EFS_23298_23327.Models
         {
             this.ListaAnfitrioes = new HashSet<Anfitrioes>();
             this.ListaReservas = new HashSet<Reservas>();          
+        }
+
+
+        public Salas(SalaDTO s) {
+            this.Numero = s.Numero;
+            this.Area = s.Area;
+            this.ListaAnfitrioes = new HashSet<Anfitrioes>();
+            this.ListaReservas = new HashSet<Reservas>();
+
+
+
         }
     }
 }
