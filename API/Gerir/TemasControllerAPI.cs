@@ -104,7 +104,7 @@ namespace EFS_23298_23327.API.Gerir
                         tema.MinPessoas = temas.MinPessoas;
                         tema.MaxPessoas = temas.MaxPessoas;
                         tema.Dificuldade = temas.Dificuldade;
-                        List<Fotos> listaDeFotos = await _context.Fotos.Where(f => tema.ListaFotosNome.Contains(f.Nome)).ToListAsync();
+                        List<Fotos> listaDeFotos = await _context.Fotos.Where(f => temas.ListaDeFotos.Contains(f.Nome)).ToListAsync();
                         tema.ListaFotos = listaDeFotos;
                         _context.Update(tema);
                         _context.Entry(tema).Property(t => t.TemaId).IsModified = false;

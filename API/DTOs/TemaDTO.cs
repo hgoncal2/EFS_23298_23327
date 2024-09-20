@@ -66,25 +66,10 @@ namespace EFS_23298_23327.API.DTOs
         [Range(0, 20)]
         public int? MaxPessoas { get; set; }
 
-        /// <summary>
-        /// Dificuldade do Tema
-        /// </summary>
-        [Required(ErrorMessage = "Por favor indique a {0}")]
-        [Display(Name = "Dificuldade")]
-        [EnumDataType(typeof(Dificuldade))]
+       
         public Dificuldade Dificuldade { get; set; }
 
-        /// <summary>
-        /// Lista de Fotos do Tema
-        /// </summary>
-        [Display(Name = "Fotos")]
-        [ForeignKey(nameof(Fotos))]
-        public virtual ICollection<Fotos>? ListaFotos { get; set; }
-
-        public DateTime DataCriacao { get; set; }  // Data de criação da sala
-       
-        public string? CriadoPorOid { get; set; }  // ID do criador da sala
-        public string? CriadoPorUsername { get; set; }  // Nome de utilizador do criador da sala
+        
 
         // Listas para IDs e nomes de relações
         public List<string>? ListaDeFotos { get; set; }  // Lista de fotos
@@ -107,9 +92,7 @@ namespace EFS_23298_23327.API.DTOs
             MaxPessoas = tema.MaxPessoas;
             Dificuldade = tema.Dificuldade;
 
-            DataCriacao = tema.DataCriacao;          
-            CriadoPorOid = tema.CriadoPorOid;
-            CriadoPorUsername = tema.CriadoPorUsername;
+           
             ListaDeFotos = listaDeFotos;
         }
     }
