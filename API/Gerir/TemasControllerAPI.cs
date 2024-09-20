@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EFS_23298_23327.Data;
 using EFS_23298_23327.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace EFS_23298_23327.API.Gerir
 {
@@ -29,7 +30,7 @@ namespace EFS_23298_23327.API.Gerir
             var applicationDbContext = await _context.Temas.Include(m => m.ListaFotos.Where(f => f.Deleted != true)).Include(s => s.Sala).Where(s => s.Deleted != true).Where(m => m.Deleted != true).OrderByDescending(m => m.DataCriacao).ToListAsync();
             foreach (var item in applicationDbContext)
             {
-                item.ListaFotosNome = item.ListaFotos?.Select(f => f.Nome).ToList();
+                item.ListaFotosNome = item.ListaFotos.Select(f => f.Nome).ToList();
                 item.ListaFotos = new HashSet<Fotos>();
 
 
@@ -53,40 +54,67 @@ namespace EFS_23298_23327.API.Gerir
             return temas;
         }
 
-        // PUT: api/TemasControllerAPI/5
-        [CustomAuthorize(Roles = "Admin,Anfitriao")]
+        // PUT: api/gerir/temas/<id>
+        //[CustomAuthorize(Roles = "Admin,Anfitriao")]
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTemas(int id, Temas temas)
+        public async Task<IActionResult> PutTemas(int id, [FromBody] Temas temas)
         {
             if (id != temas.TemaId)
             {
-                return BadRequest();
+                return NotFound();
             }
+            ModelState.Remove("PrecoStr");
 
-            _context.Entry(temas).State = EntityState.Modified;
-
-            try
+            var tema = await _context.Temas.FirstOrDefaultAsync(t => t.TemaId == temas.TemaId);
+            if (tema == null)
             {
-                await _context.SaveChangesAsync();
+                tema = await _context.Temas.Include(t => t.ListaFotos).Where(t => t.TemaId == temas.TemaId).FirstOrDefaultAsync();
+                try
+                {
+
+                    List<Fotos> listaDeFotos = await _context.Fotos.Where(f => tema.ListaFotosNome.Contains(f.Nome)).ToListAsync();
+
+                    tema = temas;
+
+                    tema.ListaFotos = listaDeFotos;
+
+                    _context.Update(tema);
+                    _context.Entry(tema).Property(t => t.DataCriacao).IsModified = false;
+                    _context.Entry(tema).Property(t => t.CriadoPorOid).IsModified = false;
+                    _context.Entry(tema).Property(t => t.CriadoPorUsername).IsModified = false;
+
+
+                    await _context.SaveChangesAsync();
+
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+
+
+                    if (!TemasExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
             }
-            catch (DbUpdateConcurrencyException)
+            var result = await GetTemas(tema.TemaId);
+
+            // Retornar o resultado apropriado
+            if (result.Result is NotFoundResult)
             {
-                if (!TemasExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(); // Se o recurso não foi encontrado
+            }
+            
+            return Ok(result.Result); // Retorna o objeto atualizado
             }
 
-            return NoContent();
-        }
-
-        // POST: api/TemasControllerAPI
-        [CustomAuthorize(Roles = "Admin,Anfitriao")]
+            // POST: api/TemasControllerAPI
+            [CustomAuthorize(Roles = "Admin,Anfitriao")]
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Temas>> PostTemas(Temas temas)
