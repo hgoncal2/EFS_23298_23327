@@ -1,6 +1,8 @@
-﻿using EFS_23298_23327.Data;
+﻿using EFS_23298_23327.API.DTOs;
+using EFS_23298_23327.Data;
 using EFS_23298_23327.Data.Enum;
 using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -128,15 +130,27 @@ namespace EFS_23298_23327.Models
         /// <summary>
         /// Construtor por defeito
         /// </summary>
-        public Temas()
-        {
-           
+        public Temas() {
             ListaFotos = new HashSet<Fotos>();
-         
+        }
+
+        public Temas(TemaDTO t)
+        {
+            this.Nome = t.Nome;
+            this.Descricao = t.Descricao;
+            this.TempoEstimado = t.TempoEstimado;
+            this.Preco = t.Preco;
+            this.PrecoStr = t.Preco+"";
+            this.Icone = t.Icone;
+            this.MinPessoas = t.MinPessoas;
+            this.MaxPessoas = t.MaxPessoas;
+            this.Dificuldade = t.Dificuldade;
+            this.SalaID= t.SalaID;
+            this.Sala = t.Sala;
+            this.ListaFotosNome = t.ListaDeFotos;           
 
 
         }
-
 
     }
 }

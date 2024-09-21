@@ -69,7 +69,18 @@ namespace EFS_23298_23327.API.DTOs
        
         public Dificuldade Dificuldade { get; set; }
 
-        
+        /// <summary>
+        /// ID da Sala a que o Tema será atribuído
+        /// </summary>
+        [ForeignKey(nameof(Salas))]
+        [Display(Name = "Sala")]
+        public int? SalaID { get; set; }
+
+        /// <summary>
+        /// Sala a que o Tema será atribuído
+        /// </summary>
+        [DisplayName("Sala")]
+        public Salas? Sala { get; set; }
 
         // Listas para IDs e nomes de relações
         public List<string>? ListaDeFotos { get; set; }  // Lista de fotos
@@ -91,7 +102,8 @@ namespace EFS_23298_23327.API.DTOs
             MinPessoas = tema.MinPessoas;
             MaxPessoas = tema.MaxPessoas;
             Dificuldade = tema.Dificuldade;
-
+            SalaID = tema.SalaID;
+            Sala = tema.Sala;
            
             ListaDeFotos = listaDeFotos;
         }
