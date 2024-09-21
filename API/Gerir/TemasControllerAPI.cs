@@ -24,12 +24,22 @@ namespace EFS_23298_23327.API.Gerir
         {
             _context = context;
         }
-        [CustomAuthorize(Roles = "Admin,Anfitriao")]
+       // [CustomAuthorize(Roles = "Admin,Anfitriao")]
         // GET: api/gerir/temas
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TemaDTO>>> GetTemas()
+        public async Task<ActionResult<IEnumerable<TemaDTO>>> GetTemas(bool showTemasSemSala)
         {
-            var temas = await _context.Temas.Where(t => !t.Deleted).Include(t => t.ListaFotos).ToListAsync();
+
+            var temas = new List<Temas>();
+            if (showTemasSemSala) {
+                temas = await _context.Temas.Where(t => !t.Deleted).Include(t => t.ListaFotos).ToListAsync();
+
+            } else {
+                temas = await _context.Temas.Where(t => !t.Deleted && t.SalaID != null).Include(t => t.ListaFotos).ToListAsync();
+            }
+
+            
 
             var result = new List<TemaDTO>();
             foreach (var tema in temas)

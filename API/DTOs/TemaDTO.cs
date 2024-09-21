@@ -69,7 +69,9 @@ namespace EFS_23298_23327.API.DTOs
        
         public Dificuldade Dificuldade { get; set; }
 
-        
+        public int? salaId { get; set; }
+
+
 
         // Listas para IDs e nomes de relações
         public List<string>? ListaDeFotos { get; set; }  // Lista de fotos
@@ -91,6 +93,7 @@ namespace EFS_23298_23327.API.DTOs
             MinPessoas = tema.MinPessoas;
             MaxPessoas = tema.MaxPessoas;
             Dificuldade = tema.Dificuldade;
+            this.salaId = tema.SalaID;
 
            
             ListaDeFotos = listaDeFotos;

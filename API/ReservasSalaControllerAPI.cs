@@ -26,16 +26,23 @@ namespace EFS_23298_23327.API
             _userManager = userManager;
         }
 
-        // GET: Devolve reservas de uma sala
+        // GET: Devolve reservas de uma sala,poder especificar se quer mostrar as canceladas ou não
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">id da sala</param>
+        /// <param name="showCanc">Permite escolher se mostra reservas canceladas</param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetReserva(int id) {
+        public async Task<IActionResult> GetReserva(int id,bool showCanc) {
 
             if (id == null) {
                 return NotFound();
             }
 
-            var tema = await _context.Temas.Include(f => f.ListaFotos.Where(f => f.Deleted == false)).Include(s => s.Sala).ThenInclude(s => s.ListaReservas.Where(r => !r.Cancelada || !r.Deleted)).ThenInclude(s => s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaID == id).FirstOrDefaultAsync();
+
+            var tema = await _context.Temas.Include(f => f.ListaFotos.Where(f => f.Deleted == false)).Include(s => s.Sala).ThenInclude(s => s.ListaReservas.Where(r =>!r.Deleted)).ThenInclude(s => s.Cliente).Where(r => !r.Deleted).Where(s => s.SalaID == id).FirstOrDefaultAsync();
             if (tema == null) {
                 return NotFound();
             }
@@ -45,11 +52,19 @@ namespace EFS_23298_23327.API
             ReservaDTO rvm = new ReservaDTO(tema.Sala, tema);
 
 
-            foreach (var item in tema.Sala.ListaReservas.Where(r => !r.Cancelada))
+            foreach (var item in tema.Sala.ListaReservas)
             {
-
-                var res = new ReservasWrapper(item);
-                rvm.ListaReservas?.Add(res);
+                
+                if(showCanc) {
+                    var res = new ReservasWrapper(item);
+                    rvm.ListaReservas?.Add(res);
+                } else {
+                    if (!item.Cancelada) {
+                        var res = new ReservasWrapper(item);
+                        rvm.ListaReservas?.Add(res);
+                    }
+                }
+               
                 
             };
            
