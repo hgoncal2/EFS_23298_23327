@@ -20,6 +20,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll",
+        builder => {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
 
 builder.Services.AddSignalR();
 builder.Services.AddTransient<IEmailSender, EnviaEmail>(i =>
@@ -44,6 +53,7 @@ builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
 
 var app = builder.Build();
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
