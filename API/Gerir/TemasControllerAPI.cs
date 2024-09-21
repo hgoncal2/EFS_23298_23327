@@ -10,6 +10,9 @@ using EFS_23298_23327.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using EFS_23298_23327.API.DTOs;
 using EFS_23298_23327.Data.Enum;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using System.Linq.Dynamic.Core;
 
 namespace EFS_23298_23327.API.Gerir
 {
@@ -24,7 +27,7 @@ namespace EFS_23298_23327.API.Gerir
         {
             _context = context;
         }
-       // [CustomAuthorize(Roles = "Admin,Anfitriao")]
+        //[CustomAuthorize(Roles = "Admin,Anfitriao")]
         // GET: api/gerir/temas
 
         [HttpGet]
@@ -83,7 +86,7 @@ namespace EFS_23298_23327.API.Gerir
         //[CustomAuthorize(Roles = "Admin,Anfitriao")]
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTemas(int id, [FromBody][Bind("Nome,Descricao,TempoEstimado,Preco,Icone,MinPessoas,MaxPessoas,Dificuldade,ListaDeFotos")] TemaDTO temas) {
+        public async Task<IActionResult> PutTemas(int id, [FromBody] TemaDTO temas) {
             if (id != temas.TemaId) {
                 return NotFound();
             }
@@ -113,8 +116,25 @@ namespace EFS_23298_23327.API.Gerir
                         tema.Icone = temas.Icone;
                         tema.MinPessoas = temas.MinPessoas;
                         tema.MaxPessoas = temas.MaxPessoas;
-                        tema.Dificuldade = temas.Dificuldade;
-                        List<Fotos> listaDeFotos = await _context.Fotos.Where(f => temas.ListaDeFotos.Contains(f.Nome)).ToListAsync();
+                        tema.Dificuldade = temas.Dificuldade;                        
+                        Salas s = await _context.Salas.Where(s => s.SalaId == temas.SalaID && !s.Deleted).FirstOrDefaultAsync();
+                        if (s != null)
+                        {
+                            if (await _context.Temas.Where(t => t.SalaID == temas.SalaID && !t.Deleted).FirstOrDefaultAsync() == null) {
+                                tema.SalaID = temas.SalaID;
+                                tema.Sala = s;
+                        }
+                        else {
+                            tema.Sala = null;
+                            tema.SalaID = null;
+                        }
+                        }
+                        else
+                        {
+                            tema.Sala = null;
+                            tema.SalaID = null;
+                        }
+                    List<Fotos> listaDeFotos = await _context.Fotos.Where(f => temas.ListaDeFotos.Contains(f.Nome)).ToListAsync();
                         tema.ListaFotos = listaDeFotos;
                         _context.Update(tema);
                         _context.Entry(tema).Property(t => t.TemaId).IsModified = false;
@@ -154,15 +174,47 @@ namespace EFS_23298_23327.API.Gerir
         //    [CustomAuthorize(Roles = "Admin,Anfitriao")]
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Temas>> PostTemas(Temas temas)
-        {
-            _context.Temas.Add(temas);
-            await _context.SaveChangesAsync();
+        public async Task<ActionResult<Temas>> CreateTemas(TemaDTO temas) {
+            if (ModelState.IsValid) {
+                var temaExiste = _context.Temas.FirstOrDefault(t => t.Nome == temas.Nome && !t.Deleted);
+                if (temaExiste != null)
+                {
+                    return BadRequest(new { Error = "Tema " + temas.Nome + " já existe!" });
+                }
+                Temas tema = new Temas(temas);
+                if (temas.ListaDeFotos.Any()) {
+                    foreach (var item in temas.ListaDeFotos)
+                    {
+                        tema.ListaFotosNome?.Add(item);
+                    }
+                }
+                Salas s = await _context.Salas.Where(s => s.SalaId == tema.SalaID && !s.Deleted).FirstOrDefaultAsync();
+                if (s != null) {
+                    tema.Sala = s;
+                }
+                else
+                {
+                    tema.Sala = null;
+                    tema.SalaID = null;
+                }
+                tema.CriadoPorOid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                tema.CriadoPorUsername = User.FindFirstValue(ClaimTypes.Name);
+                _context.Temas.Add(tema);
+                await _context.SaveChangesAsync();
+                var result = await GetTemas(tema.TemaId);
+                // Retornar o resultado apropriado
+            
+                if (result.Result is NotFoundResult) {
+                    return NotFound(); // Se o recurso não foi encontrado
+                }
 
-            return CreatedAtAction("GetTemas", new { id = temas.TemaId }, temas);
+                return Ok(((ObjectResult)result.Result).Value); // Retorna o objeto atualizado
+            }
+            return BadRequest();
         }
 
-        // DELETE: api/TemasControllerAPI/5
+        // DELETE: api/gerir/temas/{id}
+        //[CustomAuthorize(Roles = "Admin,Anfitriao")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTemas(int id)
         {
@@ -171,11 +223,12 @@ namespace EFS_23298_23327.API.Gerir
             {
                 return NotFound();
             }
-
-            _context.Temas.Remove(temas);
+            temas.SalaID = null;
+            temas.Deleted = true;
+            _context.Update(temas);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         private bool TemasExists(int id)
