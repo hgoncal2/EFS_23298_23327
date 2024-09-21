@@ -26,7 +26,7 @@ namespace EFS_23298_23327.API.DTOs
        
         public int? TemaMaxPessoas { get; set; }
         //Vamos mandar logo a cor da dificuldade,para evitar requests adicionais
-        public Dictionary<Dificuldade,String> TemaDificuldade { get; set; }
+        public String TemaDificuldade { get; set; }
 
         public ICollection<String>? TemaListaFotosNome { get; set; }
 
@@ -46,8 +46,7 @@ namespace EFS_23298_23327.API.DTOs
             this.TemaIcone = tema.Icone;
             this.TemaMaxPessoas = tema.MaxPessoas;
             this.TemaMinPessoas = tema.MinPessoas;
-            this.TemaDificuldade = new Dictionary<Dificuldade, string>();
-            this.TemaDificuldade.Add(tema.Dificuldade, DifficultiesValue.GetDifficultyColor((int)tema.Dificuldade));
+            this.TemaDificuldade= DifficultiesValue.GetDifficultyColor((int)tema.Dificuldade);
             this.TemaListaFotosNome = new HashSet<string>();
             this.TemaListaFotosNome = tema.ListaFotos.Select(x => x.Nome).ToList();
 

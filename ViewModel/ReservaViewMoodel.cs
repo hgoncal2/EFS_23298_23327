@@ -10,12 +10,14 @@ namespace EFS_23298_23327.ViewModel
         /// <summary>
         /// Tema
         /// </summary>
-        public Temas Tema { get; set; }
+        public Temas? Tema { get; set; }
 
         /// <summary>
         /// Sala
         /// </summary>
-        public Salas Sala { get; set; }
+        public Salas? Sala { get; set; }
+
+        public int? SalaId { get; set; }
 
         /// <summary>
         /// Número de Pessoas da Reserva
@@ -28,11 +30,11 @@ namespace EFS_23298_23327.ViewModel
         /// </summary>
         public DateTime dataI { get; set; }
         
-        public DateTime viewStart { get; set; }
+        public DateTime? viewStart { get; set; }
      
-        public DateTime viewEnd { get; set; }
+        public DateTime? viewEnd { get; set; }
        
-        public String viewType { get; set; }
+        public String? viewType { get; set; }
         
 
         public ReservaViewModel(Salas s,Temas t) {

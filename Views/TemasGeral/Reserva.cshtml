@@ -554,7 +554,7 @@
 
 
     @if (Model.viewStart != DateTime.MinValue) {
-        @:calendar.changeView('timeGridWeek', '@Model.viewStart.ToString("yyyy-MM-dd")');
+        @:calendar.changeView('timeGridWeek', '@Model.viewStart?.ToString("yyyy-MM-dd")');
     }
 
 

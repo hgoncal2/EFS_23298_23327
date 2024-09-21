@@ -50,7 +50,9 @@ namespace EFS_23298_23327.API
 
 
             var r = new ReservasWrapper(res);
-
+            foreach (var item2 in res.ListaAnfitrioes) {
+                r.Anfitrioes.Add(new AnfsWrapper(item2));
+            }
 
 
 
@@ -63,6 +65,55 @@ namespace EFS_23298_23327.API
 
             });
         }
+
+        /// <summary>
+        ///faz reserva baseado id da sala
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> FazReserva([FromBody] ReservaViewModel rvm) {
+
+            var r = new Reservas();
+            var sala = await _context.Salas.Where(s => s.SalaId == rvm.SalaId && !s.Deleted).Include(a=>a.ListaAnfitrioes).FirstOrDefaultAsync();
+            r.ListaAnfitrioes = sala.ListaAnfitrioes;
+            var tema = await _context.Temas.Include(s => s.Sala).Where(r => !r.Deleted).Where(s => s.SalaID == rvm.SalaId).FirstOrDefaultAsync();
+            if (tema == null) {
+
+                return BadRequest(new { Error = "Sala não tem tema associado!" });
+
+            }
+
+            var endDate = rvm.dataI.AddHours(1).AddMinutes(tema.TempoEstimado);
+            r.SalaId = sala.SalaId;
+            r.NumPessoas = rvm.nPessoas;
+            r.CriadoPorOid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            r.CriadoPorUsername = User.FindFirstValue(ClaimTypes.Name);
+            r.DataCriacao = DateTime.Now;
+            r.Sala = tema.Sala;
+            r.ListaAnfitrioes = sala.ListaAnfitrioes;
+            r.ReservaDate = rvm.dataI.AddHours(1);
+            var precoStr = (tema.Preco * rvm.nPessoas).ToString();
+            r.TotalPreco = Convert.ToDecimal(precoStr.Replace('.', ','));
+            r.TemaNome = tema.Nome;
+            r.TemaDif = tema.Dificuldade;
+            r.ReservaEndDate = endDate;
+            tema.Sala.ListaReservas.Add(r);
+            _context.Update(tema.Sala);
+            await _context.SaveChangesAsync();
+
+
+
+
+            return Ok(new {
+                Msg = "Reserva criada com sucesso!"
+
+            });
+        }
+
+
+
+
 
 
     }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace EFS_23298_23327.API.Gerir
 {
@@ -43,7 +44,12 @@ namespace EFS_23298_23327.API.Gerir
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return Unauthorized(new { Error = "Senha incorreta." });
+
+            ;
+            if (User.Identity.IsAuthenticated) {
+                return Ok(new { User = User.FindFirstValue(ClaimTypes.Name) });
+            }
+            return Unauthorized(new { Error = "Not Auth" });
         }
 
         // POST

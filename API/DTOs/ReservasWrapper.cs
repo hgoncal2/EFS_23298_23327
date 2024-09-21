@@ -25,11 +25,13 @@ namespace EFS_23298_23327.API.DTOs
         public String? ClienteUsername { get; set; }
         public String? ClientePrimeiroNome { get; set; }
         public String? ClienteUltimoNome { get; set; }
+        public ICollection<AnfsWrapper>? Anfitrioes { get; set; }
         public bool cancelada { get; set; }
 
 
         public ReservasWrapper(Reservas res) { 
 
+            this.Anfitrioes = new HashSet<AnfsWrapper>();
             this.ReservaId = res.ReservaId;
             this.ReservaDate = res.ReservaDate;
             this.ReservaEndDate = res.ReservaEndDate;
@@ -41,6 +43,21 @@ namespace EFS_23298_23327.API.DTOs
             this.NumPessoas= res.NumPessoas;
             this.cancelada = res.Cancelada;
         
+        }
+    }
+
+    public class AnfsWrapper {
+
+        public string userId { get; set; }
+        public string primeiroNome { get; set; }
+        public  string ultimoNome { get; set; }
+        public string username { get; set; }
+
+        public AnfsWrapper(Anfitrioes a) {
+            this.userId = a.Id;
+            this.primeiroNome = a.PrimeiroNome;
+            this.ultimoNome = a.UltimoNome;
+            this.username    = a.UserName;
         }
     }
 }
