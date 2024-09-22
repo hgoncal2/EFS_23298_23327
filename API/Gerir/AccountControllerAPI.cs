@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using System.Data;
 using System.Security.Claims;
 
 namespace EFS_23298_23327.API.Gerir
@@ -45,9 +47,16 @@ namespace EFS_23298_23327.API.Gerir
         public async Task<IActionResult> Index()
         {
 
-            ;
+            
             if (User.Identity.IsAuthenticated) {
-                return Ok(new { User = User.FindFirstValue(ClaimTypes.Name) });
+                var u = await _context.Utilizadores.Where(a => !a.Deleted)
+                                               .Where(a => a.Id == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                               .FirstOrDefaultAsync();
+                if (u != null) {
+                    return Ok(new { Username = User.FindFirstValue(ClaimTypes.Name), Roles = await _userManager.GetRolesAsync(u), Id = User.FindFirstValue(ClaimTypes.NameIdentifier) });
+
+                }
+
             }
             return Unauthorized(new { Error = "Not Auth" });
         }
@@ -99,14 +108,9 @@ namespace EFS_23298_23327.API.Gerir
 
                 // Define o papel baseado no utilizador
                 var roles = await _userManager.GetRolesAsync(u);
-                
 
-                return Ok(new
-                {
-                    Message = "Autenticação bem-sucedida.",
-                    Username = u.UserName,
-                    Roles = roles
-                });
+
+                return Ok(new { Username = User.FindFirstValue(ClaimTypes.Name), Roles = roles,id=User.FindFirstValue(ClaimTypes.NameIdentifier)});
             }
 
             // Verifica se o email do utilizador foi confirmado
@@ -118,6 +122,20 @@ namespace EFS_23298_23327.API.Gerir
 
             return Unauthorized(new { Error = "Erro na autenticação." });
         }
+
+        [HttpPut]
+        public async Task<IActionResult> logout() {
+           
+            await _signInManager.SignOutAsync();
+           
+            {
+                // This needs to be a redirect so that the browser performs a new
+                // request and the identity for the user gets updated.
+                return Ok();
+            }
+        }
+
+
 
 
     }

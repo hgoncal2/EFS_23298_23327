@@ -6,9 +6,11 @@ using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using System.Security.Claims;
 using System.Security.Policy;
 
@@ -20,10 +22,20 @@ namespace EFS_23298_23327.API
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Utilizadores> _userManager;
+        private readonly IUserStore<Utilizadores> _userStore;
+        private readonly SignInManager<Utilizadores> _signInManager;
 
-        public ReservasControllerAPI(ApplicationDbContext context, UserManager<Utilizadores> userManager) {
+
+        public ReservasControllerAPI(ApplicationDbContext context, UserManager<Utilizadores> userManager, IUserStore<Utilizadores> userStore,
+
+          SignInManager<Utilizadores> signInManager) {
             _context = context;
             _userManager = userManager;
+
+            _userStore = userStore;
+
+            _signInManager = signInManager;
+
         }
 
 
@@ -74,7 +86,22 @@ namespace EFS_23298_23327.API
         [HttpPost]
         public async Task<IActionResult> FazReserva([FromBody] ReservaViewModel rvm) {
 
-            var r = new Reservas();
+            Clientes u = null;
+
+            u = await _context.Clientes.FindAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            if (u == null) {
+                
+                return Unauthorized(new {Error="Apenas clientes podem fazer reservas!"});
+
+            }
+
+            var r = new Reservas(u);
+
+           
+            if (rvm.SalaId == null) {
+                return BadRequest();
+            }
             var sala = await _context.Salas.Where(s => s.SalaId == rvm.SalaId && !s.Deleted).Include(a=>a.ListaAnfitrioes).FirstOrDefaultAsync();
             r.ListaAnfitrioes = sala.ListaAnfitrioes;
             var tema = await _context.Temas.Include(s => s.Sala).Where(r => !r.Deleted).Where(s => s.SalaID == rvm.SalaId).FirstOrDefaultAsync();
@@ -111,6 +138,32 @@ namespace EFS_23298_23327.API
             });
         }
 
+        [HttpPut("{resId}")]
+        public async Task<IActionResult> CancelaReserva(int resId) {
+
+           
+            var reserva = await _context.Reservas.Include(c => c.Cliente).Where(r => r.ReservaId == resId && !r.Deleted && !r.Cancelada && DateTime.Now.AddHours(48) < r.ReservaDate && r.ClienteID == User.FindFirstValue(ClaimTypes.NameIdentifier)).FirstOrDefaultAsync();
+            var u = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (reserva == null || reserva.ClienteID != u) {
+                return Unauthorized(new {Error= "Não está autorizado!"});
+            }
+
+            //Notificar utilizador de cancelamento da reserva
+           
+            reserva.Cancelada = true;
+            reserva.DataCancel = DateTime.Now;
+
+            _context.Update(reserva);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+
+
+
+
+
+
+        }
 
 
 

@@ -1,6 +1,7 @@
 using EFS_23298_23327.Data;
 using EFS_23298_23327.Hubs;
 using EFS_23298_23327.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -23,9 +24,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll",
         builder => {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
+            builder.WithOrigins("http://localhost:3000") 
+                .AllowCredentials() 
+                .AllowAnyHeader() 
+                .AllowAnyMethod(); 
         });
 });
 
@@ -50,10 +52,19 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
 
-
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Use apenas em HTTPS
+    options.Cookie.SameSite = SameSiteMode.None; // Permite cross-site
+    options.Cookie.Name = "MyAuthCookie"; // Nome do cookie
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 app.UseCors("AllowAll");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

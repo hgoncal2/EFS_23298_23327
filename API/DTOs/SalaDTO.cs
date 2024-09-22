@@ -30,6 +30,8 @@ namespace EFS_23298_23327.API.DTOs
         public List<string>? ListaAnfitrioes { get; set; }  // Lista de nomes de utilizadores (anfitriões)
         public List<int>? ListaReservas { get; set; }  // Lista de IDs de reservas associadas
 
+        public HashSet<AnfsWrapper2> AnfsWrappersList { get; set; } = new HashSet<AnfsWrapper2>();
+
         // Construtor vazio
         public SalaDTO() {
             ListaAnfitrioes = new List<string>();
@@ -49,6 +51,18 @@ namespace EFS_23298_23327.API.DTOs
             ListaAnfitrioes = listaAnfitrioes;
             ListaReservas = listaReservas;
         }
+
+
+     
+    }
+    public class AnfsWrapper2
+    {
+        public string? username { get; set; }
+
+        public AnfsWrapper2(Anfitrioes a) {
+            this.username = a.UserName;
+        }
+
     }
 }
 

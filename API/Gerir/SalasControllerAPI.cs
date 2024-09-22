@@ -74,7 +74,16 @@ namespace EFS_23298_23327.Controllers
            
 
             var viewModel = new SalaDTO(sala, anfitrioes, reservas);
-       
+            var a = await _context.Anfitrioes.Where(a => a.Deleted == false).ToListAsync();
+            foreach (var item in a)
+            {
+
+                var w = new AnfsWrapper2(item);
+                viewModel.AnfsWrappersList.Add(w);
+                
+            }
+
+
             return Ok(viewModel);
         }
 
@@ -87,6 +96,7 @@ namespace EFS_23298_23327.Controllers
                 return NotFound();
             }
 
+            var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
             //Estes campos devem permanecer iguais,então não nos vamos preocupar se estão a ser mandados ou não
             ModelState.Remove("dataCriacao");
             ModelState.Remove("criadoPorOid");
