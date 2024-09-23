@@ -10,10 +10,12 @@ using Microsoft.AspNetCore.Identity;
 using EFS_23298_23327.ViewModel;
 using EFS_23298_23327.API.DTOs;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EFS_23298_23327.Controllers
 {
     [Route("api/gerir/anfs")]
+    [CustomAuthorize(Roles ="Admin,Anfitriao")]
     [ApiController]
     public class AnfitrioesControllerAPI : ControllerBase {
         private readonly ApplicationDbContext _context;
@@ -28,6 +30,7 @@ namespace EFS_23298_23327.Controllers
         }
 
         // GET: api/gerir/anfs
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> getAnfs() {
             //todos os utilizadores não apagados
@@ -52,7 +55,7 @@ namespace EFS_23298_23327.Controllers
 
             return Ok(listaU);
         }
-
+        [AllowAnonymous]
         // GET: api/gerir/salas/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> getAnf(string id) {

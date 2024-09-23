@@ -13,10 +13,12 @@ using EFS_23298_23327.Data.Enum;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using System.Linq.Dynamic.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EFS_23298_23327.API.Gerir
 {
     [Route("api/gerir/temas")]
+    [CustomAuthorize(Roles ="Admin,Anfitriao")]
 
     [ApiController]
     public class TemasControllerAPI : ControllerBase
@@ -29,7 +31,7 @@ namespace EFS_23298_23327.API.Gerir
         }
         //[CustomAuthorize(Roles = "Admin,Anfitriao")]
         // GET: api/gerir/temas
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TemaDTO>>> GetTemas(bool showTemasSemSala)
         {
@@ -55,7 +57,7 @@ namespace EFS_23298_23327.API.Gerir
             }
             return Ok(result);
         }
-
+        [AllowAnonymous]
         // GET: api/gerir/temas/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<TemaDTO>> GetTemas(int id)

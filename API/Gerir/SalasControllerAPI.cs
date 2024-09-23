@@ -10,10 +10,12 @@ using Microsoft.AspNetCore.Identity;
 using EFS_23298_23327.ViewModel;
 using EFS_23298_23327.API.DTOs;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EFS_23298_23327.Controllers
 {
     [Route("api/gerir/salas")]
+    [CustomAuthorize(Roles ="Admin,Anfitriao")]
     [ApiController]
     public class SalasControllerAPI : ControllerBase
     {
@@ -25,7 +27,7 @@ namespace EFS_23298_23327.Controllers
             _context = context;
             _userManager = userManager;
         }
-
+        [AllowAnonymous]
         // GET: api/gerir/salas
         [HttpGet]
 
@@ -52,7 +54,7 @@ namespace EFS_23298_23327.Controllers
             }
             return Ok(result);
         }
-
+        [AllowAnonymous]
         // GET: api/gerir/salas/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<SalaDTO>> GetSala(int id)
@@ -91,7 +93,7 @@ namespace EFS_23298_23327.Controllers
       //  [CustomAuthorize(Roles = "Admin,Anfitriao")]
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSala(int id,[FromBody][Bind("SalaId,Numero,Area,ListaAnfitrioes")] SalaDTO s) {
+        public async Task<IActionResult> PutSala(int id,[FromForm] SalaDTO s) {
             if (id != s.SalaId) {
                 return NotFound();
             }
@@ -118,8 +120,16 @@ namespace EFS_23298_23327.Controllers
                     sala = await _context.Salas.Include(a => a.ListaAnfitrioes).Include(a=>a.ListaReservas).Where(a => a.SalaId == s.SalaId).FirstOrDefaultAsync();
                     sala.Numero = s.Numero;
                     sala.Area = s.Area;
+                    
+                    var lista = new List<string>();
+                    if (s.ListaAnfitrioes[0].Contains(",")) {
+                        lista = s.ListaAnfitrioes[0].Split(",").ToList();
+                    } else {
+                        lista.Add(s.ListaAnfitrioes[0]);
+                    }
+                    
                     //Vamos assumir que o anfitrião especificado existe
-                    List<Anfitrioes> listaUsers = await _context.Anfitrioes.Where(m => s.ListaAnfitrioes.Contains(m.UserName)).ToListAsync();
+                    List<Anfitrioes> listaUsers = await _context.Anfitrioes.Where(m => lista.Contains(m.UserName)).ToListAsync();
                     sala.ListaAnfitrioes = listaUsers;
                     _context.Update(sala);
                     _context.Entry(sala).Property(t => t.DataCriacao).IsModified = false;
@@ -160,7 +170,7 @@ namespace EFS_23298_23327.Controllers
         /// <returns>Retorna para o index salas</returns>
          [CustomAuthorize(Roles = "Admin,Anfitriao")]
         [HttpPost]
-        public async Task<IActionResult> CreateSala([Bind("Numero,Area,ListaAnfitrioes")] SalaDTO s) {
+        public async Task<IActionResult> CreateSala([FromForm]SalaDTO s) {
             if (ModelState.IsValid) {
                 var userList = await _userManager.GetUsersInRoleAsync("Anfitriao");
                 var salaExiste = _context.Salas.FirstOrDefault(m => m.Numero == s.Numero && !m.Deleted);
