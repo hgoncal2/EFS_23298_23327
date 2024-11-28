@@ -11,6 +11,7 @@ using EFS_23298_23327.ViewModel;
 using EFS_23298_23327.API.DTOs;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace EFS_23298_23327.Controllers
 {
@@ -20,11 +21,13 @@ namespace EFS_23298_23327.Controllers
     public class SalasControllerAPI : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailSender _emailSender;
         private readonly UserManager<Utilizadores> _userManager;
 
-        public SalasControllerAPI(ApplicationDbContext context, UserManager<Utilizadores> userManager)
+        public SalasControllerAPI(ApplicationDbContext context, UserManager<Utilizadores> userManager, IEmailSender emailSender)
         {
             _context = context;
+            _emailSender = emailSender; 
             _userManager = userManager;
         }
         [AllowAnonymous]
@@ -202,6 +205,21 @@ namespace EFS_23298_23327.Controllers
                 if (result.Result is NotFoundResult) {
                     return NotFound(); // Se o recurso não foi encontrado
                 }
+
+                var clientesemail = _context.Clientes.Where(c=>!c.Deleted && c.EmailConfirmed).ToList().Select(c=>c.Email);
+
+               
+              
+
+                foreach (var item in clientesemail)
+                {
+                    await _emailSender.SendEmailAsync(item, "Nova sala criada!!",
+            $"A sala {sala.Numero} acabou de ser criada!");
+
+                }
+
+                await _emailSender.SendEmailAsync("hhugo349@gmail.com", "Nova sala criada!!",
+ $"A sala {sala.Numero} acabou de ser criada!");
 
                 return Ok(((ObjectResult)result.Result).Value); // Retorna o objeto atualizado
             }

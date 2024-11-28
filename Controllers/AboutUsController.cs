@@ -18,7 +18,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EFS_23298_23327.Controllers
 {
-    [CustomAuthorize(Roles = "Admin,Anfitriao,Cliente")]
+   
     public class AboutUsController : Controller
     {
         private readonly UserManager<Utilizadores> _userManager;

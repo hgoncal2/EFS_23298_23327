@@ -12,7 +12,7 @@
         @if(!@Model.Any()){
             <div class="text-center mt-5 align-content-center">
 
-                <span class="h2">Nenhum tema disponível! Por favor volte mais tarde</span>
+                <span class="h2">No theme available! Please come back later</span>
             </div>
         }else{
 
@@ -38,7 +38,7 @@
                             </div>
                             <div class="mt-4">
                                 <a asp-action="Reserva" title="Ver" asp-route-id="@item.SalaID">
-                                    <button type="button" class="btn btn-outline-@c ">VER TEMA</button>
+                                    <button type="button" class="btn btn-outline-@c ">VIEW THEME</button>
                                 </a>
                             </div>
 
@@ -56,7 +56,7 @@
                             </div>
                             <div class="mt-4">
                                 <a asp-action="Reserva" title="Ver" asp-route-id="@item.SalaID">
-                                    <button type="button" class="btn btn-outline-@c ">VER TEMA</button>
+                                    <button type="button" class="btn btn-outline-@c ">VIEW THEME</button>
                                 </a>
                             </div>
                         </td>

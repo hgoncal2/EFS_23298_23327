@@ -118,7 +118,7 @@ namespace EFS_23298_23327.Controllers
                     }
                     var confirmed = await _userManager.IsEmailConfirmedAsync(u);
                     if (!confirmed) {
-                        TempData["EmailNotConfirmed"] = "Por favor confirme o seu email para conseguir dar login!";
+                        TempData["EmailNotConfirmed"] = "Please confirm your email to login!";
                     }
                 }
                 ViewBag.Erro = true;
@@ -149,7 +149,7 @@ namespace EFS_23298_23327.Controllers
             if (ModelState.IsValid) {
 
                 if(vm.Password != vm.ConfirmPassword) {
-                    ModelState.AddModelError("ConfirmPassword", "A password e a password de confirmação não são iguais!");
+                    ModelState.AddModelError("ConfirmPassword", "Password and Confirm Password don't match!");
                     vm.Password = "";
                     vm.ConfirmPassword = "";
                     return View(vm);
@@ -157,7 +157,7 @@ namespace EFS_23298_23327.Controllers
                 var user = await _context.Utilizadores.Where(a => !a.Deleted).Where(a => a.UserName == vm.Username).FirstOrDefaultAsync();
 
                 if (user != null) {
-                    ViewBag.UserExiste = "Utilizador \"<strong>" + user.UserName + "</strong>\" já existe!";
+                    ViewBag.UserExiste = "User \"<strong>" + user.UserName + "</strong>\" already exists!";
 
                     return View(vm);
                 } else {
@@ -166,7 +166,7 @@ namespace EFS_23298_23327.Controllers
                         if (userEm != null) {
 
 
-                            ViewBag.UserExiste = "Utilizador com email \"<strong>" + userEm.Email + "</strong>\" já existe!";
+                            ViewBag.UserExiste = "User with email \"<strong>" + userEm.Email + "</strong>\" already exists!";
                             return View(vm);
                         }
                     }
@@ -201,15 +201,15 @@ namespace EFS_23298_23327.Controllers
                     var callbackUrl = Url.Action(
                         "ConfirmarEmail", "Account",values: new { area = "", userId = userId, code = code}, protocol: HttpContext.Request.Scheme
                         );
-                        await _emailSender.SendEmailAsync(vm.Email, "Confirme o seu email",
-                      $"Por favor verifique a sua conta clicando no link:\n{callbackUrl}");
+                        await _emailSender.SendEmailAsync(vm.Email, "Confirm your email",
+                      $"Please verify your account by clicking the link:\n{callbackUrl}");
 
 
 
                    
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount) {
-                        TempData["ConfirmEmail"] = "Por favor verifique o seu email antes de poder continuar!";
+                        TempData["ConfirmEmail"] = "Please verify your email before you can continue!";
                         return RedirectToAction("Index","Home");
                     } else {
                         await _signInManager.SignInAsync(u, isPersistent: false);
@@ -254,7 +254,7 @@ namespace EFS_23298_23327.Controllers
             ModelState.Remove("Password");
             
             if (ModelState.IsValid) {
-                TempData["ResetPasswordSucc"] = "Pedido de reset password enviado!Por favor verifique o seu email!";
+                TempData["ResetPasswordSucc"] = "Password reset request sent!Please check your email!";
                 var user = await _userManager.FindByNameAsync(l.Username);
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user))) {
                     // Don't reveal that the user does not exist or is not confirmed
@@ -274,7 +274,7 @@ namespace EFS_23298_23327.Controllers
                 await _emailSender.SendEmailAsync(
                     user.Email,
                     "Reset Password",
-                    $"Por favor clique no link para dar reset à password:\n {callbackUrl}");
+                    $"Please click the following link to reset your password:\n {callbackUrl}");
 
                 
             }
@@ -303,7 +303,7 @@ namespace EFS_23298_23327.Controllers
             }
             var result = await _userManager.ResetPasswordAsync(user, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code)) ,u.Password);
             if (result.Succeeded) {
-                TempData["EmailSucc"] = "Reset à password com sucesso!";
+                TempData["EmailSucc"] = "Password resetted successfully!";
                 return RedirectToAction(nameof(Login));
             }
 
@@ -345,10 +345,10 @@ namespace EFS_23298_23327.Controllers
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
             if (result.Succeeded) {
-                TempData["EmailSucc"] = "Email confirmado com sucesso!";
+                TempData["EmailSucc"] = "Email confirmed successfully!";
                
             } else {
-                TempData["EmailErr"] = "Erro ao confirmar Email!!";
+                TempData["EmailErr"] = "Error confirming Email!!";
             }
             return RedirectToAction(nameof(Login));
         }
@@ -367,7 +367,7 @@ namespace EFS_23298_23327.Controllers
             var user = await _userManager.FindByNameAsync(u.Username);
             if (user == null) {
 
-                TempData["ReenvioEmail"] = "Novo Email de confirmação enviado com sucesso!";
+                TempData["ReenvioEmail"] = "New confirmation email sent,please check your email!";
                 return RedirectToAction(nameof(Login));
             }
 
@@ -377,9 +377,9 @@ namespace EFS_23298_23327.Controllers
             var callbackUrl = Url.Action(
                          "ConfirmarEmail", "Account", values: new { area = "", userId = userId, code = code }, protocol: HttpContext.Request.Scheme
                          );
-            await _emailSender.SendEmailAsync(user.Email, "Confirme o seu email",
-          $"Por favor verifique a sua conta clicando no link:\n{callbackUrl}");
-            TempData["ReenvioEmail"] = "Novo Email de confirmação enviado com sucesso!";
+            await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+          $"Please confirm your account by clicking the link:\n{callbackUrl}");
+            TempData["ReenvioEmail"] = "New confirmation email sent succesfully!";
             return RedirectToAction(nameof(Login));
         }
 
